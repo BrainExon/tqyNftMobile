@@ -139,6 +139,7 @@ const NftMinter = () => {
            * }
            */
           console.log(`[NftMinter] being IPFS file upload...`);
+          /*
           const response = await UploadToIPFS(
             imagePath,
             nftName,
@@ -147,14 +148,15 @@ const NftMinter = () => {
             imageName,
             handleErrorCallback,
           );
-          /*
+          */
           const response: ArweaveUpload = await ArweaveUpload(
-            imageType,
             imagePath,
-            mwaWallet,
+            nftName,
+            nftDescription,
+            imageType,
+            imageName,
             handleErrorCallback,
           );
-          */
           const data = response as {
             imageData: {
               IpfsHash: string;
