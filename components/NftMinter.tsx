@@ -232,7 +232,7 @@ const NftMinter = () => {
                       </>
                     );
                   case MintingStep.Success:
-                    const explorerUrl = Config.ARWEAVE_PREVIEW_URL + mintAddress;
+                    const explorerUrl = Config.ARWEAVE_PREVIEW_URL + '/' + mintAddress;
                     return (
                       <>
                         <Text style={{fontWeight: 'bold'}}>
