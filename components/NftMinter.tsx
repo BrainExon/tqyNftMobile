@@ -1,4 +1,4 @@
-import React, {useRef, useState, useCallback} from 'react';
+import React, {useState, useCallback} from 'react';
 import Config from 'react-native-config';
 import {useMWAWallet} from './hooks/useMWAWallet';
 import {
@@ -59,13 +59,25 @@ const NftMinter = () => {
 
   const urlExists = (url, callback, retries = 3) => {
     const makeRequest = retryCount => {
-      fetch(url, {method: 'HEAD'})
+      fetch(url, {method: 'GET'})
         .then(res => {
-          callback(null, res.status === 200);
+          console.log(`[urlExists] url ${url}`);
+          if (res.ok) {
+            callback(null, true);
+          } else {
+            if (retryCount > 0) {
+              console.log(`[urlExists] retrying... ${retryCount} retries left`);
+              setTimeout(() => {
+                makeRequest(retryCount - 1);
+              }, 8000); // 3 seconds timeout
+            } else {
+              callback(null, false);
+            }
+          }
         })
         .catch(err => {
           if (retryCount > 0) {
-            console.log(`Retrying... ${retryCount} retries left`);
+            console.log(`[urlExists] retrying... ${retryCount} retries left`);
             setTimeout(() => {
               makeRequest(retryCount - 1);
             }, 8000); // 3 seconds timeout
@@ -76,6 +88,7 @@ const NftMinter = () => {
     };
     makeRequest(retries);
   };
+
   const handleSelectImage = async () => {
     const photo = await launchImageLibrary({
       selectionLimit: 1,
@@ -97,18 +110,8 @@ const NftMinter = () => {
     setSelectedImage(selectedPhoto.uri);
   };
 
-  interface UploadData {
-    imageUploadData: any;
-    metadataUploadData: any;
-  }
-
-  const uploadDataRef = useRef<UploadData>({
-    imageUploadData: null,
-    metadataUploadData: null,
-  });
-
   const mintNft = useCallback(
-    async (theImage: string, theDescription: string) => {
+    async (theImage: string) => {
       console.log('\n---------\n[mintNft]\n---------\n');
       setMintProgressStep(MintingStep.UploadingImage);
 
@@ -138,8 +141,8 @@ const NftMinter = () => {
         handleErrorCallback(err);
       }
       const nftResponse = {
-        nft: { address: `${ipfsData.data.created[0].dataTxId}`, },
-        response: { signature: '123', },
+        nft: {address: `${ipfsData.data.created[0].dataTxId}`},
+        response: {signature: '123'},
       };
       return [nftResponse.nft.address, nftResponse.response.signature];
     },
@@ -223,33 +226,26 @@ const NftMinter = () => {
                   case MintingStep.Success:
                     const explorerUrl =
                       Config.ARWEAVE_PREVIEW_URL + '/' + mintAddress;
-                    urlExists(explorerUrl, (err, exists) => {
-                      if (err) {
-                        console.error('Error:', err);
-                      } else {
-                        console.log(`URL EXISTS: ${explorerUrl} exists: ${exists}`);
-                        return (
-                          <>
-                            <Text style={{fontWeight: 'bold'}}>
-                              Mint successful!
-                            </Text>
-                            <Text
-                              onPress={() => {
-                                Linking.openURL(explorerUrl).catch(e => {
-                                  e.message;
-                                });
-                              }}
-                              style={{
-                                ...styles.modalText,
-                                color: '#0000EE',
-                                textDecorationLine: 'underline',
-                              }}>
-                              View your NFT on the explorer.
-                            </Text>
-                          </>
-                        );
-                      }
-                    });
+                    return (
+                      <>
+                        <Text style={{fontWeight: 'bold'}}>
+                          Mint successful!
+                        </Text>
+                        <Text
+                          onPress={() => {
+                            Linking.openURL(explorerUrl).catch(e => {
+                              e.message;
+                            });
+                          }}
+                          style={{
+                            ...styles.modalText,
+                            color: '#0000EE',
+                            textDecorationLine: 'underline',
+                          }}>
+                          View your NFT on the explorer.
+                        </Text>
+                      </>
+                    );
                   case MintingStep.None:
                   case MintingStep.SubmittingInfo:
                     return (
@@ -289,11 +285,21 @@ const NftMinter = () => {
                                 selectedImage,
                                 nftDescription,
                               );
-                              console.log(`Mint Successful
-                              Mint Address: ${mint}
-                              Tx Signature: ${signature}`);
-                              setMintProgressStep(MintingStep.Success);
-                              setMintAddress(mint);
+                              console.log(`Mint Successful Mint Address: ${mint} Tx Signature: ${signature}`);
+                              const explorerUrl = Config.ARWEAVE_PREVIEW_URL + '/' + mint;
+                              urlExists(explorerUrl, (err, exists) => {
+                                if (err) {
+                                  const error = '[urlExists] Error:';
+                                  console.error(error);
+                                  handleErrorCallback(error);
+                                  setMintProgressStep(MintingStep.Error);
+                                  return;
+                                } else {
+                                  console.log( `URL EXISTS: ${explorerUrl} exists: ${exists}`);
+                                  setMintProgressStep(MintingStep.Success);
+                                  setMintAddress(mint);
+                                }
+                              });
                             } catch (error) {
                               const err = `[NftMinter] error: ${JSON.stringify(
                                 error,
