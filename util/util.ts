@@ -141,7 +141,16 @@ const printDebug = (routine: string, error: any, debug) => {
     console.log(`${routine}: ${JSON.stringify(error, null, 2)}`);
   }
 };
-
+const replaceStringByKey = (inputString, key, replacement) => {
+  console.log('[replaceStringByKey] inputString: ', JSON.stringify(inputString));
+  console.log('[replaceStringByKey] key: ', JSON.stringify(key));
+  console.log('[replaceStringByKey] replacement: ', JSON.stringify(replacement));
+  // const clean = inputString.split(`{${key}}`).join(replacement);
+  const regex = new RegExp(key, 'g');
+  const clean = inputString.replace(regex, replacement);
+  console.log('[replaceStringByKey] clean: ', JSON.stringify(clean));
+  return clean;
+};
 export {
   printDebug,
   isArray,
@@ -156,4 +165,5 @@ export {
   isArrayEmpty,
   isObjectEmpty,
   stripStringification,
+  replaceStringByKey,
 };

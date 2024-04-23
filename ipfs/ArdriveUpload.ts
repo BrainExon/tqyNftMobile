@@ -1,6 +1,6 @@
 const RNFS = require('react-native-fs');
 import Config from 'react-native-config';
-
+import { replaceStringByKey } from "../util/util";
 const ArdriveUpload = async (
   imagePath: string,
   imageType: string | null,
@@ -25,7 +25,9 @@ const ArdriveUpload = async (
 
   const mint = async () => {
     const formData = new FormData();
-    formData.append('files', { uri: imagePath, type: imageType, name: imageName });
+    const cleanName = replaceStringByKey(imageName, 'rn_image_picker_lib_temp_', '');
+    //formData.append('files', { uri: imagePath, type: imageType, name: imageName });
+    formData.append('files', { uri: imagePath, type: imageType, name: cleanName });
 
     const requestOptions = {
       method: 'POST',

@@ -1,6 +1,5 @@
-import React, {useRef, useState, useCallback} from 'react';
+import React, {useState, useCallback} from 'react';
 import Config from 'react-native-config';
-import {ImageMeta} from '../components/models/ImageMeta';
 import {useMWAWallet} from './hooks/useMWAWallet';
 import {
   View,
@@ -15,15 +14,9 @@ import {
   Linking,
 } from 'react-native';
 import {launchImageLibrary} from 'react-native-image-picker';
-import {Metaplex} from '@metaplex-foundation/js';
-import {createNftOperation} from '@metaplex-foundation/js';
-import UploadToIPFS from '../ipfs/UploadToIPFS';
-//import useMetaplex from '../metaplex-util/useMetaplex';
 import {useAuthorization} from './providers/AuthorizationProvider';
-import {RPC_ENDPOINT, useConnection} from './providers/ConnectionProvider';
 import {isEmpty, isObjectEmpty} from '../util/util';
-import ArweaveUpload from '../ipfs/ArweaveUpload';
-import ArdriveUpload from "../ipfs/ArdriveUpload";
+import ArdriveUpload from '../ipfs/ArdriveUpload';
 
 enum MintingStep {
   None = 'None',
@@ -33,10 +26,7 @@ enum MintingStep {
   Success = 'Success',
   Error = 'Error',
 }
-
 const NftMinter = () => {
-  const func = '[NftMinter]';
-
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [mintProgressStep, setMintProgressStep] = useState<MintingStep>(
     MintingStep.None,
@@ -45,15 +35,12 @@ const NftMinter = () => {
   const [nftDescription, setNftDescription] = useState('zyc');
   const {selectedAccount, authorizeSession} = useAuthorization();
   const mwaWallet = useMWAWallet(authorizeSession, selectedAccount);
-  const {connection} = useConnection();
-  //const {metaplex} = useMetaplex(connection, selectedAccount, authorizeSession);
   const [mintAddress, setMintAddress] = useState<string | null>(null);
-  const [txSignature, setTxSignature] = useState<string | null>(null);
   const [imageType, setImageType] = useState<string | null>(null);
   const [imageName, setImageName] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState('');
 
-  const handleErrorCallback = useCallback((error:any) => {
+  const handleErrorCallback = useCallback((error: any) => {
     if (isObjectEmpty(error)) {
       return;
     }
@@ -61,12 +48,46 @@ const NftMinter = () => {
       return;
     }
     if (error) {
-      const er = `[HandleErrorCallBack] error \n----${JSON.stringify(error)}----\n}`;
+      const er = `[HandleErrorCallBack] error \n----${JSON.stringify(
+        error,
+      )}----\n}`;
       console.log(er);
       setErrorMessage(JSON.stringify(er));
       setMintProgressStep(MintingStep.Error);
     }
   }, []);
+
+  const urlExists = (url, callback, retries = 3) => {
+    const makeRequest = retryCount => {
+      fetch(url, {method: 'GET'})
+        .then(res => {
+          console.log(`[urlExists] url ${url}`);
+          if (res.ok) {
+            callback(null, true);
+          } else {
+            if (retryCount > 0) {
+              console.log(`[urlExists] retrying... ${retryCount} retries left`);
+              setTimeout(() => {
+                makeRequest(retryCount - 1);
+              }, 8000); // 3 seconds timeout
+            } else {
+              callback(null, false);
+            }
+          }
+        })
+        .catch(err => {
+          if (retryCount > 0) {
+            console.log(`[urlExists] retrying... ${retryCount} retries left`);
+            setTimeout(() => {
+              makeRequest(retryCount - 1);
+            }, 8000); // 3 seconds timeout
+          } else {
+            callback(err, false);
+          }
+        });
+    };
+    makeRequest(retries);
+  };
 
   const handleSelectImage = async () => {
     const photo = await launchImageLibrary({
@@ -89,35 +110,15 @@ const NftMinter = () => {
     setSelectedImage(selectedPhoto.uri);
   };
 
-  interface UploadData {
-    imageUploadData: any;
-    metadataUploadData: any;
-  }
-
-  const uploadDataRef = useRef<UploadData>({
-    imageUploadData: null,
-    metadataUploadData: null,
-  });
-
-  const mintNft = useCallback( async (theImage: string, theDescription: string) => {
-    console.log(`\n---------\n[mintNft]\n---------\n`);
+  const mintNft = useCallback(
+    async (theImage: string) => {
+      console.log('\n---------\n[mintNft]\n---------\n');
       setMintProgressStep(MintingStep.UploadingImage);
 
-      const handleMintNft = async ( imagePath: string, theNftDescription) => {
-        console.log(`\n---------\n[handleMintNFt]\n---------\n`);
+      const handleMintNft = async (imagePath: string) => {
+        console.log('\n---------\n[handleMintNFt]\n---------\n');
         try {
           setMintProgressStep(MintingStep.UploadingImage);
-          console.log(`[NftMinter] being IPFS file upload...`);
-          console.log(`[NftMinter] imagePath: ${imagePath}`);
-          console.log(`[NftMinter] imageType: ${imageType}`);
-          console.log(`[NftMinter] imageName: ${imageName}`);
-
-          /*
-          imagePath: string,
-            imageType: string | null,
-            imageName: string | null,
-            callback: (error: any) => void,
-           */
           const data = await ArdriveUpload(
             imagePath,
             imageType,
@@ -134,25 +135,16 @@ const NftMinter = () => {
           return;
         }
       };
-      const ipfsData = await handleMintNft(theImage, theDescription);
-      console.log(`\n---------\n handleMintNft.data.created[0].dataTxId}: ${ipfsData.data.created[0].dataTxId} \n---------\n`);
+      const ipfsData = await handleMintNft(theImage);
       if (!ipfsData.data.created[0].dataTxId) {
-        const err = `[NftMinter] null dataTxId!`;
+        const err = '[NftMinter] null dataTxId!';
         handleErrorCallback(err);
       }
       const nftResponse = {
-        nft: {
-          address: `${ipfsData.data.created[0].dataTxId}`
-        },
-        response: {
-          signature:  '123',
-        }
+        nft: {address: `${ipfsData.data.created[0].dataTxId}`},
+        response: {signature: '123'},
       };
-
-      return [
-        nftResponse.nft.address,
-        nftResponse.response.signature,
-      ];
+      return [nftResponse.nft.address, nftResponse.response.signature];
     },
     [
       mwaWallet,
@@ -232,7 +224,8 @@ const NftMinter = () => {
                       </>
                     );
                   case MintingStep.Success:
-                    const explorerUrl = Config.ARWEAVE_PREVIEW_URL + '/' + mintAddress;
+                    const explorerUrl =
+                      Config.ARWEAVE_PREVIEW_URL + '/' + mintAddress;
                     return (
                       <>
                         <Text style={{fontWeight: 'bold'}}>
@@ -288,13 +281,25 @@ const NftMinter = () => {
                             }
                             let mint, signature;
                             try {
-                              [mint, signature] = await mintNft( selectedImage, nftDescription );
-                              console.log(`Mint Successful
-                              Mint Address: ${mint}
-                              Tx Signature: ${signature}`);
-                              setMintProgressStep(MintingStep.Success);
-                              setMintAddress(mint);
-                              setTxSignature(signature);
+                              [mint, signature] = await mintNft(
+                                selectedImage,
+                                nftDescription,
+                              );
+                              console.log(`Mint Successful Mint Address: ${mint} Tx Signature: ${signature}`);
+                              const explorerUrl = Config.ARWEAVE_PREVIEW_URL + '/' + mint;
+                              urlExists(explorerUrl, (err, exists) => {
+                                if (err) {
+                                  const error = '[urlExists] Error:';
+                                  console.error(error);
+                                  handleErrorCallback(error);
+                                  setMintProgressStep(MintingStep.Error);
+                                  return;
+                                } else {
+                                  console.log( `URL EXISTS: ${explorerUrl} exists: ${exists}`);
+                                  setMintProgressStep(MintingStep.Success);
+                                  setMintAddress(mint);
+                                }
+                              });
                             } catch (error) {
                               const err = `[NftMinter] error: ${JSON.stringify(
                                 error,
