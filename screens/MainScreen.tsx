@@ -14,17 +14,10 @@ export default function MainScreen() {
     <>
       <View style={styles.mainContainer}>
         <ScrollView contentContainerStyle={styles.scrollContainer}>
-          {selectedAccount ? (
             <>
               <NftMinter />
             </>
-          ) : null}
         </ScrollView>
-        {selectedAccount ? (
-          <DisconnectButton title="Disconnect" />
-        ) : (
-          <ConnectButton title="Connect wallet" />
-        )}
         <Text>Selected cluster: {connection.rpcEndpoint}</Text>
       </View>
     </>

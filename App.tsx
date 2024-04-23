@@ -19,12 +19,10 @@ export default function App() {
       <ConnectionProvider
         config={{commitment: 'processed'}}
         endpoint={clusterApiUrl(RPC_ENDPOINT)}>
-        <AuthorizationProvider>
           <SafeAreaView style={styles.shell}>
             <Header />
             <MainScreen />
           </SafeAreaView>
-        </AuthorizationProvider>
       </ConnectionProvider>
     </ErrorBoundary>
   );

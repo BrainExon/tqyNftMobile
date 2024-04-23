@@ -15,6 +15,7 @@ module.exports = {
       zlib: require.resolve('browserify-zlib'),
       path: require.resolve('path-browserify'),
       fs: require.resolve('fs'),
+      os: require.resolve('os'),
     },
   },
   transformer: {

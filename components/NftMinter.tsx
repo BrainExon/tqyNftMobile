@@ -18,11 +18,12 @@ import {launchImageLibrary} from 'react-native-image-picker';
 import {Metaplex} from '@metaplex-foundation/js';
 import {createNftOperation} from '@metaplex-foundation/js';
 import UploadToIPFS from '../ipfs/UploadToIPFS';
-import useMetaplex from '../metaplex-util/useMetaplex';
+//import useMetaplex from '../metaplex-util/useMetaplex';
 import {useAuthorization} from './providers/AuthorizationProvider';
 import {RPC_ENDPOINT, useConnection} from './providers/ConnectionProvider';
 import {isEmpty, isObjectEmpty} from '../util/util';
 import ArweaveUpload from '../ipfs/ArweaveUpload';
+import ArdriveUpload from "../ipfs/ArdriveUpload";
 
 enum MintingStep {
   None = 'None',
@@ -40,18 +41,19 @@ const NftMinter = () => {
   const [mintProgressStep, setMintProgressStep] = useState<MintingStep>(
     MintingStep.None,
   );
-  const [nftName, setNftName] = useState('');
-  const [nftDescription, setNftDescription] = useState('');
+  const [nftName, setNftName] = useState('xyz');
+  const [nftDescription, setNftDescription] = useState('zyc');
   const {selectedAccount, authorizeSession} = useAuthorization();
   const mwaWallet = useMWAWallet(authorizeSession, selectedAccount);
   const {connection} = useConnection();
-  const {metaplex} = useMetaplex(connection, selectedAccount, authorizeSession);
+  //const {metaplex} = useMetaplex(connection, selectedAccount, authorizeSession);
   const [mintAddress, setMintAddress] = useState<string | null>(null);
   const [txSignature, setTxSignature] = useState<string | null>(null);
   const [imageType, setImageType] = useState<string | null>(null);
   const [imageName, setImageName] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState('');
-  const handleErrorCallback = useCallback(error => {
+
+  const handleErrorCallback = useCallback((error:any) => {
     if (isObjectEmpty(error)) {
       return;
     }
@@ -59,10 +61,9 @@ const NftMinter = () => {
       return;
     }
     if (error) {
-      console.log(
-        `[HandleErrorCallBack] error \n----${JSON.stringify(error)}----\n}`,
-      );
-      setErrorMessage(JSON.stringify(error));
+      const er = `[HandleErrorCallBack] error \n----${JSON.stringify(error)}----\n}`;
+      console.log(er);
+      setErrorMessage(JSON.stringify(er));
       setMintProgressStep(MintingStep.Error);
     }
   }, []);
@@ -98,74 +99,31 @@ const NftMinter = () => {
     metadataUploadData: null,
   });
 
-  const mintNft = useCallback(
-    async (metaplexObject: Metaplex, theImage: string) => {
+  const mintNft = useCallback( async (theImage: string, theDescription: string) => {
+    console.log(`\n---------\n[mintNft]\n---------\n`);
       setMintProgressStep(MintingStep.UploadingImage);
 
-      const handleMintNft = async (
-        metaplexInstance: Metaplex,
-        imagePath: string,
-      ) => {
+      const handleMintNft = async ( imagePath: string, theNftDescription) => {
+        console.log(`\n---------\n[handleMintNFt]\n---------\n`);
         try {
           setMintProgressStep(MintingStep.UploadingImage);
-          /**
-           *   "imageData":{
-           *     "IpfsHash":"QmSoSBFFohEJHL5KEkJEWMgsf5m7guUbpKQ6fS3KkT36CE",
-           *     "PinSize":15056,
-           *     "Timestamp":"2024-04-13T06:32:14.624Z"
-           *   },
-           *   "imageMeta":{
-           *     "appName":"TQN",
-           *     "version":"TQN",
-           *     "author":"undefined",
-           *     "company":"undefined",
-           *     "date":"Sat Apr 13 2024",
-           *     "description":"Bf",
-           *     "features":[
-           *       {
-           *         "name":"Uploads",
-           *         "limit":"500",
-           *         "fileTypeLimits":{
-           *           "Text":"10",
-           *           "Image":"100",
-           *           "Video":"25"
-           *         }
-           *       }
-           *     ],
-           *     "ipfsImage":"https://ipfs.io/ipfs/",
-           *     "imageName":"rn_image_picker_lib_temp_11269932-b5f6-4da7-926d-0700061bc9f9.jpg",
-           *     "attributes":[ ]
-           *   }
-           * }
-           */
           console.log(`[NftMinter] being IPFS file upload...`);
+          console.log(`[NftMinter] imagePath: ${imagePath}`);
+          console.log(`[NftMinter] imageType: ${imageType}`);
+          console.log(`[NftMinter] imageName: ${imageName}`);
+
           /*
-          const response = await UploadToIPFS(
+          imagePath: string,
+            imageType: string | null,
+            imageName: string | null,
+            callback: (error: any) => void,
+           */
+          const data = await ArdriveUpload(
             imagePath,
-            nftName,
-            nftDescription,
             imageType,
             imageName,
             handleErrorCallback,
           );
-          */
-          const response: ArweaveUpload = await ArweaveUpload(
-            imagePath,
-            nftName,
-            nftDescription,
-            imageType,
-            imageName,
-            handleErrorCallback,
-          );
-          const data = response as {
-            imageData: {
-              IpfsHash: string;
-              PinSize: string;
-              Timestamp: string;
-              isDuplicate: string;
-            };
-            imageMeta: ImageMeta;
-          };
           return data;
         } catch (error) {
           const er = `[NftMinter] Error: ${
@@ -176,120 +134,23 @@ const NftMinter = () => {
           return;
         }
       };
-
-      const ipfsData = await handleMintNft(metaplexObject, theImage);
-      uploadDataRef.current = {
-        imageUploadData: ipfsData.imageData,
-        metadataUploadData: ipfsData?.imageMeta,
-      };
-      if (
-        uploadDataRef.current.imageUploadData?.error ||
-        uploadDataRef.current.metadataUploadData?.error
-      ) {
-        if (uploadDataRef.current.imageUploadData.error) {
-          const err = `[NftMinter] uploadDataRef.current.imageUploadData.error: ${JSON.stringify(
-            uploadDataRef.current.imageUploadData.error,
-          )}`;
-          console.log(err);
-          handleErrorCallback(err);
-        }
-
-        if (uploadDataRef.current.metadataUploadData.error) {
-          const err = `[NftMinter] uploadDataRef.current.metadataUploadData.error: ${JSON.stringify(
-            uploadDataRef.current.metadataUploadData.error,
-          )}`;
-          console.log(err);
-          handleErrorCallback(err);
-        }
-        const errr = '[NftMinter] unknown image upload error.';
-        console.log(errr);
-        handleErrorCallback(errr);
+      const ipfsData = await handleMintNft(theImage, theDescription);
+      console.log(`\n---------\n handleMintNft.data.created[0].dataTxId}: ${ipfsData.data.created[0].dataTxId} \n---------\n`);
+      if (!ipfsData.data.created[0].dataTxId) {
+        const err = `[NftMinter] null dataTxId!`;
+        handleErrorCallback(err);
       }
-
-      console.log(
-        `[NftMinter] imageUploadData ${JSON.stringify(
-          uploadDataRef.current.imageUploadData,
-        )}`,
-      );
-      console.log(
-        `[NftMinter] metadataUploadData ${JSON.stringify(
-          uploadDataRef.current.metadataUploadData,
-        )}`,
-      );
-      setMintProgressStep(MintingStep.MintingMetadata);
-
-      /**
-       * Creates a new NFT.
-       * const { nft } = await metaplex
-       *   .nfts()
-       *   .create({
-       *     name: 'My NFT',
-       *     uri: 'https://example.com/my-nft',
-       *     sellerFeeBasisPoints: 250, // 2.5%
-       *   };
-       */
-      const multiplexConfig = {
-        name: nftName,
-        uri: `${uploadDataRef.current.metadataUploadData.ipfsUri}${uploadDataRef.current.imageUploadData.IpfsHash}`,
-        sellerFeeBasisPoints: 0,
-        tokenOwner: selectedAccount?.publicKey,
-      };
-      const getNftOperation = async input => {
-        try {
-          const operation = await createNftOperation(input);
-          console.log(
-            `[NftMinter][createNftOperation] operation: ${JSON.stringify(
-              operation,
-            )}`,
-          );
-          return operation;
-        } catch (error) {
-          const erMsg = `[NftMinter] [getNftOperation] error: ${JSON.stringify(
-            error,
-          )}`;
-          console.log(erMsg);
-          handleErrorCallback(erMsg);
-          return;
+      const nftResponse = {
+        nft: {
+          address: `${ipfsData.data.created[0].dataTxId}`
+        },
+        response: {
+          signature:  '123',
         }
       };
-
-      const mintOperation = await getNftOperation(multiplexConfig);
-      if (!mintOperation) {
-        const erMsg = `[NftMinter] [getNftOperation] mintOperation is null: ${JSON.stringify(
-          mintOperation,
-        )}`;
-        console.log(erMsg);
-        handleErrorCallback(erMsg);
-        return;
-      }
-      const nftCreate = async config => {
-        try {
-          //const createNftOutput = await metaplexInstance.operations().execute(config);
-          const {nft, response} = await metaplexObject.nfts().create(config);
-          return {nft, response};
-        } catch (error) {
-          const erMsg = `[NftMinter] [nftCreate] Error: ${JSON.stringify(
-            error,
-          )}`;
-          console.log(erMsg);
-          handleErrorCallback(erMsg);
-          return;
-        }
-      };
-      const nftResponse = await nftCreate(multiplexConfig);
-      if (!nftResponse) {
-        const erMsg = `[NftMinter][nftCreate] NFT response is null: ${JSON.stringify(
-          nftResponse,
-        )}`;
-        console.log(erMsg);
-        handleErrorCallback(erMsg);
-        return;
-      }
-      console.log(nftResponse.nft.address.toBase58());
-      console.log(nftResponse.response.signature);
 
       return [
-        nftResponse.nft.address.toBase58(),
+        nftResponse.nft.address,
         nftResponse.response.signature,
       ];
     },
@@ -371,12 +232,7 @@ const NftMinter = () => {
                       </>
                     );
                   case MintingStep.Success:
-                    const explorerUrl =
-                      'https://explorer.solana.com/address/' +
-                      mintAddress +
-                      '?cluster=' +
-                      RPC_ENDPOINT;
-
+                    const explorerUrl = Config.ARWEAVE_PREVIEW_URL + mintAddress;
                     return (
                       <>
                         <Text style={{fontWeight: 'bold'}}>
@@ -423,13 +279,6 @@ const NftMinter = () => {
                         <Button
                           title="Mint this NFT!"
                           onPress={async () => {
-                            if (!metaplex) {
-                              const error =
-                                '[NftMinter] error: Metaplex/MWA not initialized.';
-                              console.log(error);
-                              handleErrorCallback(error);
-                              return;
-                            }
                             if (!selectedImage) {
                               const error =
                                 '[NftMinter] error: Image not selected.';
@@ -439,10 +288,7 @@ const NftMinter = () => {
                             }
                             let mint, signature;
                             try {
-                              [mint, signature] = await mintNft(
-                                metaplex,
-                                selectedImage,
-                              );
+                              [mint, signature] = await mintNft( selectedImage, nftDescription );
                               console.log(`Mint Successful
                               Mint Address: ${mint}
                               Tx Signature: ${signature}`);
