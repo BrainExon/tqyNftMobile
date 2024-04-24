@@ -69,21 +69,15 @@ function LoginScreen() {
         keyboardType="phone-pad"
         value={phone}
         onChangeText={text => {
-          // Remove all non-numeric characters from the input
-          let formattedText = text.replace(/\D/g, '');
+          let formattedText = text.replace(/\D/g, ''); // Remove all non-numeric characters
           if (formattedText.length <= 10) {
+            // Format the phone number as (XXX) XXX-XXXX if it's 10 characters or less
             formattedText = formattedText.replace(
               /(\d{3})(\d{0,3})(\d{0,4})/,
               '($1) $2-$3',
             );
-          } else {
-            formattedText = formattedText.replace(
-              /(\d{3})(\d{3})(\d{0,4})/,
-              '($1) $2-$3',
-            );
+            setPhone(formattedText);
           }
-
-          setPhone(formattedText);
         }}
       />
       <View style={styles.boxMiddle} />
@@ -91,7 +85,7 @@ function LoginScreen() {
         <TransparentButton onPress={() => handlePress(phone)} title=">>>" />
       ) : null}
       {showModal ? (
-        <UserModal visible={true} onClose={handleButtonClose} />
+        <UserModal visible={showModal} onClose={handleButtonClose} />
       ) : null}
       <ProcessingModal
         visible={loading}
