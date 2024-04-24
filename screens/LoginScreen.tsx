@@ -1,8 +1,10 @@
 import {TextInput, View, StyleSheet, useWindowDimensions} from 'react-native';
 import React, {useState} from 'react';
 import TransparentButton from '../components/ui/TransParentButton';
-import Config from 'react-native-config';
+import UserModal from '../components/ui/UserModal';
 import {v4 as uuidv4} from 'uuid';
+import {addUser} from '../util/dbUtils';
+import {User} from '../components/models/User';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -10,9 +12,96 @@ import {
 import {isTablet, setOutline} from '../util/util';
 import {useNavigation} from '@react-navigation/native';
 import ProcessingModal from '../components/ui/ProcessingModal';
-import GlobalStyles from '../constants/GlobalStyles';
-import {Header} from '../components/Header';
-// import ErrorOverlay from '../components/ui/ErrorOverlay';
+
+function LoginScreen() {
+  const boardSize = useWindowDimensions();
+  const styles = generateLoginStyles(boardSize);
+  const navigation = useNavigation();
+  const [phone, setPhone] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [showModal, setShowModal] = useState(false);
+
+  const handleProcessingClose = () => {
+    setLoading(false); // Update the state to hide the modal
+  };
+  const handleErrorCallback = async (errMsg: any) => {
+    console.log(
+      `[LoginScreen][handleErrorCallback]: ${JSON.stringify(errMsg)}`,
+    );
+    setError(errMsg);
+  };
+  const handleButtonClose = async () => {
+    navigation.navigate('UserScreen');
+  };
+  const handlePress = async (phoneNumber: string) => {
+    setLoading(true);
+    const timestamp = Date.now();
+
+    setError('[LoginScreen] TEST');
+    return;
+    try {
+      const userId = uuidv4();
+      const user = new User(userId, phoneNumber, '', [], [], [], timestamp);
+      const response = await addUser({user}, handleErrorCallback);
+      if (response) {
+        setShowModal(true);
+        //navigation.navigate('UserScreen');
+      }
+    } catch (e: any) {
+      console.error('Error adding user:', e.message);
+      setError(
+        `[LoginScreen] Failed to add user to the Toqyn system. Please check your network connection and try again: ${JSON.stringify(
+          e.message,
+        )}`,
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <View style={styles.loginContainer}>
+      <View style={styles.boxHeader} />
+      <TextInput
+        style={styles.login_input}
+        placeholder="Phone Number"
+        keyboardType="phone-pad"
+        value={phone}
+        onChangeText={text => {
+          // Remove all non-numeric characters from the input
+          let formattedText = text.replace(/\D/g, '');
+          if (formattedText.length <= 10) {
+            formattedText = formattedText.replace(
+              /(\d{3})(\d{0,3})(\d{0,4})/,
+              '($1) $2-$3',
+            );
+          } else {
+            formattedText = formattedText.replace(
+              /(\d{3})(\d{3})(\d{0,4})/,
+              '($1) $2-$3',
+            );
+          }
+
+          setPhone(formattedText);
+        }}
+      />
+      <View style={styles.boxMiddle} />
+      {phone ? (
+        <TransparentButton onPress={() => handlePress(phone)} title=">>>" />
+      ) : null}
+      {showModal ? (
+        <UserModal visible={true} onClose={handleButtonClose} />
+      ) : null}
+      <ProcessingModal
+        visible={loading}
+        error={error}
+        onClose={handleProcessingClose}
+      />
+      <View style={styles.boxFooter} />
+    </View>
+  );
+}
 
 function generateLoginStyles(size: any) {
   // eslint-disable
@@ -76,75 +165,5 @@ function generateLoginStyles(size: any) {
   return styles;
   // eslint-enable
 }
-
-function LoginScreen() {
-  const boardSize = useWindowDimensions();
-  const styles = generateLoginStyles(boardSize);
-  const navigation = useNavigation();
-  const [phone, setPhone] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-
-  const handlePress = async phoneNumber => {
-    setLoading(true);
-    const timestamp = Date.now();
-    try {
-      const myHeaders = new Headers();
-      myHeaders.append('Content-Type', 'application/json');
-      const raw = JSON.stringify({
-        id: uuidv4(),
-        phone: phoneNumber,
-        date: timestamp,
-      });
-      const requestOptions = {
-        method: 'POST',
-        headers: myHeaders,
-        body: raw,
-        redirect: 'follow',
-      };
-      const response = await fetch(
-        `${Config.NODEJS_EXPRESS_SERVER}/add_user`,
-        requestOptions,
-      );
-      console.log('[LoginScreen] ');
-      if (response.ok) {
-        const data = await response.json();
-        console.log('User added successfully:', data);
-        navigation.navigate('UserScreen');
-      } else {
-        const er = `LoginScreenError adding user:  ${JSON.stringify(
-          response.statusText,
-        )}`;
-        console.error(er);
-        setError('Failed to add user. Please try again later.');
-      }
-    } catch (e) {
-      console.error('Error adding user:', e.message);
-      setError(
-        `[LoginScreen] Failed to add user to the Toqyn system. Please check your network connection and try again: ${JSON.stringify(
-          e.message,
-        )}`,
-      );
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  return (
-    <View style={styles.loginContainer}>
-      <View style={styles.boxHeader} />
-      <TextInput
-        style={styles.login_input}
-        placeholder="Phone Number"
-        keyboardType="phone-pad"
-        value={phone}
-        onChangeText={text => setPhone(text)}
-      />
-      <View style={styles.boxMiddle} />
-      {phone ? <TransparentButton onPress={() => handlePress(phone)} title=">>>" /> : null}
-      <ProcessingModal visible={loading} />
-      <View style={styles.boxFooter} />
-    </View>
-  );}
 
 export default LoginScreen;
