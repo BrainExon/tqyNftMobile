@@ -22,6 +22,7 @@
     "@solana/spl-token": "^0.3.8",
     "@solana/web3.js": "^1.78.0",
     "@tanstack/react-query": "^5.32.0",
+    "@types/uuid": "^9.0.8",
     "assert": "^2.0.0",
     "browserify-zlib": "^0.2.0",
     "crypto-browserify": "^3.12.0",
