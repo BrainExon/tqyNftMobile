@@ -1,5 +1,5 @@
 import {PinataConfig} from '../ipfs/testAuthentication';
-import {ERROR_NO_CREDENTIALS_PROVIDED} from '../components/constants/constants';
+import {ERROR_NO_CREDENTIALS_PROVIDED} from '../constants/constants';
 import Config from 'react-native-config';
 import {printDebug} from './util';
 //import {version} from './package.json';

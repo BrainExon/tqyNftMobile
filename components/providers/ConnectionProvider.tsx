@@ -21,6 +21,8 @@ export const ConnectionProvider: FC<ConnectionProviderProps> = ({
   endpoint,
   config = {commitment: 'confirmed'},
 }) => {
+  console.log(`[ConnectionProvider] endpoint: ${JSON.stringify(endpoint)}`);
+  console.log(`[ConnectionProvider] config: ${JSON.stringify(endpoint)}`);
   const connection = useMemo(
     () => new Connection(endpoint, config),
     [endpoint, config],

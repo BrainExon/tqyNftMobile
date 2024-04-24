@@ -36,7 +36,7 @@ const ArdriveUpload = async (
     };
 
     try {
-      const response = await fetch(Config.NODEJS_EXPRESS_SERVER, requestOptions);
+      const response = await fetch(`${Config.NODEJS_EXPRESS_SERVER}/upload_files`, requestOptions);
       const result = await response.json();
       return result;
     } catch (error) {
