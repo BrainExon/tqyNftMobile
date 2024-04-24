@@ -11,7 +11,7 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
-import GlobalStyles from '../constants/GlobalStyles';
+import GlobalStyles from '../../constants/GlobalStyles';
 import {isTablet, setOutline} from '../../util/util';
 
 const generateFlipStyles = size => {

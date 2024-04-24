@@ -1,5 +1,5 @@
 import {View, StyleSheet, Text} from 'react-native';
-import GlobalStyles from '../constants/GlobalStyles';
+import GlobalStyles from '../../constants/GlobalStyles';
 import GenButton from './GenButton';
 
 const styles = StyleSheet.create({

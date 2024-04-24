@@ -3,53 +3,48 @@ import {
   ImageBackground,
   StyleSheet,
   Text,
-  useColorScheme,
-  View,
-} from 'react-native';
+  useColorScheme, useWindowDimensions,
+  View
+} from "react-native";
 import {Colors} from './Colors';
-
-export function Header() {
-  const isDarkMode = useColorScheme() === 'dark';
-  return (
-    <ImageBackground
-      accessibilityRole="image"
-      testID="new-app-screen-header"
-      source={require('../img/background.png')}
-      style={[
-        styles.background,
-        {
-          backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
-        },
-      ]}
-      imageStyle={styles.logo}>
-      <View>
-        <Text style={styles.title}>Solana NFT Minter</Text>
-        <Text style={styles.subtitle}>React Native</Text>
-      </View>
-    </ImageBackground>
-  );
+import Config from 'react-native-config';
+import { isTablet, setOutline } from "../util/util";
+import { heightPercentageToDP as hp, widthPercentageToDP as wp } from "react-native-responsive-screen";
+function generateLoginStyles(size: any) {
+  const headerStyles = StyleSheet.create({
+    header: {
+      paddingVertical: isTablet(size.width, size.height) ? hp('8') : wp('12'),
+      //paddingHorizontal: isTablet(size.width, size.height) ? hp('4') : wp('6'),
+      backgroundColor: 'transparent',
+    },
+    title: {
+      color: '#fff',
+      fontSize: isTablet(size.width, size.height) ? hp('4') : wp('6'),
+      fontWeight: '700',
+      textAlign: 'center',
+      backgroundColor: 'transparent',
+    },
+  });
+  const styles = JSON.parse(JSON.stringify(headerStyles));
+  if (setOutline()) {
+    Object.keys(styles).forEach(key => {
+      Object.assign(styles[key], {
+        borderStyle: 'solid',
+        borderColor: 'red',
+        borderWidth: 2,
+      });
+    });
+  }
+  return styles;
 }
 
-const styles = StyleSheet.create({
-  background: {
-    paddingBottom: 40,
-    paddingTop: 60,
-    paddingHorizontal: 32,
-  },
-  logo: {
-    overflow: 'visible',
-    resizeMode: 'cover',
-  },
-  subtitle: {
-    color: '#333',
-    fontSize: 24,
-    fontWeight: '500',
-    textAlign: 'center',
-  },
-  title: {
-    color: '#fff',
-    fontSize: 40,
-    fontWeight: '700',
-    textAlign: 'center',
-  },
-});
+export function Header() {
+  const headSize = useWindowDimensions();
+  const styles = generateLoginStyles(headSize)
+  // const isDarkMode = useColorScheme() === 'dark';
+  return (
+    <View style={styles.header}>
+      <Text style={styles.title}>{Config.META_APP_NAME}</Text>
+    </View>
+  );
+}
