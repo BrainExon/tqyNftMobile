@@ -7,7 +7,7 @@ const ErrorModal = ({message, onClose}) => {
       <View style={styles.modalContainer}>
         <View style={styles.modalContent}>
           <Text style={styles.title}>Error</Text>
-          <Text style={styles.message}>{message}</Text>
+          <Text style={styles.message}>HERE: {message}</Text>
           <Button title="Close" onPress={onClose} />
         </View>
       </View>

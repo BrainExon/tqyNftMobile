@@ -25,7 +25,7 @@ function generatePModalStyles(size: any) {
     },
     pModalContent: {
       width: isTablet(size.width, size.height) ? hp('60') : wp('70'),
-      backgroundColor: 'red',
+      backgroundColor: 'rgba(200, 0, 0, 0.75)',
       paddingVertical: isTablet(size.width, size.height) ? hp('15') : wp('8'),
       paddingHorizontal: isTablet(size.width, size.height) ? hp('15') : wp('8'),
       marginVertical: isTablet(size.width, size.height) ? hp('15') : wp('8'),
@@ -35,16 +35,16 @@ function generatePModalStyles(size: any) {
       borderRadius: isTablet(size.width, size.height) ? hp('12') : wp('6'),
     },
     pModalText: {
-      fontSize: hp('2'),
+      fontSize: isTablet(size.width, size.height) ? hp('2') : wp('4'),
       flexDirection: 'row',
       alignItems: 'center',
       color: 'black',
       textAlign: 'center',
     },
     pModalButton: {
-      width: isTablet(size.width, size.height) ? hp('38') : wp('28'),
+      width: isTablet(size.width, size.height) ? hp('48') : wp('38'),
       alignItems: 'center',
-      color: 'black',
+      backgroundColor: 'rgba(200, 200, 200, 0.75)',
       borderStyle: 'solid',
       borderColor: 'black',
       borderWidth: isTablet(size.width, size.height) ? hp('2') : wp('1'),
@@ -52,7 +52,7 @@ function generatePModalStyles(size: any) {
     },
     pModalButtonText: {
       color: 'black',
-      fontSize: isTablet(size.width, size.height) ? hp('2') : wp('4'),
+      fontSize: isTablet(size.width, size.height) ? hp('6') : wp('4'),
       textAlign: 'center',
     },
   });
