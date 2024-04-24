@@ -38,7 +38,7 @@ function LoginScreen() {
     setLoading(true);
     const timestamp = Date.now();
 
-    setError('[LoginScreen] TEST');
+    setError('[LoginScreen] TEST Test testing test modal mmmm');
     return;
     try {
       const userId = uuidv4();
