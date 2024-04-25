@@ -39,7 +39,8 @@ function LoginScreen() {
         setError('[LoginScreen] null user - cannot setUser() redux state}');
         return;
       }
-      dispatch(setUser({phone: userAccount.phone}));
+      // dispatch(setUser({ phone: '1234567890', role: 'creator' }));
+      dispatch(setUser({phone: userAccount.phone, role: userAccount.role}));
       navigation.navigate('UserScreen');
     }
     setShowModal(false);
