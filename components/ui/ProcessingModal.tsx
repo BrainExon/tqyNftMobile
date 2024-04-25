@@ -6,7 +6,6 @@ import {
   View,
   StyleSheet,
   useWindowDimensions,
-  Button,
 } from 'react-native';
 import {isTablet, setOutline} from '../../util/util';
 import {

@@ -1,0 +1,29 @@
+import React from 'react';
+import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
+import UserScreen from '../../screens/UserScreen';
+import ChallengeScreen from '../../screens/ChallengeScreen';
+import SignupScreen from '../../screens/SignupScreen';
+import BottomTabIcon from './BottomTabIcon';
+import LoginScreen from '../../screens/LoginScreen';
+const Tab = createBottomTabNavigator();
+
+const BottomTabNavigator = () => {
+  const screenOptions = ({route}) => ({
+    headerShown: false,
+    tabBarShowLabel: false,
+    tabBarIcon: ({focused}) => (
+      <BottomTabIcon title={route.name} focused={focused} />
+    ),
+  });
+
+  return (
+    <Tab.Navigator screenOptions={screenOptions}>
+      <Tab.Screen name="LoginScreen" component={LoginScreen} />
+      <Tab.Screen name="UserScreen" component={UserScreen} />
+      <Tab.Screen name="ChallengeScreen" component={ChallengeScreen} />
+      <Tab.Screen name="SignupScreen" component={SignupScreen} />
+    </Tab.Navigator>
+  );
+};
+
+export default BottomTabNavigator;

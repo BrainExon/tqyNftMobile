@@ -8,7 +8,6 @@ const ErrorModalOverlay = ({visible, message, onClose}) => {
   console.log(`[ErrorModalOverlay] cleanMessage: ${cleanMessage}`);
   return (
     <ErrorModal animationType="slide" transparent>
-      {' '}
       <View
         style={{
           flex: 1,
@@ -16,7 +15,6 @@ const ErrorModalOverlay = ({visible, message, onClose}) => {
           alignItems: 'center',
           backgroundColor: 'white',
         }}>
-        {' '}
         <View
           style={{
             backgroundColor: 'white',
@@ -24,11 +22,10 @@ const ErrorModalOverlay = ({visible, message, onClose}) => {
             borderRadius: 10,
             alignItems: 'center',
           }}>
-          {' '}
-          <Text style={{color: 'black'}}>{cleanMessage}</Text>{' '}
-          <Button title="Close" onPress={onClose} />{' '}
-        </View>{' '}
-      </View>{' '}
+          <Text style={{color: 'black'}}>{cleanMessage}</Text>
+          <Button title="Close" onPress={onClose} />
+        </View>
+      </View>
     </ErrorModal>
   );
 };
