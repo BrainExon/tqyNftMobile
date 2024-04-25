@@ -2,24 +2,24 @@ import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {ImageBackground, useColorScheme} from 'react-native';
 import {clusterApiUrl} from '@solana/web3.js';
-import UserScreen from "./screens/UserScreen";
+import GlobalStyles from './constants/GlobalStyles';
+import UserScreen from './screens/UserScreen';
 import LoginScreen from './screens/LoginScreen';
 import React from 'react';
 import {View, Text, SafeAreaView, StyleSheet} from 'react-native';
 import ErrorBoundary from 'react-native-error-boundary';
 import ErrorOverlay from './components/ui/ErrorOverlay';
-import {Colors} from './components/Colors';
 import {
   DarkTheme as NavigationDarkTheme,
   DefaultTheme as NavigationDefaultTheme,
 } from '@react-navigation/native';
 import {
-  PaperProvider,
   MD3DarkTheme,
   MD3LightTheme,
   adaptNavigationTheme,
 } from 'react-native-paper';
-import { Header } from "./components/Header";
+import {Header} from './components/Header';
+import TabsNavigator from './components/ui/TabsNavigator';
 const styles = StyleSheet.create({
   shell: {
     height: '100%',
@@ -106,24 +106,24 @@ export default function App() {
             styles.shell,
             {
               backgroundColor:
-                isDarkMode === "dark"
+                isDarkMode === 'dark'
                   ? MD3DarkTheme.colors.background
                   : MD3LightTheme.colors.background,
             },
           ]}
           imageStyle={styles.logo}>
-          <Header/>
+          <Header />
           <NavigationContainer theme={MyTheme}>
             <Stack.Navigator>
               <Stack.Screen
-                name="Login Screen"
-                component={LoginScreen}
-                options={{ headerShown: false }}
+                name="TabsNavigator"
+                component={TabsNavigator}
+                options={{headerShown: false}}
               />
               <Stack.Screen
-                name="UserScreen"
-                component={UserScreen}
-                options={{ headerShown: false }}
+                name="Login Screen"
+                component={LoginScreen}
+                options={{headerShown: false}}
               />
             </Stack.Navigator>
           </NavigationContainer>

@@ -1,37 +1,22 @@
-import React from 'react';
-import {
-  Modal,
-  View,
-  Text,
-  Button,
-  StyleSheet,
-  useWindowDimensions,
-  ActivityIndicator,
-} from 'react-native';
-import GlobalStyles from '../../constants/GlobalStyles';
-import {isTablet, setOutline} from '../../util/util';
+import {StyleSheet, useWindowDimensions, View} from 'react-native';
+import {Text} from 'react-native-paper';
+import {isTablet, setOutline} from '../util/util';
 import {
   heightPercentageToDP as hp,
   widthPercentageToDP as wp,
 } from 'react-native-responsive-screen';
-import GenButton from './GenButton';
 
-interface UserModalProps {
-  visible: boolean;
-  onClose: () => void;
-}
-
-function generateUModalStyles(size: any) {
-  const uModalStyles = StyleSheet.create({
-    uModalContainer: {
+function generateChallengeStyles(size: any) {
+  const chStyles = StyleSheet.create({
+    chContainer: {
       flex: 1,
       justifyContent: 'center',
       alignItems: 'center',
       backgroundColor: 'rgba(0, 0, 0, 0.8)',
     },
-    uModalContent: {
+    chContent: {
       width: isTablet(size.width, size.height) ? hp('60') : wp('70'),
-      backgroundColor: 'rgba(200, 200, 200, 0.75)',
+      backgroundColor: 'rgba(180, 0, 0, 0.4)',
       paddingVertical: isTablet(size.width, size.height) ? hp('15') : wp('8'),
       paddingHorizontal: isTablet(size.width, size.height) ? hp('15') : wp('8'),
       marginVertical: isTablet(size.width, size.height) ? hp('15') : wp('8'),
@@ -40,7 +25,7 @@ function generateUModalStyles(size: any) {
       borderWidth: isTablet(size.width, size.height) ? hp('2') : wp('1'),
       borderRadius: isTablet(size.width, size.height) ? hp('12') : wp('6'),
     },
-    uModalText: {
+    chText: {
       fontSize: isTablet(size.width, size.height) ? hp('2') : wp('4'),
       lineHeight: isTablet(size.width, size.height) ? hp('2') : wp('7'),
       flexDirection: 'row',
@@ -48,7 +33,7 @@ function generateUModalStyles(size: any) {
       color: 'white',
       textAlign: 'center',
     },
-    uModalButton: {
+    chButton: {
       width: isTablet(size.width, size.height) ? hp('48') : wp('38'),
       backgroundColor: 'rgba(200, 200, 200, 0.75)',
       borderStyle: 'solid',
@@ -57,13 +42,13 @@ function generateUModalStyles(size: any) {
       borderWidth: isTablet(size.width, size.height) ? hp('2') : wp('1'),
       borderRadius: isTablet(size.width, size.height) ? hp('6') : wp('3'),
     },
-    uModalButtonText: {
+    chButtonText: {
       color: 'black',
       fontSize: isTablet(size.width, size.height) ? hp('6') : wp('4'),
       textAlign: 'center',
     },
   });
-  const styles = JSON.parse(JSON.stringify(uModalStyles));
+  const styles = JSON.parse(JSON.stringify(chStyles));
   if (setOutline()) {
     Object.keys(styles).forEach(key => {
       Object.assign(styles[key], {
@@ -77,24 +62,15 @@ function generateUModalStyles(size: any) {
   // eslint-enable
 }
 
-const UserModal: React.FC<UserModalProps> = ({visible, message, onClose}) => {
-  const pUsize = useWindowDimensions();
-  const styles = generateUModalStyles(pUsize);
+export default function ChallengeScreen() {
+  console.log('[ChallengeScreen]...');
+  const chSize = useWindowDimensions();
+  const styles = generateChallengeStyles(chSize);
   return (
-    <Modal transparent={true} animationType="fade" visible={visible}>
-      <View style={styles.uModalContainer}>
-        <View style={styles.uModalContent}>
-          <Text style={styles.uModalText}>{message}</Text>
-        </View>
-        <GenButton
-          onPress={onClose}
-          style={styles.uModalButton}
-          textStyle={styles.uModalButtonText}>
-          >>>
-        </GenButton>
+    <>
+      <View style={styles.chContainer}>
+        <Text variant="titleLarge">Challenge Screen!</Text>
       </View>
-    </Modal>
+    </>
   );
-};
-
-export default UserModal;
+}

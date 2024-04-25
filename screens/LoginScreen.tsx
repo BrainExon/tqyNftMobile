@@ -14,6 +14,7 @@ import {useNavigation} from '@react-navigation/native';
 import ProcessingModal from '../components/ui/ProcessingModal';
 
 function LoginScreen() {
+  console.log('[LoginScreen]...');
   const boardSize = useWindowDimensions();
   const styles = generateLoginStyles(boardSize);
   const navigation = useNavigation();
@@ -38,11 +39,18 @@ function LoginScreen() {
     setLoading(true);
     const timestamp = Date.now();
 
-    setError('[LoginScreen] TEST Test testing test modal mmmm');
-    return;
     try {
       const userId = uuidv4();
-      const user = new User(userId, phoneNumber, '', [], [], [], timestamp);
+      const cleanPhoneNumber = phoneNumber.replace(/\D/g, '');
+      const user = new User(
+        userId,
+        cleanPhoneNumber,
+        '',
+        [],
+        [],
+        [],
+        timestamp,
+      );
       const response = await addUser({user}, handleErrorCallback);
       if (response) {
         setShowModal(true);
@@ -85,7 +93,11 @@ function LoginScreen() {
         <TransparentButton onPress={() => handlePress(phone)} title=">>>" />
       ) : null}
       {showModal ? (
-        <UserModal visible={showModal} onClose={handleButtonClose} />
+        <UserModal
+          visible={showModal}
+          message={'Login success!'}
+          onClose={handleButtonClose}
+        />
       ) : null}
       <ProcessingModal
         visible={loading}

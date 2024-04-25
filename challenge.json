@@ -1,0 +1,11 @@
+{
+  chId: string;
+  name: string;
+  date: string;
+  owner: string;
+  users: string[];
+  doubloon: string;
+  nft: string;
+  nftVersion: number;
+}
+
