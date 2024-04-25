@@ -31,7 +31,6 @@ function TabsNavigator() {
   return (
     <BottomTabs.Navigator
       screenOptions={({route}) => {
-        console.log(`[TabsNavigator] route: ${JSON.stringify(route)}`);
         const options = {
           headerStyle: {
             backgroundColor: GlobalStyles.accent.blue200,

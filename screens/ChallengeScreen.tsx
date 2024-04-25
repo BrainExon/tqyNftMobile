@@ -25,7 +25,6 @@ import {useNavigation} from '@react-navigation/native';
 const ChallengeScreen = () => {
   const navigation = useNavigation();
   const userState = useSelector(getUserState);
-  console.log(`[ChallengeScreen] userState: ${JSON.stringify(userState)}`);
   const chSize = useWindowDimensions();
   const styles = generateChallengeStyles(chSize);
   const [category, setCategory] = useState('');
@@ -34,6 +33,7 @@ const ChallengeScreen = () => {
   const [error, setError] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [message, setMessage] = useState('');
+  console.log(`[ChallengeScreen] userState: ${JSON.stringify(userState)}`);
   const handleErrorCallback = (errMsg: any) => {
     setError(errMsg);
   };
@@ -43,24 +43,20 @@ const ChallengeScreen = () => {
   };
 
   useEffect(() => {
-    console.log(
-      `[ChallengeScreen][useEffect] userState: ${JSON.stringify(userState)}`,
-    );
-
+    console.log(`[useEffect] userState: ${JSON.stringify(userState)}`);
+    console.log(`[useEffect] userState.role: ${userState.role}`);
     const checkUserRole = () => {
       if (userState.role !== 'creator') {
-        const err = `Only ${Config.APP_NAME} Creators can create Challenges. \n\nPlease signup to become a Creator and get access to the "${Config.DOUBLOON_DESIGNER}" and more features.`;
-        setError(err);
+        const errorMessage = Config.AUTH_ERROR?.replace(
+          '${APP_NAME}',
+          Config.APP_NAME,
+        )?.replace('${DOUBLOON_DESIGNER}', Config.DOUBLOON_DESIGNER);
+        setError(errorMessage);
         setShowModal(true);
       }
     };
-
-    // Add a focus listener to check the user role when the screen comes into focus
     const focusListener = navigation.addListener('focus', checkUserRole);
-
-    // Check if the focusListener exists before trying to remove it
     if (focusListener && focusListener.remove) {
-      // Clean up the listener when the component unmounts
       return () => {
         focusListener.remove();
       };

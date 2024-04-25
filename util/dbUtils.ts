@@ -1,60 +1,64 @@
 import Config from 'react-native-config';
-import {User} from '../components/models/User';
+import axios from 'axios';
 
-export async function dbFindOne({endPoint, data, setError}) {
-  if (!data) {
-    const err = `[dbFindOne] "data" is null for endpoint ${endPoint}`;
+export async function dbFindOne({endPoint, conditions, setError}) {
+  console.log(
+    `[dbFindOne] endpoint: ${endPoint} conditions: ${JSON.stringify(
+      conditions,
+    )}`,
+  );
+
+  if (!conditions) {
+    const err = `[dbFindOne] "conditions" is null for endpoint ${endPoint}`;
     console.log(err);
     setError(err);
     return;
   }
-  const myHeaders = new Headers();
-  myHeaders.append('Content-Type', 'application/json');
-  const raw = JSON.stringify(data);
-  const requestOptions = {
-    method: 'GET',
-    headers: myHeaders,
-    body: raw,
-    redirect: 'follow',
-  };
+
   try {
-    const response = await fetch(
+    const response = await axios.post(
       `${Config.NODEJS_EXPRESS_SERVER}/${endPoint}`,
-      requestOptions,
+      conditions,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      },
     );
+
     console.log(
       `[dbFindOne] end point "${endPoint}" response: ${JSON.stringify(
-        response,
+        response.data,
       )}`,
     );
-    console.log(`[dbFindOne] response.ok: ${JSON.stringify(response.ok)}`);
-    if (response.ok) {
-      const data = await response.json();
-      console.log('[dbFindOne] User added successfully:', data);
-      return data;
+
+    if (response.status === 200) {
+      console.log('[dbFindOne] Data retrieved successfully:', response.data);
+      return response.data;
     } else {
-      const er = `[dbFindOne] adding user: ${JSON.stringify(
+      const er = `[dbFindOne] Error retrieving data: ${JSON.stringify(
         response.statusText,
       )}`;
       setError(er);
     }
   } catch (error) {
-    const er = `[dbFindOne] An error occurred while searching end point: ${JSON.stringify(
+    const er = `[dbFindOne] An error occurred while searching endpoint: ${JSON.stringify(
       endPoint,
     )}`;
     setError(er);
   }
 }
-export async function dbUpsert({endPoint, data, setError}) {
-  if (!data) {
-    const err = `[dbUpsert] "data" is null for endpoint ${endPoint}`;
+
+export async function dbUpsert({endPoint, conditions, setError}) {
+  if (!conditions) {
+    const err = `[dbUpsert] "conditions" is null for endpoint ${endPoint}`;
     console.log(err);
     setError(err);
     return;
   }
   const myHeaders = new Headers();
   myHeaders.append('Content-Type', 'application/json');
-  const raw = JSON.stringify(data);
+  const raw = JSON.stringify(conditions);
   const requestOptions = {
     method: 'POST',
     headers: myHeaders,
