@@ -1,9 +1,10 @@
 import {TextInput, View, StyleSheet, useWindowDimensions} from 'react-native';
+import Config from 'react-native-config';
 import React, {useState} from 'react';
 import TransparentButton from '../components/ui/TransParentButton';
 import UserModal from '../components/ui/UserModal';
 import {v4 as uuidv4} from 'uuid';
-import {dbUpsert} from '../util/dbUtils';
+import {dbFindOne, dbUpsert} from '../util/dbUtils';
 import {User, UserRole} from '../components/models/User';
 import {
   widthPercentageToDP as wp,
@@ -19,80 +20,83 @@ function LoginScreen() {
   const boardSize = useWindowDimensions();
   const styles = generateLoginStyles(boardSize);
   const navigation = useNavigation();
-  const [phone, setPhone] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [phone, setPhone] = useState('(770) 289-6960');
   const [error, setError] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [userAccount, setUserAccount] = useState('');
-  const handleErrorCallback = errMsg => {
-    console.log(
-      `[LoginScreen][handleErrorCallback]: ${JSON.stringify(errMsg)}`,
-    );
-    setError(errMsg);
+
+  const handleErrorCallback = (errMsg: any) => {
+    setError(`[Login] Error:  ${JSON.stringify(errMsg)}`);
     return;
   };
-  const handleButtonClose = error => {
+
+  const handleButtonClose = (error: any) => {
     if (!error) {
-      console.log(`[LoginScreen] userAccount: ${JSON.stringify(userAccount)}`);
       if (!userAccount) {
-        console.log('[LoginScreen] null user - cannot setUser() redux state}');
-        setError('[LoginScreen] null user - cannot setUser() redux state}');
+        setError(
+          '[Login] Error: null User Account. Please close the app and try again.}',
+        );
         return;
       }
-      // dispatch(setUser({ phone: '1234567890', role: 'creator' }));
       dispatch(setUser({phone: userAccount.phone, role: userAccount.role}));
       navigation.navigate('UserScreen');
     }
     setShowModal(false);
   };
+  // see if we have a user, if not create one...
   const handlePress = async phoneNumber => {
-    setLoading(true);
+    const cleanPhoneNumber = phoneNumber.replace(/\D/g, '');
+    console.log(`[handlePress] cleanPhoneNumber: ${cleanPhoneNumber}`);
     const timestamp = Date.now();
     try {
-      const userId = uuidv4();
-      const cleanPhoneNumber = phoneNumber.replace(/\D/g, '');
-      const user = new User(
-        userId,
-        cleanPhoneNumber,
-        '',
-        [],
-        [],
-        [],
-        timestamp,
-        UserRole.User,
+      console.log(
+        '[Login] call dbFindOne and see if we have an existing user...',
       );
-      //const response = await addUser({user}, handleErrorCallback);
-      const result = await dbUpsert({
-        endPoint: 'upsert_user',
-        data: user,
+      const search = {
+        collection: 'users',
+        conditions: {
+          phone: '7702896960',
+        },
+      };
+      const response = await dbFindOne({
+        endPoint: 'find_one',
+        conditions: search,
         setError: handleErrorCallback,
       });
-      if (!result.data) {
-        console.log(
-          `[LoginScreen] Error: null result.data: ${JSON.stringify(result)}`,
+      setUserAccount(response.data ?? '');
+      if (!response.data) {
+        const userId = uuidv4();
+        const cleanPhoneNumber = phoneNumber.replace(/\D/g, '');
+        const newUser = new User(
+          userId,
+          cleanPhoneNumber,
+          '',
+          [],
+          [],
+          [],
+          timestamp,
+          UserRole.User,
         );
-        setLoading(false);
-        setError(
-          `[LoginScreen] Error: null result.data: ${JSON.stringify(result)}`,
-        );
-        // Show modal in case of error
-        setShowModal(true);
-        return;
+        const queryResult = await dbUpsert({
+          endPoint: 'upsert_user',
+          conditions: newUser,
+          setError: handleErrorCallback,
+        });
+        if (!queryResult.data) {
+          setError(
+            'Error: there was a problem with the User Account. Please close the app and try again.',
+          );
+          return;
+        }
+        setUserAccount(queryResult.data ?? '');
       }
-      setUserAccount(result.data);
-      // Show modal regardless of response
+      // update state if new user or updated user:
+      dispatch(setUser({phone: userAccount.phone, role: userAccount.role}));
       setShowModal(true);
     } catch (e) {
-      console.log('Error adding user:', e.message);
-      setLoading(false);
-      setError(
-        'Failed to add user to the Toqyn system. Please check your network connection and try again.',
-      );
-      // Show modal in case of error
+      setError(Config.LOGIN_ERROR?.replace('${APP_NAME}', Config.APP_NAME));
       setShowModal(true);
       return;
-    } finally {
-      setLoading(false);
     }
   };
 
