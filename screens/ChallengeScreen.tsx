@@ -6,6 +6,7 @@ import {
   StyleSheet,
   useWindowDimensions,
 } from 'react-native';
+import Config from 'react-native-config';
 import React, {useState, useEffect} from 'react';
 import {isTablet, setOutline} from '../util/util';
 import {Picker} from '@react-native-picker/picker';
@@ -20,7 +21,9 @@ import {Challenge} from '../components/models/Challenge';
 import UserModal from '../components/ui/UserModal';
 import {useSelector} from 'react-redux';
 import {getUserState} from '../redux/userSlice';
+import {useNavigation} from '@react-navigation/native';
 const ChallengeScreen = () => {
+  const navigation = useNavigation();
   const userState = useSelector(getUserState);
   console.log(`[ChallengeScreen] userState: ${JSON.stringify(userState)}`);
   const chSize = useWindowDimensions();
@@ -36,18 +39,34 @@ const ChallengeScreen = () => {
   };
   const handleButtonClose = () => {
     setShowModal(false);
+    navigation.navigate('LoginScreen');
   };
 
-  console.log(`[ChallengeScreen] userState:${JSON.stringify(userState)}`);
-  /*
-  if (userState.role !== 'creator') {
-    const err = `[ChallengeScreen] user is not a creator: ${JSON.stringify(
-      userState.role,
-    )}`;
-    setError(err);
-    setShowModal(true);
-  }
-   */
+  useEffect(() => {
+    console.log(
+      `[ChallengeScreen][useEffect] userState: ${JSON.stringify(userState)}`,
+    );
+
+    const checkUserRole = () => {
+      if (userState.role !== 'creator') {
+        const err = `Only ${Config.APP_NAME} Creators can create Challenges. \n\nPlease signup to become a Creator and get access to the "${Config.DOUBLOON_DESIGNER}" and more features.`;
+        setError(err);
+        setShowModal(true);
+      }
+    };
+
+    // Add a focus listener to check the user role when the screen comes into focus
+    const focusListener = navigation.addListener('focus', checkUserRole);
+
+    // Check if the focusListener exists before trying to remove it
+    if (focusListener && focusListener.remove) {
+      // Clean up the listener when the component unmounts
+      return () => {
+        focusListener.remove();
+      };
+    }
+  }, [userState, navigation]);
+
   const handleValueChange = itemValue => {
     setCategory(itemValue);
   };
