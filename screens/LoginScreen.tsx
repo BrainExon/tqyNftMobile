@@ -11,7 +11,125 @@ import {
 } from 'react-native-responsive-screen';
 import {isTablet, setOutline} from '../util/util';
 import {useNavigation} from '@react-navigation/native';
-import ProcessingModal from '../components/ui/ProcessingModal';
+import {useDispatch} from 'react-redux';
+import {setUser} from '../redux/userSlice';
+
+function LoginScreen() {
+  const dispatch = useDispatch();
+  const boardSize = useWindowDimensions();
+  const styles = generateLoginStyles(boardSize);
+  const navigation = useNavigation();
+  const [phone, setPhone] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [showModal, setShowModal] = useState(false);
+  const [userAccount, setUserAccount] = useState('');
+  const handleErrorCallback = errMsg => {
+    console.log(
+      `[LoginScreen][handleErrorCallback]: ${JSON.stringify(errMsg)}`,
+    );
+    setError(errMsg);
+    return;
+  };
+  const handleButtonClose = error => {
+    if (!error) {
+      console.log(`[LoginScreen] userAccount: ${JSON.stringify(userAccount)}`);
+      if (!userAccount) {
+        console.log('[LoginScreen] null user - cannot setUser() redux state}');
+        setError('[LoginScreen] null user - cannot setUser() redux state}');
+        return;
+      }
+      dispatch(setUser({phone: userAccount.phone}));
+      navigation.navigate('UserScreen');
+    }
+    setShowModal(false);
+  };
+  const handlePress = async phoneNumber => {
+    setLoading(true);
+    const timestamp = Date.now();
+    try {
+      const userId = uuidv4();
+      const cleanPhoneNumber = phoneNumber.replace(/\D/g, '');
+      const user = new User(
+        userId,
+        cleanPhoneNumber,
+        '',
+        [],
+        [],
+        [],
+        timestamp,
+        UserRole.User,
+      );
+      //const response = await addUser({user}, handleErrorCallback);
+      const result = await dbUpsert({
+        endPoint: 'upsert_user',
+        data: user,
+        setError: handleErrorCallback,
+      });
+      if (!result.data) {
+        console.log(
+          `[LoginScreen] Error: null result.data: ${JSON.stringify(result)}`,
+        );
+        setLoading(false);
+        setError(
+          `[LoginScreen] Error: null result.data: ${JSON.stringify(result)}`,
+        );
+        // Show modal in case of error
+        setShowModal(true);
+        return;
+      }
+      setUserAccount(result.data);
+      // Show modal regardless of response
+      setShowModal(true);
+    } catch (e) {
+      console.log('Error adding user:', e.message);
+      setLoading(false);
+      setError(
+        'Failed to add user to the Toqyn system. Please check your network connection and try again.',
+      );
+      // Show modal in case of error
+      setShowModal(true);
+      return;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <View style={styles.loginContainer}>
+      <View style={styles.boxHeader} />
+      <TextInput
+        style={styles.loginInput}
+        placeholder="Phone Number"
+        keyboardType="phone-pad"
+        value={phone}
+        onChangeText={text => {
+          let formattedText = text.replace(/\D/g, '');
+          if (formattedText.length <= 10) {
+            formattedText = formattedText.replace(
+              /(\d{3})(\d{0,3})(\d{0,4})/,
+              '($1) $2-$3',
+            );
+            setPhone(formattedText);
+          }
+        }}
+      />
+      <View style={styles.boxMiddle} />
+      {phone && (
+        <TransparentButton onPress={() => handlePress(phone)} title=">>>" />
+      )}
+      {showModal && (
+        <UserModal
+          visible={showModal}
+          message={'Login success!'}
+          error={error}
+          onClose={handleButtonClose}
+        />
+      )}
+      <View style={styles.boxFooter} />
+    </View>
+  );
+}
 
 function generateLoginStyles(size: any) {
   // eslint-disable
@@ -69,108 +187,6 @@ function generateLoginStyles(size: any) {
   }
   return styles;
   // eslint-enable
-}
-
-function LoginScreen() {
-  const boardSize = useWindowDimensions();
-  const styles = generateLoginStyles(boardSize);
-  const navigation = useNavigation();
-  const [phone, setPhone] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [showModal, setShowModal] = useState(false);
-
-  const handleProcessingClose = () => {
-    if (!error) {
-      setLoading(false);
-    }
-  };
-
-  const handleErrorCallback = errMsg => {
-    console.log(
-      `[LoginScreen][handleErrorCallback]: ${JSON.stringify(errMsg)}`,
-    );
-    setError(errMsg);
-  };
-
-  const handleButtonClose = error => {
-    if (!error) {
-      navigation.navigate('UserScreen');
-    }
-    setShowModal(false);
-  };
-
-  const handlePress = async phoneNumber => {
-    setLoading(true);
-    const timestamp = Date.now();
-    try {
-      const userId = uuidv4();
-      const cleanPhoneNumber = phoneNumber.replace(/\D/g, '');
-      const user = new User(
-        userId,
-        cleanPhoneNumber,
-        '',
-        [],
-        [],
-        [],
-        timestamp,
-        UserRole.User,
-      );
-      //const response = await addUser({user}, handleErrorCallback);
-      await dbUpsert({
-        endPoint: 'upsert_user',
-        data: user,
-        setError: handleErrorCallback,
-      });
-      // Show modal regardless of response
-      setShowModal(true);
-    } catch (e) {
-      console.log('Error adding user:', e.message);
-      setLoading(false);
-      setError(
-        'Failed to add user to the Toqyn system. Please check your network connection and try again.',
-      );
-      // Show modal in case of error
-      setShowModal(true);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  return (
-    <View style={styles.loginContainer}>
-      <View style={styles.boxHeader} />
-      <TextInput
-        style={styles.loginInput}
-        placeholder="Phone Number"
-        keyboardType="phone-pad"
-        value={phone}
-        onChangeText={text => {
-          let formattedText = text.replace(/\D/g, '');
-          if (formattedText.length <= 10) {
-            formattedText = formattedText.replace(
-              /(\d{3})(\d{0,3})(\d{0,4})/,
-              '($1) $2-$3',
-            );
-            setPhone(formattedText);
-          }
-        }}
-      />
-      <View style={styles.boxMiddle} />
-      {phone && (
-        <TransparentButton onPress={() => handlePress(phone)} title=">>>" />
-      )}
-      {showModal && (
-        <UserModal
-          visible={showModal}
-          message={'Login success!'}
-          error={error}
-          onClose={handleButtonClose}
-        />
-      )}
-      <View style={styles.boxFooter} />
-    </View>
-  );
 }
 
 export default LoginScreen;

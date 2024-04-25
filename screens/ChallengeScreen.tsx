@@ -18,8 +18,10 @@ import {v4 as uuidv4} from 'uuid';
 import {dbUpsert} from '../util/dbUtils';
 import {Challenge} from '../components/models/Challenge';
 import UserModal from '../components/ui/UserModal';
+import {useSelector} from 'react-redux';
 
 const ChallengeScreen = () => {
+  const userState = useSelector(state => state.user.user);
   const chSize = useWindowDimensions();
   const styles = generateChallengeStyles(chSize);
   const [category, setCategory] = useState('');
@@ -34,7 +36,9 @@ const ChallengeScreen = () => {
   const handleButtonClose = error => {
     setShowModal(false);
   };
-
+  const userPermission = () => {
+    const found = dbUpsert();
+  };
   const handleValueChange = (itemValue, itemIndex) => {
     console.log(`[handleValueChange] itemValue: ${itemValue}`);
     console.log(`[handleValueChange] itemIndex: ${itemIndex}`);
