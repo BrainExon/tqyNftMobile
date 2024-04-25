@@ -6,7 +6,7 @@ import {
   StyleSheet,
   useWindowDimensions,
 } from 'react-native';
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {isTablet, setOutline} from '../util/util';
 import {Picker} from '@react-native-picker/picker';
 import {
@@ -15,13 +15,14 @@ import {
 } from 'react-native-responsive-screen';
 import {categories} from '../constants/constants';
 import {v4 as uuidv4} from 'uuid';
-import {dbUpsert} from '../util/dbUtils';
+import {dbFindOne, dbUpsert} from '../util/dbUtils';
 import {Challenge} from '../components/models/Challenge';
 import UserModal from '../components/ui/UserModal';
 import {useSelector} from 'react-redux';
-
+import {getUserState} from '../redux/userSlice';
 const ChallengeScreen = () => {
-  const userState = useSelector(state => state.user.user);
+  const userState = useSelector(getUserState);
+  console.log(`[ChallengeScreen] userState: ${JSON.stringify(userState)}`);
   const chSize = useWindowDimensions();
   const styles = generateChallengeStyles(chSize);
   const [category, setCategory] = useState('');
@@ -30,25 +31,30 @@ const ChallengeScreen = () => {
   const [error, setError] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [message, setMessage] = useState('');
-  const handleErrorCallback = errMsg => {
+  const handleErrorCallback = (errMsg: any) => {
     setError(errMsg);
   };
-  const handleButtonClose = error => {
+  const handleButtonClose = () => {
     setShowModal(false);
   };
-  const userPermission = () => {
-    const found = dbUpsert();
-  };
-  const handleValueChange = (itemValue, itemIndex) => {
-    console.log(`[handleValueChange] itemValue: ${itemValue}`);
-    console.log(`[handleValueChange] itemIndex: ${itemIndex}`);
+
+  console.log(`[ChallengeScreen] userState:${JSON.stringify(userState)}`);
+  /*
+  if (userState.role !== 'creator') {
+    const err = `[ChallengeScreen] user is not a creator: ${JSON.stringify(
+      userState.role,
+    )}`;
+    setError(err);
+    setShowModal(true);
+  }
+   */
+  const handleValueChange = itemValue => {
     setCategory(itemValue);
   };
   const handleSubmit = async () => {
     console.log('Category:', category);
     console.log('Name:', name);
     console.log('Description:', description);
-    const timestamp = Date.now();
     try {
       const challenge = new Challenge(
         uuidv4(),
@@ -70,8 +76,8 @@ const ChallengeScreen = () => {
       // Show modal regardless of response
       setShowModal(true);
       setMessage('Challenge created!');
-    } catch (e) {
-      console.log('Error adding challenge:', e.message);
+    } catch (e: any) {
+      console.log('[ChallengeScreen] Error adding challenge:', e.message);
       setError(
         'Failed to create a Toqyn Challenge. Please check your network connection and try again.',
       );
