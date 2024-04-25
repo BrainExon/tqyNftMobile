@@ -1,4 +1,4 @@
-class Challenge {
+export class Challenge {
   chId: string;
   name: string;
   date: string;
@@ -8,6 +8,7 @@ class Challenge {
   nft: string;
   nftVersion: number;
   category: string;
+  description: string;
   constructor(
     chId: string,
     name: string,
@@ -18,6 +19,7 @@ class Challenge {
     nft: string,
     nftVersion: number,
     category: string,
+    description: string,
   ) {
     this.chId = chId;
     this.name = name;
@@ -28,7 +30,6 @@ class Challenge {
     this.nft = nft;
     this.nftVersion = nftVersion;
     this.category = category;
+    this.description = description;
   }
 }
-
-export default Challenge;

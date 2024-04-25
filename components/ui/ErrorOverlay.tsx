@@ -1,3 +1,4 @@
+import React from 'react';
 import {View, StyleSheet, Text} from 'react-native';
 import GlobalStyles from '../../constants/GlobalStyles';
 import GenButton from './GenButton';
@@ -24,15 +25,24 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
 });
-const ErrorOverlay = ({message, onConfirm}) => (
-  <View testID="test-error-overlay" style={styles.container}>
-    <Text style={[styles.text, styles.title]}>
-      {`An error occurred! ${JSON.stringify(message)}`}
-    </Text>
-    <Text style={styles.text}>{JSON.stringify(message)}</Text>
-    <GenButton onPress={onConfirm} textStyle={undefined}>
-      Okay
-    </GenButton>
-  </View>
-);
+
+const ErrorOverlay = ({message, onConfirm}) => {
+  const handleConfirm = () => {
+    // Close the error overlay window
+    onConfirm();
+  };
+
+  return (
+    <View testID="test-error-overlay" style={styles.container}>
+      <Text style={[styles.text, styles.title]}>
+        {`An error occurred! ${JSON.stringify(message)}`}
+      </Text>
+      <Text style={styles.text}>{JSON.stringify(message)}</Text>
+      <GenButton onPress={handleConfirm} textStyle={undefined}>
+        Okay
+      </GenButton>
+    </View>
+  );
+};
+
 export default ErrorOverlay;

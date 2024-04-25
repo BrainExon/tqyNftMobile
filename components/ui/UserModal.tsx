@@ -1,13 +1,5 @@
 import React from 'react';
-import {
-  Modal,
-  View,
-  Text,
-  Button,
-  StyleSheet,
-  useWindowDimensions,
-  ActivityIndicator,
-} from 'react-native';
+import {Modal, View, Text, StyleSheet, useWindowDimensions} from 'react-native';
 import GlobalStyles from '../../constants/GlobalStyles';
 import {isTablet, setOutline} from '../../util/util';
 import {
@@ -31,7 +23,18 @@ function generateUModalStyles(size: any) {
     },
     uModalContent: {
       width: isTablet(size.width, size.height) ? hp('60') : wp('70'),
-      backgroundColor: 'rgba(200, 200, 200, 0.75)',
+      backgroundColor: 'rgba(0, 0, 0, 0.5)',
+      paddingVertical: isTablet(size.width, size.height) ? hp('15') : wp('8'),
+      paddingHorizontal: isTablet(size.width, size.height) ? hp('15') : wp('8'),
+      marginVertical: isTablet(size.width, size.height) ? hp('15') : wp('8'),
+      borderStyle: 'solid',
+      borderColor: GlobalStyles.colors.primary400,
+      borderWidth: isTablet(size.width, size.height) ? hp('2') : wp('1'),
+      borderRadius: isTablet(size.width, size.height) ? hp('12') : wp('6'),
+    },
+    uModalContentError: {
+      width: isTablet(size.width, size.height) ? hp('60') : wp('70'),
+      backgroundColor: 'rgba(180, 20, 40, 0.4)',
       paddingVertical: isTablet(size.width, size.height) ? hp('15') : wp('8'),
       paddingHorizontal: isTablet(size.width, size.height) ? hp('15') : wp('8'),
       marginVertical: isTablet(size.width, size.height) ? hp('15') : wp('8'),
@@ -50,7 +53,16 @@ function generateUModalStyles(size: any) {
     },
     uModalButton: {
       width: isTablet(size.width, size.height) ? hp('48') : wp('38'),
-      backgroundColor: 'rgba(200, 200, 200, 0.75)',
+      backgroundColor: 'rgba(0, 0, 0, 0.4)',
+      borderStyle: 'solid',
+      borderColor: GlobalStyles.colors.primary400,
+      paddingVertical: isTablet(size.width, size.height) ? hp('2') : wp('3'),
+      borderWidth: isTablet(size.width, size.height) ? hp('2') : wp('1'),
+      borderRadius: isTablet(size.width, size.height) ? hp('6') : wp('3'),
+    },
+    uModalButtonError: {
+      width: isTablet(size.width, size.height) ? hp('48') : wp('38'),
+      backgroundColor: 'rgba(180, 20, 40, 0.4)',
       borderStyle: 'solid',
       borderColor: 'red',
       paddingVertical: isTablet(size.width, size.height) ? hp('2') : wp('3'),
@@ -58,7 +70,12 @@ function generateUModalStyles(size: any) {
       borderRadius: isTablet(size.width, size.height) ? hp('6') : wp('3'),
     },
     uModalButtonText: {
-      color: 'black',
+      color: 'white',
+      fontSize: isTablet(size.width, size.height) ? hp('6') : wp('4'),
+      textAlign: 'center',
+    },
+    uModalButtonText: {
+      color: 'white',
       fontSize: isTablet(size.width, size.height) ? hp('6') : wp('4'),
       textAlign: 'center',
     },
@@ -77,20 +94,35 @@ function generateUModalStyles(size: any) {
   // eslint-enable
 }
 
-const UserModal: React.FC<UserModalProps> = ({visible, message, onClose}) => {
+const UserModal: React.FC<UserModalProps> = ({
+  visible,
+  message,
+  error,
+  onClose,
+}) => {
   const pUsize = useWindowDimensions();
   const styles = generateUModalStyles(pUsize);
+
   return (
-    <Modal transparent={true} animationType="fade" visible={visible}>
+    <Modal transparent={visible} animationType="fade" visible={visible}>
       <View style={styles.uModalContainer}>
-        <View style={styles.uModalContent}>
-          <Text style={styles.uModalText}>{message}</Text>
-        </View>
+        {error && (
+          <View style={styles.uModalContentError}>
+            <Text style={styles.uModalText}>{error ? error : message}</Text>
+          </View>
+        )}
+        {!error && (
+          <View style={styles.uModalContent}>
+            <Text style={styles.uModalText}>{error ? error : message}</Text>
+          </View>
+        )}
         <GenButton
-          onPress={onClose}
-          style={styles.uModalButton}
-          textStyle={styles.uModalButtonText}>
-          >>>
+          onPress={() => onClose && onClose(error)}
+          style={error ? styles.uModalButtonError : styles.uModalButton}
+          textStyle={
+            error ? styles.uModalButtonTextError : styles.uModalButtonText
+          }>
+          {'>>>'}
         </GenButton>
       </View>
     </Modal>
