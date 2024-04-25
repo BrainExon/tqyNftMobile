@@ -1,3 +1,9 @@
+export enum UserRole {
+  Admin = 'admin',
+  User = 'user',
+  Moderator = 'moderator',
+}
+
 export class User {
   userId: string;
   phone: string;
@@ -6,6 +12,7 @@ export class User {
   chCreated: any[];
   chAccepted: any[];
   date: number;
+  role: UserRole;
 
   constructor(
     userId: string,
@@ -15,6 +22,7 @@ export class User {
     chCreated: any[] = [],
     chAccepted: any[] = [],
     date: number,
+    role: UserRole,
   ) {
     this.userId = userId;
     this.phone = phone;
@@ -23,5 +31,6 @@ export class User {
     this.chCreated = chCreated;
     this.chAccepted = chAccepted;
     this.date = date;
+    this.role = role;
   }
 }

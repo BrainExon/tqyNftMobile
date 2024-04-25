@@ -3,8 +3,8 @@ import React, {useState} from 'react';
 import TransparentButton from '../components/ui/TransParentButton';
 import UserModal from '../components/ui/UserModal';
 import {v4 as uuidv4} from 'uuid';
-import {addUser, dbUpsert} from '../util/dbUtils';
-import {User} from '../components/models/User';
+import {dbUpsert} from '../util/dbUtils';
+import {User, UserRole} from '../components/models/User';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -114,10 +114,11 @@ function LoginScreen() {
         [],
         [],
         timestamp,
+        UserRole.User,
       );
       //const response = await addUser({user}, handleErrorCallback);
       await dbUpsert({
-        endPoint: 'add_user',
+        endPoint: 'upsert_user',
         data: user,
         setError: handleErrorCallback,
       });
