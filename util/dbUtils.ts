@@ -1,6 +1,7 @@
 import Config from 'react-native-config';
 import {User} from '../components/models/User';
 
+export async function dbFetch({endPoint, data, setError}) {}
 export async function dbUpsert({endPoint, data, setError}) {
   if (!data) {
     const err = `[dbUpsert] "data" is null for endpoint ${endPoint}`;

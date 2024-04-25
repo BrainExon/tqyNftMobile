@@ -2,13 +2,13 @@ import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {ImageBackground, useColorScheme} from 'react-native';
 import {clusterApiUrl} from '@solana/web3.js';
-import GlobalStyles from './constants/GlobalStyles';
-import UserScreen from './screens/UserScreen';
 import LoginScreen from './screens/LoginScreen';
 import React from 'react';
-import {View, Text, SafeAreaView, StyleSheet} from 'react-native';
+import {SafeAreaView, StyleSheet} from 'react-native';
+import {Provider} from 'react-redux';
 import ErrorBoundary from 'react-native-error-boundary';
 import ErrorOverlay from './components/ui/ErrorOverlay';
+import store from './redux/store';
 import {
   DarkTheme as NavigationDarkTheme,
   DefaultTheme as NavigationDefaultTheme,
@@ -49,20 +49,6 @@ const styles = StyleSheet.create({
   },
 });
 
-function HomeScreen() {
-  return (
-    <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
-      <Text>Home Screen</Text>
-    </View>
-  );
-}
-function DetailsScreen() {
-  return (
-    <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
-      <Text>Details Screen</Text>
-    </View>
-  );
-}
 const Stack = createNativeStackNavigator();
 
 export default function App() {
@@ -95,40 +81,42 @@ export default function App() {
     },
   };
   return (
-    <ErrorBoundary FallbackComponent={ErrorOverlay}>
-      <SafeAreaView style={styles.shell}>
-        <ImageBackground
-          accessibilityRole="image"
-          testID="image-background"
-          resizeMode="cover"
-          source={require('./img/doubloons_bkg.png')}
-          style={[
-            styles.shell,
-            {
-              backgroundColor:
-                isDarkMode === 'dark'
-                  ? MD3DarkTheme.colors.background
-                  : MD3LightTheme.colors.background,
-            },
-          ]}
-          imageStyle={styles.logo}>
-          <Header />
-          <NavigationContainer theme={MyTheme}>
-            <Stack.Navigator>
-              <Stack.Screen
-                name="TabsNavigator"
-                component={TabsNavigator}
-                options={{headerShown: false}}
-              />
-              <Stack.Screen
-                name="Login Screen"
-                component={LoginScreen}
-                options={{headerShown: false}}
-              />
-            </Stack.Navigator>
-          </NavigationContainer>
-        </ImageBackground>
-      </SafeAreaView>
-    </ErrorBoundary>
+    <Provider store={store}>
+      <ErrorBoundary FallbackComponent={ErrorOverlay}>
+        <SafeAreaView style={styles.shell}>
+          <ImageBackground
+            accessibilityRole="image"
+            testID="image-background"
+            resizeMode="cover"
+            source={require('./img/doubloons_bkg.png')}
+            style={[
+              styles.shell,
+              {
+                backgroundColor:
+                  isDarkMode === 'dark'
+                    ? MD3DarkTheme.colors.background
+                    : MD3LightTheme.colors.background,
+              },
+            ]}
+            imageStyle={styles.logo}>
+            <Header />
+            <NavigationContainer theme={MyTheme}>
+              <Stack.Navigator>
+                <Stack.Screen
+                  name="TabsNavigator"
+                  component={TabsNavigator}
+                  options={{headerShown: false}}
+                />
+                <Stack.Screen
+                  name="Login Screen"
+                  component={LoginScreen}
+                  options={{headerShown: false}}
+                />
+              </Stack.Navigator>
+            </NavigationContainer>
+          </ImageBackground>
+        </SafeAreaView>
+      </ErrorBoundary>
+    </Provider>
   );
 }
