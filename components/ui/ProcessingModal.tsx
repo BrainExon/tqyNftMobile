@@ -88,9 +88,8 @@ const ProcessingModal = ({visible, error, onClose}) => {
         <GenButton
           onPress={onClose}
           style={styles.pModalButton}
-          textStyle={styles.pModalButtonText}>
-          close
-        </GenButton>
+          textStyle={styles.pModalButtonText}
+        />
       </View>
     </Modal>
   );

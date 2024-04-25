@@ -1,11 +1,123 @@
-import {StyleSheet, useWindowDimensions, View} from 'react-native';
-import {Text} from 'react-native-paper';
+import {
+  View,
+  Text,
+  TextInput,
+  Button,
+  StyleSheet,
+  useWindowDimensions,
+} from 'react-native';
+import React, {useState} from 'react';
 import {isTablet, setOutline} from '../util/util';
+import {Picker} from '@react-native-picker/picker';
 import {
   heightPercentageToDP as hp,
   widthPercentageToDP as wp,
 } from 'react-native-responsive-screen';
+import {categories} from '../constants/constants';
+import {v4 as uuidv4} from 'uuid';
+import {dbUpsert} from '../util/dbUtils';
+import {Challenge} from '../components/models/Challenge';
+import UserModal from '../components/ui/UserModal';
 
+const ChallengeScreen = () => {
+  const chSize = useWindowDimensions();
+  const styles = generateChallengeStyles(chSize);
+  const [category, setCategory] = useState('');
+  const [name, setName] = useState('');
+  const [description, setDescription] = useState('');
+  const [error, setError] = useState('');
+  const [showModal, setShowModal] = useState(false);
+  const [message, setMessage] = useState('');
+  const handleErrorCallback = errMsg => {
+    setError(errMsg);
+  };
+  const handleButtonClose = error => {
+    setShowModal(false);
+  };
+
+  const handleValueChange = (itemValue, itemIndex) => {
+    console.log(`[handleValueChange] itemValue: ${itemValue}`);
+    console.log(`[handleValueChange] itemIndex: ${itemIndex}`);
+    setCategory(itemValue);
+  };
+  const handleSubmit = async () => {
+    console.log('Category:', category);
+    console.log('Name:', name);
+    console.log('Description:', description);
+    const timestamp = Date.now();
+    try {
+      const challenge = new Challenge(
+        uuidv4(),
+        name,
+        Date.now(),
+        '',
+        [],
+        '',
+        '',
+        '',
+        category,
+        description,
+      );
+      await dbUpsert({
+        endPoint: 'upsert_challenge',
+        data: challenge,
+        setError: handleErrorCallback,
+      });
+      // Show modal regardless of response
+      setShowModal(true);
+      setMessage('Challenge created!');
+    } catch (e) {
+      console.log('Error adding challenge:', e.message);
+      setError(
+        'Failed to create a Toqyn Challenge. Please check your network connection and try again.',
+      );
+      setShowModal(true);
+    }
+  };
+
+  return (
+    <View style={styles.container}>
+      <Text>Category:</Text>
+      <Picker
+        selectedValue={category}
+        onValueChange={(itemValue, itemIndex) => handleValueChange(itemValue)}>
+        {categories.map((category, index) => (
+          <Picker.Item
+            key={index}
+            label={category.label}
+            value={category.value}
+          />
+        ))}
+      </Picker>
+      <Text>Name:</Text>
+      <TextInput
+        style={styles.input}
+        value={name}
+        onChangeText={text => setName(text)}
+        placeholder="Enter Name"
+      />
+
+      <Text>Description:</Text>
+      <TextInput
+        style={styles.input}
+        value={description}
+        onChangeText={text => setDescription(text)}
+        placeholder="Enter Description"
+        multiline
+      />
+
+      <Button title="Submit" onPress={handleSubmit} />
+      {showModal && (
+        <UserModal
+          visible={showModal}
+          message={message ?? ''}
+          error={error ?? ''}
+          onClose={handleButtonClose}
+        />
+      )}
+    </View>
+  );
+};
 function generateChallengeStyles(size: any) {
   const chStyles = StyleSheet.create({
     chContainer: {
@@ -47,6 +159,17 @@ function generateChallengeStyles(size: any) {
       fontSize: isTablet(size.width, size.height) ? hp('6') : wp('4'),
       textAlign: 'center',
     },
+    container: {
+      flex: 1,
+      padding: 20,
+    },
+    input: {
+      height: 40,
+      borderColor: 'gray',
+      borderWidth: 1,
+      marginBottom: 10,
+      paddingHorizontal: 10,
+    },
   });
   const styles = JSON.parse(JSON.stringify(chStyles));
   if (setOutline()) {
@@ -62,15 +185,4 @@ function generateChallengeStyles(size: any) {
   // eslint-enable
 }
 
-export default function ChallengeScreen() {
-  console.log('[ChallengeScreen]...');
-  const chSize = useWindowDimensions();
-  const styles = generateChallengeStyles(chSize);
-  return (
-    <>
-      <View style={styles.chContainer}>
-        <Text variant="titleLarge">Challenge Screen!</Text>
-      </View>
-    </>
-  );
-}
+export default ChallengeScreen;

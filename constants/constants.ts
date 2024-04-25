@@ -2,6 +2,20 @@ import Config from 'react-native-config';
 export const baseUrl = 'https://api.pinata.cloud';
 export const ERROR_NO_CREDENTIALS_PROVIDED =
   'No credentials provided! Please provide your pinata api keys, or JWT token, when starting this script.';
+export const categories = [
+  {label: 'Gaming', value: 'gaming'},
+  {label: 'Social Challenge', value: 'social_challenge'},
+  {label: 'Corporate', value: 'corporate_training'},
+  {label: 'Continuing Education', value: 'continuing_education'},
+  {label: 'Certification', value: 'certification'},
+  {label: 'Xtreme', value: 'xtreme'},
+  {label: 'Sports', value: 'sports'},
+  {label: 'Toqyn This', value: 'toqyn_this'},
+  {label: 'Licensing', value: 'licensing'},
+  {label: 'Personal Challenge', value: 'personal_challenge'},
+  {label: 'Event', value: 'event'},
+  {label: 'Other', value: 'other'},
+];
 export const ImageMetaTemplate = {
   appName: `${Config.META_APP_NAME}`,
   version: `${Config.META_APP_VERSION}`,

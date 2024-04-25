@@ -11,6 +11,7 @@ import GlobalStyles from '../../constants/GlobalStyles';
 import ChallengeScreen from '../../screens/ChallengeScreen';
 import SignupScreen from '../../screens/SignupScreen';
 import UserScreen from '../../screens/UserScreen';
+import LoginScreen from '../../screens/LoginScreen';
 const BottomTabs = createBottomTabNavigator();
 const setTabBarVisible = name => {
   switch (name) {
@@ -45,11 +46,22 @@ function TabsNavigator() {
           },
           headerTintColor: GlobalStyles.colors.primary30,
           tabBarStyle: {
-            backgroundColor: GlobalStyles.accent.blue200,
+            borderTopWidth: 2,
+            borderTopColor: GlobalStyles.colors.primary400,
+            borderBottomWidth: 2,
+            borderBottomColor: GlobalStyles.colors.primary400,
+            borderLeftWidth: 2,
+            borderLeftColor: GlobalStyles.colors.primary400,
+            borderRightWidth: 2,
+            borderRightColor: GlobalStyles.colors.primary400,
+            backgroundColor: 'rgba(0, 0, 0, 0.9)',
             display: setTabBarVisible(route?.name),
-            padding: isTablet(screenSize.width, screenSize.height)
+            paddingTop: isTablet(screenSize.width, screenSize.height)
               ? hp('1')
               : wp('2'),
+            paddingBottom: isTablet(screenSize.width, screenSize.height)
+              ? hp('2')
+              : wp('4'),
             height: isTablet(screenSize.width, screenSize.height)
               ? hp('8')
               : wp('20'),
@@ -60,17 +72,38 @@ function TabsNavigator() {
               : wp('3.5'),
           },
           tabBarLabelPosition: 'below-icon',
-          tabBarActiveTintColor: GlobalStyles.colors.primary950,
-          tabBarInactiveTintColor: GlobalStyles.colors.primary380,
+          tabBarActiveTintColor: GlobalStyles.colors.primary200,
+          tabBarInactiveTintColor: GlobalStyles.colors.primary500,
         };
         return options;
       }}>
+      <BottomTabs.Screen
+        name="LoginScreen"
+        component={LoginScreen}
+        options={{
+          title: 'Login',
+          tabBarLabel: 'Login',
+          headerShown: false, // Hide the header for this screen
+          tabBarIcon: ({color, size}) => (
+            <Icon
+              color={color}
+              size={
+                isTablet(screenSize.width, screenSize.height)
+                  ? hp('3')
+                  : wp('5')
+              }
+              name="lock"
+            />
+          ),
+        }}
+      />
       <BottomTabs.Screen
         name="UserScreen"
         component={UserScreen}
         options={{
           title: 'Home',
           tabBarLabel: 'Home',
+          headerShown: false, // Hide the header for this screen
           // eslint-disable-next-line react/no-unstable-nested-components
           tabBarIcon: ({color, size}) => (
             <Icon
@@ -91,12 +124,7 @@ function TabsNavigator() {
         options={{
           title: 'Signup',
           tabBarLabel: 'Signup',
-          headerStyle: {
-            backgroundColor: GlobalStyles.accent.blue200,
-            height: isTablet(screenSize.width, screenSize.height)
-              ? hp('28')
-              : wp('32'),
-          },
+          headerShown: false, // Hide the header for this screen
           tabBarIcon: ({color, size}) => (
             <Icon
               color={color}
@@ -116,12 +144,7 @@ function TabsNavigator() {
         options={{
           title: 'Challenge',
           tabBarLabel: 'Challenge',
-          headerStyle: {
-            backgroundColor: GlobalStyles.accent.blue200,
-            height: isTablet(screenSize.width, screenSize.height)
-              ? hp('28')
-              : wp('32'),
-          },
+          headerShown: false, // Hide the header for this screen
           tabBarIcon: ({color, size}) => (
             <Icon
               color={color}

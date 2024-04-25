@@ -1,7 +1,52 @@
 import Config from 'react-native-config';
 import {User} from '../components/models/User';
 
-export async function addUser({user}: {user: User}, setError: any) {
+export async function dbUpsert({endPoint, data, setError}) {
+  if (!data) {
+    const err = `[dbUpsert] "data" is null for endpoint ${endPoint}`;
+    console.log(err);
+    setError(err);
+    return;
+  }
+  const myHeaders = new Headers();
+  myHeaders.append('Content-Type', 'application/json');
+  const raw = JSON.stringify(data);
+  const requestOptions = {
+    method: 'POST',
+    headers: myHeaders,
+    body: raw,
+    redirect: 'follow',
+  };
+  try {
+    const response = await fetch(
+      `${Config.NODEJS_EXPRESS_SERVER}/${endPoint}`,
+      requestOptions,
+    );
+    console.log(
+      `[dbUpsert] end point "${endPoint}" response: ${JSON.stringify(
+        response,
+      )}`,
+    );
+    console.log(`[dbUpsert] response.ok: ${JSON.stringify(response.ok)}`);
+    if (response.ok) {
+      const data = await response.json();
+      console.log('[dbUpsert] User added successfully:', data);
+      return data;
+    } else {
+      const er = `[dbUpsert] adding user: ${JSON.stringify(
+        response.statusText,
+      )}`;
+      setError(er);
+    }
+  } catch (error) {
+    const er = `An error occurred while upserting to end point: ${JSON.stringify(
+      endPoint,
+    )}`;
+    setError(er);
+  }
+}
+
+export async function addUser({user, setError}) {
   if (!user) {
     const err = '[addUser] null user!';
     console.log(err);
@@ -22,12 +67,15 @@ export async function addUser({user}: {user: User}, setError: any) {
       requestOptions,
     );
     console.log(`[dbUtils][addUser] response: ${JSON.stringify(response)}`);
+    console.log(
+      `[dbUtils][addUser] response.ok: ${JSON.stringify(response.ok)}`,
+    );
     if (response.ok) {
       const data = await response.json();
-      console.log('User added successfully:', data);
+      console.log('[addUser] User added successfully:', data);
       return data;
     } else {
-      const er = `LoginScreenError adding user: ${JSON.stringify(
+      const er = `[addUser] adding user: ${JSON.stringify(
         response.statusText,
       )}`;
       setError(er);

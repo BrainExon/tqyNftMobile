@@ -10,13 +10,14 @@ import {
   heightPercentageToDP as hp,
   widthPercentageToDP as wp,
 } from 'react-native-responsive-screen';
+import GlobalStyles from '../../constants/GlobalStyles';
 
 const generateTransButtonStyles = size => {
   const transStyles = StyleSheet.create({
     tButton: {
-      backgroundColor: '#D3D3D3',
+      backgroundColor: 'rgba(0, 0, 0, 0.5)',
       borderWidth: 2,
-      borderColor: 'black',
+      borderColor: GlobalStyles.colors.primary200,
       width: isTablet(size.width, size.height) ? hp('40') : wp('30'),
       borderRadius: isTablet(size.width, size.height) ? hp('4') : wp('4'),
       //paddingVertical: isTablet(size.width, size.height) ? hp('4') : wp('1'),
@@ -25,7 +26,7 @@ const generateTransButtonStyles = size => {
       alignItems: 'center',
     },
     tText: {
-      color: 'black',
+      color: GlobalStyles.colors.primary200,
       fontSize: isTablet(size.width, size.height) ? hp('4') : wp('6'),
       fontWeight: 'bold',
       textAlign: 'center',
