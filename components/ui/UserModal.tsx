@@ -1,5 +1,12 @@
 import React from 'react';
-import {Modal, View, Text, StyleSheet, useWindowDimensions} from 'react-native';
+import {
+  Modal,
+  View,
+  Text,
+  StyleSheet,
+  useWindowDimensions,
+  ActivityIndicator,
+} from 'react-native';
 import GlobalStyles from '../../constants/GlobalStyles';
 import {isTablet, setOutline} from '../../util/util';
 import {
@@ -99,6 +106,7 @@ const UserModal: React.FC<UserModalProps> = ({
   message,
   error,
   onClose,
+  showActivity,
 }) => {
   const pUsize = useWindowDimensions();
   const styles = generateUModalStyles(pUsize);
@@ -116,6 +124,11 @@ const UserModal: React.FC<UserModalProps> = ({
             <Text style={styles.uModalText}>{error ? error : message}</Text>
           </View>
         )}
+        {showActivity && (
+          <View style={styles.activityIndicatorContainer}>
+            <ActivityIndicator size="large" color="#0000ff" />
+          </View>
+        )}
         <GenButton
           onPress={() => onClose && onClose(error)}
           style={error ? styles.uModalButtonError : styles.uModalButton}
@@ -128,5 +141,4 @@ const UserModal: React.FC<UserModalProps> = ({
     </Modal>
   );
 };
-
 export default UserModal;
