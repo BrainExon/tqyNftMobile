@@ -12,6 +12,7 @@ import ChallengeScreen from '../../screens/ChallengeScreen';
 import SignupScreen from '../../screens/SignupScreen';
 import UserScreen from '../../screens/UserScreen';
 import LoginScreen from '../../screens/LoginScreen';
+import NftMinter from '../NftMinter';
 const BottomTabs = createBottomTabNavigator();
 const setTabBarVisible = name => {
   switch (name) {
@@ -153,6 +154,26 @@ function TabsNavigator() {
                   : wp('5')
               }
               name="gear"
+            />
+          ),
+        }}
+      />
+      <BottomTabs.Screen
+        name="NFT"
+        component={NftMinter}
+        options={{
+          title: 'NFT',
+          tabBarLabel: 'NFT',
+          headerShown: false, // Hide the header for this screen
+          tabBarIcon: ({color, size}) => (
+            <Icon
+              color={color}
+              size={
+                isTablet(screenSize.width, screenSize.height)
+                  ? hp('3')
+                  : wp('5')
+              }
+              name="bitcoin"
             />
           ),
         }}

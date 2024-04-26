@@ -78,16 +78,16 @@ export async function dbUpsert({endPoint, conditions, setError}) {
     console.log(`[dbUpsert] response.ok: ${JSON.stringify(response.ok)}`);
     if (response.ok) {
       const data = await response.json();
-      console.log('[dbUpsert] User added successfully:', data);
+      console.log('[dbUpsert] ${endPoint} success:', data);
       return data;
     } else {
-      const er = `[dbUpsert] adding user: ${JSON.stringify(
+      const er = `[dbUpsert] ${endPoint}  : ${JSON.stringify(
         response.statusText,
       )}`;
       setError(er);
     }
   } catch (error) {
-    const er = `[dbUpsert] An error occurred while upserting to end point: ${JSON.stringify(
+    const er = `[dbUpsert] An error occurred while upserting endpoint: ${JSON.stringify(
       endPoint,
     )}`;
     setError(er);

@@ -1,6 +1,6 @@
 import React, {useState, useCallback} from 'react';
 import Config from 'react-native-config';
-import {useMWAWallet} from './hooks/useMWAWallet';
+import {NFTData} from './models/NFT';
 import {
   View,
   Image,
@@ -14,9 +14,10 @@ import {
   Linking,
 } from 'react-native';
 import {launchImageLibrary} from 'react-native-image-picker';
-import {useAuthorization} from './providers/AuthorizationProvider';
 import {isEmpty, isObjectEmpty} from '../util/util';
 import ArdriveUpload from '../ipfs/ArdriveUpload';
+import NFT from './models/NFT';
+import {dbUpsert} from '../util/dbUtils';
 
 enum MintingStep {
   None = 'None',
@@ -33,8 +34,6 @@ const NftMinter = () => {
   );
   const [nftName, setNftName] = useState('xyz');
   const [nftDescription, setNftDescription] = useState('zyc');
-  const {selectedAccount, authorizeSession} = useAuthorization();
-  const mwaWallet = useMWAWallet(authorizeSession, selectedAccount);
   const [mintAddress, setMintAddress] = useState<string | null>(null);
   const [imageType, setImageType] = useState<string | null>(null);
   const [imageName, setImageName] = useState<string | null>(null);
@@ -56,6 +55,18 @@ const NftMinter = () => {
       setMintProgressStep(MintingStep.Error);
     }
   }, []);
+
+  const dbUpsertNft = useCallback(
+    async (nft: NFTData) => {
+      console.log(`[dbUpsertNft] nft (data): ${JSON.stringify(nft)}`);
+      return await dbUpsert({
+        endPoint: 'upsert_nft',
+        conditions: nft,
+        setError: handleErrorCallback,
+      });
+    },
+    [handleErrorCallback],
+  );
 
   const urlExists = (url, callback, retries = 3) => {
     const makeRequest = retryCount => {
@@ -125,8 +136,31 @@ const NftMinter = () => {
             imageName,
             handleErrorCallback,
           );
+          if (data.data) {
+            console.log(`MINT data: ${JSON.stringify(data)}`);
+            try {
+              const nft = new NFT(data.data);
+              console.log(`New [NFT] ${JSON.stringify(nft, null, 2)}`);
+              const response = await dbUpsertNft(nft);
+              if (response) {
+                console.log(
+                  `[dbUpsertNft] response: ${JSON.stringify(
+                    response,
+                    null,
+                    2,
+                  )}`,
+                );
+              }
+            } catch (e) {
+              console.log(
+                `unable to create "new NFT()" error: ${JSON.stringify(e)}`,
+              );
+            }
+          } else {
+            console.error('[NFT] null "data.data"');
+          }
           return data;
-        } catch (error) {
+        } catch (error: any) {
           const er = `[NftMinter] Error: ${
             error.message || 'Unknown error occurred'
           }`;
@@ -146,13 +180,7 @@ const NftMinter = () => {
       };
       return [nftResponse.nft.address, nftResponse.response.signature];
     },
-    [
-      mwaWallet,
-      handleErrorCallback,
-      nftName,
-      selectedAccount?.publicKey,
-      imageType,
-    ],
+    [dbUpsertNft, handleErrorCallback, imageType, imageName],
   );
 
   const isLoading =
@@ -285,8 +313,11 @@ const NftMinter = () => {
                                 selectedImage,
                                 nftDescription,
                               );
-                              console.log(`Mint Successful Mint Address: ${mint} Tx Signature: ${signature}`);
-                              const explorerUrl = Config.ARWEAVE_PREVIEW_URL + '/' + mint;
+                              console.log(
+                                `Mint Successful Mint Address: "${mint}" Tx Signature: "${signature}"`,
+                              );
+                              const explorerUrl =
+                                Config.ARWEAVE_PREVIEW_URL + '/' + mint;
                               urlExists(explorerUrl, (err, exists) => {
                                 if (err) {
                                   const error = '[urlExists] Error:';
@@ -295,7 +326,9 @@ const NftMinter = () => {
                                   setMintProgressStep(MintingStep.Error);
                                   return;
                                 } else {
-                                  console.log( `URL EXISTS: ${explorerUrl} exists: ${exists}`);
+                                  console.log(
+                                    `URL EXISTS: ${explorerUrl} exists: ${exists}`,
+                                  );
                                   setMintProgressStep(MintingStep.Success);
                                   setMintAddress(mint);
                                 }
