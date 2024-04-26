@@ -22,6 +22,7 @@ import UserModal from '../components/ui/UserModal';
 import {useSelector} from 'react-redux';
 import {getUserState} from '../redux/userSlice';
 import {useNavigation} from '@react-navigation/native';
+
 const ChallengeScreen = () => {
   const navigation = useNavigation();
   const userState = useSelector(getUserState);
@@ -46,7 +47,12 @@ const ChallengeScreen = () => {
     console.log(`[useEffect] userState: ${JSON.stringify(userState)}`);
     console.log(`[useEffect] userState.role: ${userState.role}`);
     const checkUserRole = () => {
+      setError('');
+      setShowModal(false);
       if (userState.role !== 'creator') {
+        console.log(
+          `[useEffect] userState.role is not creator?? "${userState.role}"`,
+        );
         const errorMessage = Config.AUTH_ERROR?.replace(
           '${APP_NAME}',
           Config.APP_NAME,
@@ -55,13 +61,8 @@ const ChallengeScreen = () => {
         setShowModal(true);
       }
     };
-    const focusListener = navigation.addListener('focus', checkUserRole);
-    if (focusListener && focusListener.remove) {
-      return () => {
-        focusListener.remove();
-      };
-    }
-  }, [userState, navigation]);
+    checkUserRole();
+  }, []);
 
   const handleValueChange = itemValue => {
     setCategory(itemValue);
@@ -149,11 +150,12 @@ function generateChallengeStyles(size: any) {
       flex: 1,
       justifyContent: 'center',
       alignItems: 'center',
-      backgroundColor: 'rgba(0, 0, 0, 0.8)',
+      backgroundColor: 'rgba(150, 150, 150, 1)',
     },
     chContent: {
       width: isTablet(size.width, size.height) ? hp('60') : wp('70'),
-      backgroundColor: 'rgba(180, 0, 0, 0.4)',
+      backgroundColor: 'rgba(150, 150, 150, 1)',
+      //backgroundColor: 'rgba(180, 0, 0, 0.4)',
       paddingVertical: isTablet(size.width, size.height) ? hp('15') : wp('8'),
       paddingHorizontal: isTablet(size.width, size.height) ? hp('15') : wp('8'),
       marginVertical: isTablet(size.width, size.height) ? hp('15') : wp('8'),

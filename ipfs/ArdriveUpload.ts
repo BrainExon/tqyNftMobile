@@ -48,7 +48,7 @@ const ArdriveUpload = async (
   console.log(`[ArDriveUpload] imageName: ${imageName}`);
 
   const handleError = (error: any) => {
-    console.error('[ArdriveUpload][mint] Error:', JSON.stringify(error));
+    console.log('[ArdriveUpload][mint] Error:', JSON.stringify(error));
     callback(error.message);
   };
 
@@ -65,19 +65,17 @@ const ArdriveUpload = async (
       'rn_image_picker_lib_temp_',
       '',
     );
-    //formData.append('files', { uri: imagePath, type: imageType, name: imageName });
     formData.append('files', {
       uri: imagePath,
       type: imageType,
       name: cleanName,
     });
-
     const requestOptions = {
       method: 'POST',
       body: formData,
       redirect: 'follow',
     };
-
+    console.log(`[ArdriveUplaod] formData: ${JSON.stringify(formData)}`);
     try {
       const response = await fetch(
         `${Config.NODEJS_EXPRESS_SERVER}/upload_files`,
@@ -86,14 +84,13 @@ const ArdriveUpload = async (
       const result = await response.json();
       return result;
     } catch (error) {
-      console.error(error);
-      throw error;
+      handleError(`[ArdriveUpload] error: ${JSON.stringify(error)}`);
     }
   };
 
   try {
     const minting = await mint();
-
+    console.log(`[ArdriveUpload] minting response: ${JSON.stringify(minting)}`);
     if (minting.error) {
       console.log(
         `[ArDriveUpload][mint] error: ${JSON.stringify(minting.error)}`,
