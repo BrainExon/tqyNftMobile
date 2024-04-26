@@ -1,6 +1,7 @@
 import React, {useState, useCallback, useEffect} from 'react';
 import Config from 'react-native-config';
-import {NFTData} from './models/NFT';
+import {PinNft, pinNft} from '../ipfs/blockchain';
+import {urlExists} from '../util/httpUtils';
 import {
   View,
   Image,
@@ -11,15 +12,11 @@ import {
   StyleSheet,
   TouchableWithoutFeedback,
   TextInput,
-  Linking,
   useWindowDimensions,
 } from 'react-native';
 import {useSelector} from 'react-redux';
 import {launchImageLibrary} from 'react-native-image-picker';
 import {isEmpty, isObjectEmpty, isTablet, setOutline} from '../util/util';
-import ArdriveUpload from '../ipfs/ArdriveUpload';
-import NFT from './models/NFT';
-import {dbUpsert} from '../util/dbUtils';
 import {getUserState} from '../redux/userSlice';
 import UserModal from './ui/UserModal';
 import {useNavigation} from '@react-navigation/native';
@@ -29,6 +26,96 @@ import {
 } from 'react-native-responsive-screen';
 import GlobalStyles from '../constants/GlobalStyles';
 
+function generateMinterSytles(size: any) {
+  const mintStyles = StyleSheet.create({
+    container: {
+      flex: 1,
+      justifyContent: 'flex-end',
+      alignItems: 'center',
+      backgroundColor: 'rgba(0, 0, 0, 0.8)',
+    },
+    inputContainerWrapper: {
+      alignItems: 'center',
+      width: isTablet(size.width, size.height) ? hp('80') : wp('70'),
+      padding: isTablet(size.width, size.height) ? hp('6') : wp('4'),
+      borderRadius: isTablet(size.width, size.height) ? hp('6') : wp('9'),
+      backgroundColor: 'rgba(100, 100, 100, 0.8)',
+    },
+    buttonGroup: {
+      flexDirection: 'row',
+      marginBottom: isTablet(size.width, size.height) ? hp('12') : wp('8'),
+    },
+    pickImageButton: {
+      marginHorizontal: isTablet(size.width, size.height) ? hp('8') : wp('4'),
+      width: isTablet(size.width, size.height) ? hp('12') : wp('40'),
+      backgroundColor: 'rgba(100, 100, 100, 0.8)',
+      color: GlobalStyles.colors.primary400,
+    },
+    mintThisNftButton: {
+      marginHorizontal: isTablet(size.width, size.height) ? hp('8') : wp('4'),
+      width: isTablet(size.width, size.height) ? hp('12') : wp('40'),
+    },
+    mintButton: {
+      marginVertical: isTablet(size.width, size.height) ? hp('8') : wp('4'),
+      marginHorizontal: isTablet(size.width, size.height) ? hp('8') : wp('4'),
+      borderRadius: isTablet(size.width, size.height) ? hp('6') : wp('8'),
+    },
+    modalImage: {
+      width: isTablet(size.width, size.height) ? hp('80') : wp('60'),
+      height: isTablet(size.width, size.height) ? hp('80') : wp('60'),
+      marginBottom: isTablet(size.width, size.height) ? hp('20') : wp('35'),
+      backgroundColor: 'transparent',
+    },
+    textTitle: {
+      paddingTop: isTablet(size.width, size.height) ? hp('4') : wp('3'),
+      paddingHorizontal: isTablet(size.width, size.height) ? hp('5') : wp('3'),
+    },
+    textInput: {
+      height: isTablet(size.width, size.height) ? hp('10') : wp('10'),
+      //borderWidth: isTablet(size.width, size.height) ? hp('2') : wp('1'),
+      marginBottom: isTablet(size.width, size.height) ? hp('12') : wp('8'),
+      //margin: isTablet(size.width, size.height) ? hp('4') : wp('8'),
+      padding: isTablet(size.width, size.height) ? hp('12') : wp('2'),
+      backgroundColor: GlobalStyles.colors.primary200,
+    },
+    centeredView: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    modalView: {
+      borderWidth: isTablet(size.width, size.height) ? hp('6') : wp('1'),
+      borderColor: GlobalStyles.colors.primary200,
+      borderRadius: isTablet(size.width, size.height) ? hp('6') : wp('2'),
+      margin: isTablet(size.width, size.height) ? hp('4') : wp('8'),
+      // backgroundColor: 'rgba(100, 100, 100, 0.8)',
+      padding: isTablet(size.width, size.height) ? hp('12') : wp('4'),
+      alignItems: 'center',
+    },
+    inputContainer: {
+      width: isTablet(size.width, size.height) ? hp('80') : wp('60'),
+      backgroundColor: 'rgba(100, 100, 100, 0.8)',
+      borderRadius: isTablet(size.width, size.height) ? hp('6') : wp('4'),
+    },
+    modalText: {
+      marginBottom: isTablet(size.width, size.height) ? hp('15') : wp('3'),
+      textAlign: 'center',
+      color: 'white',
+    },
+  });
+  const styles = JSON.parse(JSON.stringify(mintStyles));
+  if (setOutline()) {
+    Object.keys(styles).forEach(key => {
+      Object.assign(styles[key], {
+        borderStyle: 'solid',
+        borderColor: 'red',
+        borderWidth: 2,
+      });
+    });
+  }
+  return styles;
+  // eslint-enable
+}
 enum MintingStep {
   None = 'None',
   SubmittingInfo = 'Submit',
@@ -48,7 +135,6 @@ const NftMinter = () => {
   );
   const [nftName, setNftName] = useState('xyz');
   const [nftDescription, setNftDescription] = useState('zyc');
-  const [mintAddress, setMintAddress] = useState<string | null>(null);
   const [imageType, setImageType] = useState<string | null>(null);
   const [imageName, setImageName] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState('');
@@ -61,34 +147,21 @@ const NftMinter = () => {
   };
 
   const handleErrorCallback = useCallback((error: any) => {
-    if (isObjectEmpty(error)) {
+    if (isObjectEmpty(error) || isEmpty(error)) {
       return;
     }
-    if (isEmpty(error)) {
-      return;
-    }
-    if (error) {
-      let er = '';
-      if (typeof error !== 'string') {
-        er = `${JSON.stringify(error)}}`;
-      } else {
-        er = error;
-      }
-      console.log(er);
-      setShowModal(true);
-      setErrorMessage(JSON.stringify(er));
-      setMintProgressStep(MintingStep.Error);
-    }
+    // eslint-disable-next-line
+    const errorMessage = typeof error !== 'string' ? JSON.stringify(error) : error;
+    console.log(`[handleErrorCallback] errorMessage: ${errorMessage}`);
+    setShowModal(true);
+    setErrorMessage(errorMessage);
+    setMintProgressStep(MintingStep.Error);
   }, []);
 
+  // check user permissions
   useEffect(() => {
-    console.log(`[useEffect] userState: ${JSON.stringify(userState)}`);
-    console.log(`[useEffect] userState.role: ${userState.role}`);
     const checkUserRole = () => {
       if (userState.role !== 'creator') {
-        console.log(
-          `[useEffect] userState.role is not creator?? "${userState.role}"`,
-        );
         const errorMessage = Config.AUTH_ERROR?.replace(
           '${APP_NAME}',
           Config.APP_NAME,
@@ -99,51 +172,7 @@ const NftMinter = () => {
       }
     };
     checkUserRole();
-  }, []);
-
-  const dbUpsertNft = useCallback(
-    async (nft: NFTData) => {
-      console.log(`[dbUpsertNft] nft (data): ${JSON.stringify(nft)}`);
-      return await dbUpsert({
-        endPoint: 'upsert_nft',
-        conditions: nft,
-        setError: handleErrorCallback,
-      });
-    },
-    [handleErrorCallback],
-  );
-
-  const urlExists = (url, callback, retries = 3) => {
-    const makeRequest = retryCount => {
-      fetch(url, {method: 'GET'})
-        .then(res => {
-          console.log(`[urlExists] url ${url}`);
-          if (res.ok) {
-            callback(null, true);
-          } else {
-            if (retryCount > 0) {
-              console.log(`[urlExists] retrying... ${retryCount} retries left`);
-              setTimeout(() => {
-                makeRequest(retryCount - 1);
-              }, 8000); // 3 seconds timeout
-            } else {
-              callback(null, false);
-            }
-          }
-        })
-        .catch(err => {
-          if (retryCount > 0) {
-            console.log(`[urlExists] retrying... ${retryCount} retries left`);
-            setTimeout(() => {
-              makeRequest(retryCount - 1);
-            }, 8000); // 3 seconds timeout
-          } else {
-            callback(err, false);
-          }
-        });
-    };
-    makeRequest(retries);
-  };
+  }, [handleErrorCallback]);
 
   const handleSelectImage = async () => {
     const photo = await launchImageLibrary({
@@ -167,106 +196,86 @@ const NftMinter = () => {
   };
 
   const mintNft = useCallback(
-    async (theImage: string) => {
+    async (nftImage: string) => {
       console.log('\n---------\n[mintNft]\n---------\n');
+      console.log('[mintNft] nftImage', JSON.stringify(nftImage));
       setMintProgressStep(MintingStep.UploadingImage);
-
-      const handleMintNft = async (imagePath: string) => {
-        console.log('\n---------\n[handleMintNFt]\n---------\n');
-        try {
-          setMintProgressStep(MintingStep.UploadingImage);
-          const data = await ArdriveUpload(
-            imagePath,
-            imageType,
-            imageName,
-            handleErrorCallback,
-          );
-          if (data && !data.data) {
-            handleErrorCallback('[ArdriveUpload] null data response');
-            return;
-          }
-          if (data.data) {
-            console.log(`MINT data: ${JSON.stringify(data)}`);
-            try {
-              const nft = new NFT(data.data);
-              console.log(`New [NFT] ${JSON.stringify(nft, null, 2)}`);
-              const response = await dbUpsertNft(nft);
-              if (response) {
-                console.log(
-                  `[dbUpsertNft] response: ${JSON.stringify(
-                    response,
-                    null,
-                    2,
-                  )}`,
-                );
-              }
-            } catch (e) {
-              console.log(
-                `unable to create "new NFT()" error: ${JSON.stringify(e)}`,
-              );
-            }
-          } else {
-            console.log('[NFT] null "data.data"');
-          }
-          return data;
-        } catch (error: any) {
-          const er = `[NftMinter] Error: ${
-            error.message || 'Unknown error occurred'
-          }`;
-          console.log(er);
-          handleErrorCallback(er);
-          return;
+      /**
+       * interface PinNft {
+       *   imagePath: string;
+       *   imageType: string;
+       *   imageName: string;
+       *   callback: () => void;
+       * }
+       */
+      try {
+        const ipfsData: PinNft = await pinNft({
+          imagePath: nftImage,
+          imageType: imageType,
+          imageName: imageName,
+          callback: handleErrorCallback,
+        });
+        if (!ipfsData.data.created[0].dataTxId) {
+          const err = '[NftMinter] null dataTxId!';
+          handleErrorCallback(err);
         }
-      };
-      const ipfsData = await handleMintNft(theImage);
-      if (!ipfsData.data.created[0].dataTxId) {
-        const err = '[NftMinter] null dataTxId!';
-        handleErrorCallback(err);
+        const nftResponse = {
+          nft: {address: `${ipfsData.data.created[0].dataTxId}`},
+          response: {signature: '123'},
+        };
+        return [nftResponse.nft.address, nftResponse.response.signature];
+      } catch (e) {
+        console.log(`[mintNft] error: ${JSON.stringify(e)}`);
+        handleErrorCallback(e);
       }
-      const nftResponse = {
-        nft: {address: `${ipfsData.data.created[0].dataTxId}`},
-        response: {signature: '123'},
-      };
-      return [nftResponse.nft.address, nftResponse.response.signature];
     },
-    [dbUpsertNft, handleErrorCallback, imageType, imageName],
+    [handleErrorCallback, imageType, imageName],
   );
   const isLoading =
     mintProgressStep === MintingStep.MintingMetadata ||
     mintProgressStep === MintingStep.UploadingImage;
 
+  function ImageComponent() {
+    return (
+      <View>
+        {selectedImage ? (
+          <Image
+            source={{uri: selectedImage}}
+            style={showModal ? '' : styles.modalImage}
+          />
+        ) : (
+          <View style={{marginBottom: 16}}>
+            <Text>Select an image from your Photo Library to get started!</Text>
+          </View>
+        )}
+      </View>
+    );
+  }
+  function ButtonGroup() {
+    return (
+      <View style={styles.buttonGroup}>
+        <View style={styles.pickImageButton}>
+          <Button
+            onPress={handleSelectImage}
+            title="Pick an image"
+            disabled={isLoading}
+          />
+        </View>
+        <View style={styles.mintThisNftButton}>
+          <Button
+            onPress={() => setMintProgressStep(MintingStep.SubmittingInfo)}
+            title="Mint this NFT"
+            disabled={isLoading || !selectedImage}
+          />
+        </View>
+      </View>
+    );
+  }
+
   return (
     <View style={showModal ? '' : styles.container}>
-      {selectedImage ? (
-        <Image
-          source={{uri: selectedImage}}
-          style={showModal ? '' : styles.modalImage}
-        />
-      ) : (
-        <View style={{marginBottom: 16}}>
-          <Text>Select an image from your Photo Library to get started!</Text>
-        </View>
-      )}
-      {showModal ? (
-        ''
-      ) : (
-        <View style={styles.buttonGroup}>
-          <View style={styles.pickImageButton}>
-            <Button
-              onPress={handleSelectImage}
-              title="Pick an image"
-              disabled={isLoading}
-            />
-          </View>
-          <View style={styles.mintButton}>
-            <Button
-              onPress={() => setMintProgressStep(MintingStep.SubmittingInfo)}
-              title="Mint this NFT"
-              disabled={isLoading || !selectedImage}
-            />
-          </View>
-        </View>
-      )}
+      <ImageComponent />
+      <ButtonGroup />
       <Modal
         animationType="slide"
         transparent={true}
@@ -274,16 +283,21 @@ const NftMinter = () => {
         <TouchableWithoutFeedback
           onPress={() => setMintProgressStep(MintingStep.None)}>
           <View style={showModal ? '' : styles.centeredView}>
-            <View style={showModal ? '' : styles.modalView}>
+            <View>
               {mintProgressStep === MintingStep.UploadingImage ||
               mintProgressStep === MintingStep.MintingMetadata ? (
                 <>
-                  <Text style={styles.modalText}>
-                    {mintProgressStep === MintingStep.UploadingImage
-                      ? 'Uploading to blockchain...'
-                      : 'Minting NFT...'}
-                  </Text>
-                  <ActivityIndicator size="large" color="#0000ff" />
+                  <UserModal
+                    visible={showModal}
+                    message={
+                      mintProgressStep === MintingStep.UploadingImage
+                        ? 'Uploading to blockchain...'
+                        : 'Minting NFT...'
+                    }
+                    error={''}
+                    onClose={handleModalButtonClose}
+                    showActivity={true}
+                  />
                 </>
               ) : mintProgressStep === MintingStep.Error ? (
                 <UserModal
@@ -291,81 +305,71 @@ const NftMinter = () => {
                   message={message ?? ''}
                   error={errorMessage ?? ''}
                   onClose={handleModalButtonClose}
+                  showActivity={false}
                 />
               ) : mintProgressStep === MintingStep.Success ? (
                 <>
-                  <Text style={{fontWeight: 'bold'}}>
-                    {Config.MINT_SUCCESS}
-                  </Text>
+                  <UserModal
+                    visible={showModal}
+                    message={Config.MINT_SUCCESS}
+                    error={errorMessage ?? ''}
+                    onClose={handleModalButtonClose}
+                    showActivity={false}
+                  />
                 </>
               ) : (
-                <View style={styles.inputContainerWrapper}>
-                  <View style={styles.inputContainer}>
-                    <Text style={{fontWeight: 'bold', textAlign: 'center'}}>
-                      NFT Metadata
-                    </Text>
-                    <Text style={styles.textTitle}>Name:</Text>
-                    <TextInput
-                      style={styles.textInput}
-                      autoCorrect={false}
-                      placeholder="Enter text"
-                      onChangeText={text => setNftName(text)}
-                      value={nftName}
-                    />
-                    <Text style={styles.textTitle}>Description:</Text>
-                    <TextInput
-                      style={styles.textInput}
-                      autoCorrect={false}
-                      placeholder="Enter text"
-                      onChangeText={text => setNftDescription(text)}
-                      value={nftDescription}
-                    />
+                <View style={styles.inputContainer}>
+                  <Text style={{fontWeight: 'bold', textAlign: 'center'}}>
+                    NFT Metadata
+                  </Text>
+                  <Text style={styles.textTitle}>Name:</Text>
+                  <TextInput
+                    style={styles.textInput}
+                    autoCorrect={false}
+                    placeholder="Enter text"
+                    onChangeText={text => setNftName(text)}
+                    value={nftName}
+                  />
+                  <Text style={styles.textTitle}>Description:</Text>
+                  <TextInput
+                    style={styles.textInput}
+                    autoCorrect={false}
+                    placeholder="Enter text"
+                    onChangeText={text => setNftDescription(text)}
+                    value={nftDescription}
+                  />
+                  <View style={styles.mintButton}>
                     <Button
                       title="Mint!"
                       onPress={async () => {
                         if (!selectedImage) {
-                          const error =
-                            '[NftMinter] error: Image not selected.';
-                          console.log(error);
-                          handleErrorCallback(error);
+                          handleErrorCallback(
+                            '[NftMinter] error: Image not selected.',
+                          );
                           return;
                         }
-                        let mint, signature;
                         try {
-                          [mint, signature] = await mintNft(
-                            selectedImage,
-                            nftDescription,
-                          );
-                          console.log(
-                            `Mint Successful Mint Address: "${mint}" Tx Signature: "${signature}"`,
-                          );
+                          let mint,
+                            signature = '';
+                          [mint, signature] = await mintNft(selectedImage);
+                          console.log(`Mint Address: "${mint}"`);
                           const explorerUrl =
                             Config.ARWEAVE_PREVIEW_URL + '/' + mint;
                           urlExists(explorerUrl, (err, exists) => {
                             if (err) {
-                              const error = '[urlExists] Error:';
-                              console.log(error);
-                              handleErrorCallback(error);
                               setMintProgressStep(MintingStep.Error);
+                              handleErrorCallback(err);
                               return;
-                            } else {
-                              console.log(
-                                `URL EXISTS: ${explorerUrl} exists: ${exists}`,
-                              );
-                              setMintProgressStep(MintingStep.Success);
-                              setMintAddress(mint);
                             }
+                            setMintProgressStep(MintingStep.Success);
                           });
                         } catch (error) {
-                          let err =
-                            '[NftMinter] Minting service unavailable, try again later.';
-                          if (!isObjectEmpty(error)) {
-                            err = `[NftMinter] Minting error: ${JSON.stringify(
-                              error,
-                            )}`;
-                          }
-                          console.log(err);
-                          handleErrorCallback(err);
+                          console.log(
+                            `[NftMinting] error: ${JSON.stringify(error)}`,
+                          );
+                          handleErrorCallback(
+                            'Minting service unavailable, try again later.',
+                          );
                           return;
                         }
                       }}
@@ -380,95 +384,5 @@ const NftMinter = () => {
     </View>
   );
 };
-
-const styles = StyleSheet.create({});
-
-function generateMinterSytles(size: any) {
-  const mintStyles = StyleSheet.create({
-    container: {
-      flex: 1,
-      justifyContent: 'flex-end',
-      alignItems: 'center',
-      backgroundColor: 'rgba(0, 0, 0, 0.8)',
-    },
-    inputContainerWrapper: {
-      alignItems: 'center',
-      width: isTablet(size.width, size.height) ? hp('80') : wp('70'),
-      padding: isTablet(size.width, size.height) ? hp('6') : wp('4'),
-      borderRadius: isTablet(size.width, size.height) ? hp('6') : wp('9'),
-      backgroundColor: 'rgba(100, 100, 100, 0.8)',
-    },
-    inputContainer: {
-      width: isTablet(size.width, size.height) ? hp('80') : wp('60'),
-      backgroundColor: 'rgba(100, 100, 0, 0.8)',
-    },
-    centeredView: {
-      flex: 1,
-      justifyContent: 'center',
-      alignItems: 'center',
-    },
-    buttonGroup: {
-      flexDirection: 'row',
-      marginBottom: isTablet(size.width, size.height) ? hp('12') : wp('8'),
-    },
-    pickImageButton: {
-      marginHorizontal: isTablet(size.width, size.height) ? hp('8') : wp('4'),
-      width: isTablet(size.width, size.height) ? hp('12') : wp('40'),
-      backgroundColor: 'rgba(100, 100, 100, 0.8)',
-      color: GlobalStyles.colors.primary400,
-    },
-    mintButton: {
-      marginHorizontal: isTablet(size.width, size.height) ? hp('8') : wp('4'),
-      width: isTablet(size.width, size.height) ? hp('12') : wp('40'),
-    },
-    modalImage: {
-      width: isTablet(size.width, size.height) ? hp('80') : wp('60'),
-      height: isTablet(size.width, size.height) ? hp('80') : wp('60'),
-      marginBottom: isTablet(size.width, size.height) ? hp('20') : wp('35'),
-      //borderWidth: isTablet(size.width, size.height) ? hp('2') : wp('1'),
-      //borderRadius: isTablet(size.width, size.height) ? hp('6') : wp('3'),
-      //borderColor: GlobalStyles.colors.primary200,
-      backgroundColor: 'transparent',
-    },
-    textTitle: {
-      paddingTop: isTablet(size.width, size.height) ? hp('4') : wp('3'),
-      paddingHorizontal: isTablet(size.width, size.height) ? hp('5') : wp('3'),
-    },
-    textInput: {
-      height: isTablet(size.width, size.height) ? hp('10') : wp('10'),
-      //borderWidth: isTablet(size.width, size.height) ? hp('2') : wp('1'),
-      marginBottom: isTablet(size.width, size.height) ? hp('12') : wp('8'),
-      //margin: isTablet(size.width, size.height) ? hp('4') : wp('8'),
-      padding: isTablet(size.width, size.height) ? hp('12') : wp('2'),
-      backgroundColor: GlobalStyles.colors.primary200,
-    },
-    modalView: {
-      borderWidth: isTablet(size.width, size.height) ? hp('6') : wp('1'),
-      borderColor: GlobalStyles.colors.primary200,
-      borderRadius: isTablet(size.width, size.height) ? hp('6') : wp('8'),
-      margin: isTablet(size.width, size.height) ? hp('4') : wp('8'),
-      backgroundColor: 'rgba(100, 100, 100, 0.8)',
-      padding: isTablet(size.width, size.height) ? hp('12') : wp('4'),
-      alignItems: 'center',
-    },
-    modalText: {
-      marginBottom: isTablet(size.width, size.height) ? hp('15') : wp('3'),
-      textAlign: 'center',
-      color: 'white',
-    },
-  });
-  const styles = JSON.parse(JSON.stringify(mintStyles));
-  if (setOutline()) {
-    Object.keys(styles).forEach(key => {
-      Object.assign(styles[key], {
-        borderStyle: 'solid',
-        borderColor: 'red',
-        borderWidth: 2,
-      });
-    });
-  }
-  return styles;
-  // eslint-enable
-}
 
 export default NftMinter;
