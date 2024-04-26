@@ -206,7 +206,7 @@ const NftMinter = () => {
               );
             }
           } else {
-            console.error('[NFT] null "data.data"');
+            console.log('[NFT] null "data.data"');
           }
           return data;
         } catch (error: any) {
@@ -273,8 +273,8 @@ const NftMinter = () => {
         visible={mintProgressStep !== MintingStep.None}>
         <TouchableWithoutFeedback
           onPress={() => setMintProgressStep(MintingStep.None)}>
-          <View style={styles.centeredView}>
-            <View style={styles.modalView}>
+          <View style={showModal ? '' : styles.centeredView}>
+            <View style={showModal ? '' : styles.modalView}>
               {mintProgressStep === MintingStep.UploadingImage ||
               mintProgressStep === MintingStep.MintingMetadata ? (
                 <>
@@ -326,7 +326,7 @@ const NftMinter = () => {
                         if (!selectedImage) {
                           const error =
                             '[NftMinter] error: Image not selected.';
-                          console.error(error);
+                          console.log(error);
                           handleErrorCallback(error);
                           return;
                         }
@@ -344,7 +344,7 @@ const NftMinter = () => {
                           urlExists(explorerUrl, (err, exists) => {
                             if (err) {
                               const error = '[urlExists] Error:';
-                              console.error(error);
+                              console.log(error);
                               handleErrorCallback(error);
                               setMintProgressStep(MintingStep.Error);
                               return;
@@ -364,7 +364,7 @@ const NftMinter = () => {
                               error,
                             )}`;
                           }
-                          console.error(err);
+                          console.log(err);
                           handleErrorCallback(err);
                           return;
                         }
@@ -395,12 +395,12 @@ function generateMinterSytles(size: any) {
       alignItems: 'center',
       width: isTablet(size.width, size.height) ? hp('80') : wp('70'),
       padding: isTablet(size.width, size.height) ? hp('6') : wp('4'),
-      borderRadius: isTablet(size.width, size.height) ? hp('6') : wp('3'),
+      borderRadius: isTablet(size.width, size.height) ? hp('6') : wp('9'),
       backgroundColor: 'rgba(100, 100, 100, 0.8)',
     },
     inputContainer: {
       width: isTablet(size.width, size.height) ? hp('80') : wp('60'),
-      backgroundColor: 'rgba(100, 100, 100, 0.8)',
+      backgroundColor: 'rgba(100, 100, 0, 0.8)',
     },
     centeredView: {
       flex: 1,
@@ -425,9 +425,10 @@ function generateMinterSytles(size: any) {
       width: isTablet(size.width, size.height) ? hp('80') : wp('60'),
       height: isTablet(size.width, size.height) ? hp('80') : wp('60'),
       marginBottom: isTablet(size.width, size.height) ? hp('20') : wp('35'),
-      borderWidth: isTablet(size.width, size.height) ? hp('2') : wp('1'),
-      borderRadius: isTablet(size.width, size.height) ? hp('6') : wp('3'),
-      borderColor: GlobalStyles.colors.primary200,
+      //borderWidth: isTablet(size.width, size.height) ? hp('2') : wp('1'),
+      //borderRadius: isTablet(size.width, size.height) ? hp('6') : wp('3'),
+      //borderColor: GlobalStyles.colors.primary200,
+      backgroundColor: 'transparent',
     },
     textTitle: {
       paddingTop: isTablet(size.width, size.height) ? hp('4') : wp('3'),
@@ -444,7 +445,7 @@ function generateMinterSytles(size: any) {
     modalView: {
       borderWidth: isTablet(size.width, size.height) ? hp('6') : wp('1'),
       borderColor: GlobalStyles.colors.primary200,
-      borderRadius: isTablet(size.width, size.height) ? hp('6') : wp('3'),
+      borderRadius: isTablet(size.width, size.height) ? hp('6') : wp('8'),
       margin: isTablet(size.width, size.height) ? hp('4') : wp('8'),
       backgroundColor: 'rgba(100, 100, 100, 0.8)',
       padding: isTablet(size.width, size.height) ? hp('12') : wp('4'),
