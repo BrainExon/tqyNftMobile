@@ -63,7 +63,7 @@ function generateSignupStyles(size: any) {
 }
 
 export default function SignupScreen() {
-  console.log('[ChallengeScreen]...');
+  console.log('[CreateChallenge]...');
   const chSize = useWindowDimensions();
   const styles = generateSignupStyles(chSize);
   return (

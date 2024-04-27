@@ -3,6 +3,7 @@ import {
   heightPercentageToDP as hp,
   widthPercentageToDP as wp,
 } from 'react-native-responsive-screen';
+import CreateChallenge from '../components/CreateChallenge';
 import {isTablet, setOutline} from '../util/util';
 import {
   Button,
@@ -36,7 +37,7 @@ const ImageDetail = ({route}) => {
           <Button
             title="Create Challenge"
             onPress={() =>
-              navigation.navigate('ChallengeScreen', {
+              navigation.navigate('CreateChallenge', {
                 doubloonUri: uri,
                 dataTxId: dataTxId,
                 nftId: nftId,

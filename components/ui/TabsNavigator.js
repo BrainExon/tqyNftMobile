@@ -5,10 +5,11 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
+import ChallengeScreen from '../../screens/ChallengeScreen';
 import {useWindowDimensions} from 'react-native';
 import {isTablet} from '../../util/util';
 import GlobalStyles from '../../constants/GlobalStyles';
-import ChallengeScreen from '../../screens/ChallengeScreen';
+import CreateChallenge from '../CreateChallenge';
 import SignupScreen from '../../screens/SignupScreen';
 import UserScreen from '../../screens/UserScreen';
 import LoginScreen from '../../screens/LoginScreen';
@@ -143,8 +144,8 @@ function TabsNavigator() {
         name="ChallengeScreen"
         component={ChallengeScreen}
         options={{
-          title: 'Challenge',
-          tabBarLabel: 'Challenge',
+          title: 'ChallengeScreen',
+          tabBarLabel: 'Challenges',
           headerShown: false, // Hide the header for this screen
           tabBarIcon: ({color, size}) => (
             <Icon
@@ -154,27 +155,7 @@ function TabsNavigator() {
                   ? hp('3')
                   : wp('5')
               }
-              name="gear"
-            />
-          ),
-        }}
-      />
-      <BottomTabs.Screen
-        name="NFT"
-        component={NftMinter}
-        options={{
-          title: 'NFT',
-          tabBarLabel: 'NFT',
-          headerShown: false, // Hide the header for this screen
-          tabBarIcon: ({color, size}) => (
-            <Icon
-              color={color}
-              size={
-                isTablet(screenSize.width, screenSize.height)
-                  ? hp('3')
-                  : wp('5')
-              }
-              name="bitcoin"
+              name="trophy"
             />
           ),
         }}
@@ -183,7 +164,17 @@ function TabsNavigator() {
         name="ImageDetail"
         component={ImageDetail}
         options={{
-          title: 'Quiz',
+          title: 'ImageDetail',
+          tabBarVisible: false,
+          headerShown: false, // Hide the header for this screen
+          tabBarButton: props => null,
+        }}
+      />
+      <BottomTabs.Screen
+        name="CreateChallenge"
+        component={CreateChallenge}
+        options={{
+          title: 'CreateChallenge',
           tabBarVisible: false,
           headerShown: false, // Hide the header for this screen
           tabBarButton: props => null,
