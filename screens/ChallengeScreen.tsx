@@ -6,6 +6,7 @@ import {
   StyleSheet,
   useWindowDimensions,
 } from 'react-native';
+import {dbUpsert} from '../util/dbUtils';
 import Config from 'react-native-config';
 import React, {useState, useEffect} from 'react';
 import {isTablet, setOutline} from '../util/util';
@@ -16,7 +17,6 @@ import {
 } from 'react-native-responsive-screen';
 import {categories} from '../constants/constants';
 import {v4 as uuidv4} from 'uuid';
-import {dbFindOne, dbUpsert} from '../util/dbUtils';
 import {Challenge} from '../components/models/Challenge';
 import UserModal from '../components/ui/UserModal';
 import {useSelector} from 'react-redux';
@@ -24,7 +24,7 @@ import {getUserState} from '../redux/userSlice';
 import {useNavigation} from '@react-navigation/native';
 
 const ChallengeScreen = ({route}) => {
-  const {doubloonUri} = route.params;
+  const {doubloonUri, dataTxId, nftId} = route.params;
   const navigation = useNavigation();
   const userState = useSelector(getUserState);
   const chSize = useWindowDimensions();
@@ -36,7 +36,6 @@ const ChallengeScreen = ({route}) => {
   const [showModal, setShowModal] = useState(false);
   const [message, setMessage] = useState('');
 
-  console.log(`[ChallengeScreen] userState: ${JSON.stringify(userState)}`);
   const handleErrorCallback = (errMsg: any) => {
     setError(errMsg);
   };
@@ -46,7 +45,6 @@ const ChallengeScreen = ({route}) => {
   };
 
   useEffect(() => {
-    //console.log(`[useEffect] userState: ${JSON.stringify(userState)}`);
     const checkUserRole = () => {
       setError('');
       setShowModal(false);
@@ -73,6 +71,19 @@ const ChallengeScreen = ({route}) => {
     console.log('Name:', name);
     console.log('Description:', description);
     try {
+      /**
+       * chId: string,
+       * name: string,
+       * date: string,
+       * owner: string,
+       * users: string[] = [],
+       * doubloon: string,
+       * nft: string,
+       * dataTxId: string,
+       * nftVersion: number,
+       * category: string,
+       * description: string,
+       */
       const challenge = new Challenge(
         uuidv4(),
         name,
@@ -80,7 +91,8 @@ const ChallengeScreen = ({route}) => {
         userState.userId,
         [],
         doubloonUri,
-        '',
+        nftId,
+        dataTxId,
         '',
         category,
         description,
@@ -92,15 +104,11 @@ const ChallengeScreen = ({route}) => {
           2,
         )}`,
       );
-      /*
       await dbUpsert({
         endPoint: 'upsert_challenge',
-        data: challenge,
+        conditions: challenge,
         setError: handleErrorCallback,
       });
-      // Show modal regardless of response
-
-       */
       setShowModal(true);
       setMessage('Challenge created!');
     } catch (e: any) {

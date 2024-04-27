@@ -1,10 +1,9 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   heightPercentageToDP as hp,
   widthPercentageToDP as wp,
 } from 'react-native-responsive-screen';
-import {isEmpty, isObjectEmpty, isTablet, setOutline} from '../util/util';
-import GlobalStyles from '../constants/GlobalStyles';
+import {isTablet, setOutline} from '../util/util';
 import {
   Button,
   View,
@@ -16,24 +15,20 @@ import {
 import {useNavigation} from '@react-navigation/native';
 
 const ImageDetail = ({route}) => {
-  const mintSize = useWindowDimensions();
-  const styles = generateMinterSytles(mintSize);
-  const {uri} = route.params;
+  const {uri, dataTxId, nftId} = route.params;
+  const boardSize = useWindowDimensions();
+  const styles = generateDetailStyles(boardSize);
   const navigation = useNavigation();
-  const [isVisible, setIsVisible] = useState(true);
-  const [doubloonUri, setDoubloonUri] = useState(true);
-  //TODO: really, imageList needs to be cached on UserScreen page instead of making an navigation call...
+
   const handleImagePress = () => {
-    //setIsVisible(!isVisible);
-    console.log('\n----\n[ImageDetail] navigation to UserScreen...\n----\n');
     navigation.navigate('UserScreen');
   };
-  setDoubloonUri(uri);
+
   return (
     <View style={styles.container}>
       <TouchableOpacity onPress={() => handleImagePress()}>
         <View style={styles.imgContainer}>
-          {isVisible && <Image source={{uri: uri}} style={styles.imgImage} />}
+          <Image source={{uri: uri}} style={styles.imgImage} />
         </View>
       </TouchableOpacity>
       <View style={styles.imgButtonGroup}>
@@ -41,7 +36,11 @@ const ImageDetail = ({route}) => {
           <Button
             title="Create Challenge"
             onPress={() =>
-              navigation.navigate('ChallengeScreen', {doubloonUri: doubloonUri})
+              navigation.navigate('ChallengeScreen', {
+                doubloonUri: uri,
+                dataTxId: dataTxId,
+                nftId: nftId,
+              })
             }
           />
         </View>
@@ -53,7 +52,7 @@ const ImageDetail = ({route}) => {
   );
 };
 
-function generateMinterSytles(size: any) {
+function generateDetailStyles(size: any) {
   const mintStyles = StyleSheet.create({
     container: {
       flex: 1,

@@ -16,6 +16,7 @@ const ImageList = ({items}) => {
   const [imageUris, setImageUris] = useState([]);
   const [numColumns, setNumColumns] = useState(3);
   const navigation = useNavigation();
+
   useEffect(() => {
     const fetchImageUri = async filename => {
       try {
@@ -27,33 +28,45 @@ const ImageList = ({items}) => {
         return null;
       }
     };
+
     const fetchData = async () => {
-      const uris = await Promise.all(items.map(item => fetchImageUri(item)));
+      const uris = await Promise.all(
+        items.map(async item => {
+          const uri = await fetchImageUri(item.uri);
+          return {uri: uri, dataTxId: item.dataTxId, nftId: item.nftId};
+        }),
+      );
       setImageUris(uris);
     };
+
     fetchData().catch(e =>
       console.log(`fetchData error: ${JSON.stringify(e)}`),
     );
   }, [items]);
+
   const handleImagePress = index => {
-    navigation.navigate('ImageDetail', {uri: imageUris[index]});
+    navigation.navigate('ImageDetail', {
+      uri: imageUris[index].uri,
+      dataTxId: imageUris[index].dataTxId,
+      nftId: imageUris[index].nftId,
+    });
   };
   const renderItem = ({item, index}) => {
     if (!imageUris[index]) {
       return null;
     }
-
     return (
       <TouchableOpacity onPress={() => handleImagePress(index)}>
         <View style={styles.itemContainer}>
-          <Image source={{uri: imageUris[index]}} style={styles.image} />
+          <Image source={{uri: imageUris[index].uri}} style={styles.image} />
         </View>
       </TouchableOpacity>
     );
   };
+
   const windowWidth = Dimensions.get('window').width;
-  //const imageWidth = windowWidth / numColumns - 20;
   const keyExtractor = (item, index) => `${index}-${numColumns}`;
+
   return (
     <FlatList
       data={items}
@@ -65,6 +78,7 @@ const ImageList = ({items}) => {
   );
 };
 
+export default ImageList;
 const windowWidth = Dimensions.get('window').width;
 const imageWidth = windowWidth / 3 - 20;
 
