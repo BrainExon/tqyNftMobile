@@ -84,9 +84,9 @@ function generateMinterSytles(size: any) {
       alignItems: 'center',
     },
     modalView: {
-      borderWidth: isTablet(size.width, size.height) ? hp('6') : wp('1'),
-      borderColor: GlobalStyles.colors.primary200,
-      borderRadius: isTablet(size.width, size.height) ? hp('6') : wp('2'),
+      //borderWidth: isTablet(size.width, size.height) ? hp('6') : wp('1'),
+      //borderColor: GlobalStyles.colors.primary200,
+      //borderRadius: isTablet(size.width, size.height) ? hp('6') : wp('2'),
       margin: isTablet(size.width, size.height) ? hp('4') : wp('8'),
       // backgroundColor: 'rgba(100, 100, 100, 0.8)',
       padding: isTablet(size.width, size.height) ? hp('12') : wp('4'),
@@ -200,14 +200,7 @@ const NftMinter = () => {
       console.log('\n---------\n[mintNft]\n---------\n');
       console.log('[mintNft] nftImage', JSON.stringify(nftImage));
       setMintProgressStep(MintingStep.UploadingImage);
-      /**
-       * interface PinNft {
-       *   imagePath: string;
-       *   imageType: string;
-       *   imageName: string;
-       *   callback: () => void;
-       * }
-       */
+      setShowModal(true);
       try {
         const ipfsData: PinNft = await pinNft({
           imagePath: nftImage,
@@ -273,7 +266,7 @@ const NftMinter = () => {
   }
 
   return (
-    <View style={showModal ? '' : styles.container}>
+    <View style={styles.container}>
       <ImageComponent />
       <ButtonGroup />
       <Modal
@@ -286,7 +279,7 @@ const NftMinter = () => {
             <View>
               {mintProgressStep === MintingStep.UploadingImage ||
               mintProgressStep === MintingStep.MintingMetadata ? (
-                <>
+                <View style={styles.modalView}>
                   <UserModal
                     visible={showModal}
                     message={
@@ -298,7 +291,7 @@ const NftMinter = () => {
                     onClose={handleModalButtonClose}
                     showActivity={true}
                   />
-                </>
+                </View>
               ) : mintProgressStep === MintingStep.Error ? (
                 <UserModal
                   visible={showModal}
