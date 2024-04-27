@@ -97,6 +97,7 @@ export async function dbUpsert({endPoint, conditions, setError}) {
 
 export async function dbFetchNFTs({endPoint, setError}) {
   try {
+    //console.log( `[dbFetchNFTs] URL: ${Config.NODEJS_EXPRESS_SERVER}/${endPoint}`, );
     const requestOptions = {method: 'GET', redirect: 'follow'};
     const response = await fetch(
       `${Config.NODEJS_EXPRESS_SERVER}/${endPoint}`,

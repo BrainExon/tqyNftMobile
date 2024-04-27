@@ -1,7 +1,7 @@
 import React from 'react';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import UserScreen from '../../screens/UserScreen';
-import ChallengeScreen from '../../screens/ChallengeScreen';
+import CreateChallenge from '../CreateChallenge';
 import SignupScreen from '../../screens/SignupScreen';
 import BottomTabIcon from './BottomTabIcon';
 import LoginScreen from '../../screens/LoginScreen';
@@ -20,7 +20,7 @@ const BottomTabNavigator = () => {
     <Tab.Navigator screenOptions={screenOptions}>
       <Tab.Screen name="LoginScreen" component={LoginScreen} />
       <Tab.Screen name="UserScreen" component={UserScreen} />
-      <Tab.Screen name="ChallengeScreen" component={ChallengeScreen} />
+      <Tab.Screen name="ChallengeScreen" component={CreateChallenge} />
       <Tab.Screen name="SignupScreen" component={SignupScreen} />
     </Tab.Navigator>
   );
