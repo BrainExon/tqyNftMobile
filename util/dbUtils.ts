@@ -93,3 +93,45 @@ export async function dbUpsert({endPoint, conditions, setError}) {
     setError(er);
   }
 }
+
+export async function dbFetchNFTs({endPoint, setError}) {
+  try {
+    const requestOptions = {method: 'GET', redirect: 'follow'};
+    const response = await fetch(
+      `${Config.NODEJS_EXPRESS_SERVER}/${endPoint}`,
+      requestOptions,
+    );
+    //const result = await response.text();
+    const result = await response.json();
+    console.log(typeof result);
+    return result;
+  } catch (error) {
+    console.error('dbFetchNFTs error: ', JSON.stringify(error));
+    setError(error);
+  }
+}
+
+interface FetchImageParams {
+  endPoint: string;
+  imageName: string;
+  callback: (error: any) => void;
+}
+
+export async function fetchImage({endPoint, imageName, callback}) {
+  try {
+    console.error(
+      '\n-------\n[fetchImage] ENDPOINT: ',
+      JSON.stringify(endPoint),
+    );
+    console.error('[fetchImage] imageName: ', JSON.stringify(imageName));
+    const url = `${Config.NODEJS_EXPRESS_SERVER}/${endPoint}/${imageName}`;
+    console.error('[fetchImage] URI: ', JSON.stringify(url));
+    const response = await axios.get(url);
+    console.error('[fetchImage] RSEPONSEC: ', JSON.stringify(resposne));
+    const result = response.data;
+    return result;
+  } catch (error) {
+    console.error('[fetchImage] error: ', JSON.stringify(error));
+    callback('[fetchImage] error: ', JSON.stringify(error));
+  }
+}
