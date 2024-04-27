@@ -4,7 +4,7 @@ import {useWindowDimensions} from 'react-native';
 import {dbFetchNFTs} from '../util/dbUtils';
 import ImageList from '../components/ImageList';
 import {isEmpty, isObjectEmpty, setOutline} from '../util/util';
-
+import {useNavigation} from '@react-navigation/native';
 import UserModal from '../components/ui/UserModal';
 
 const generateItemStyles = (size: any) => {
@@ -31,6 +31,7 @@ const generateItemStyles = (size: any) => {
 
 function UserScreen() {
   console.log('[UserScreen]');
+  const navigation = useNavigation();
   const boardSize = useWindowDimensions();
   const styles = generateItemStyles(boardSize);
   const [nfts, setNfts] = useState([]);
@@ -50,32 +51,37 @@ function UserScreen() {
 
   const handleModalButtonClose = () => {
     setShowModal(false);
-    //navigation.navigate('LoginScreen');
   };
 
-  let bucketArray = [];
   useEffect(() => {
     const fetchData = async () => {
+      console.log('fetch user data....');
       try {
         const foundNfts = await dbFetchNFTs({endPoint: 'get_nfts'});
         if (foundNfts.data) {
+          const updatedBucketArray = [];
           foundNfts.data.forEach(item => {
             item.created.forEach(createdItem => {
               if (createdItem.sourceUri) {
                 const uri = createdItem.sourceUri;
-                bucketArray.push(uri); // Convert object to stringch
+                updatedBucketArray.push(uri);
               }
             });
           });
-          setNfts(bucketArray);
+          setNfts(updatedBucketArray);
         }
       } catch (error) {
         handleErrorCallback(`[UserScreen] Error fetching NFTs: ${error}`);
         return;
       }
     };
-    fetchData();
-  }, []);
+
+    const onFocus = navigation.addListener('focus', () => {
+      fetchData();
+    });
+
+    return onFocus;
+  }, [navigation]);
   return (
     <View style={styles.userContainer}>
       {showModal ? (
