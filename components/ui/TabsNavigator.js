@@ -12,6 +12,7 @@ import ChallengeScreen from '../../screens/ChallengeScreen';
 import SignupScreen from '../../screens/SignupScreen';
 import UserScreen from '../../screens/UserScreen';
 import LoginScreen from '../../screens/LoginScreen';
+import ImageDetail from '../../screens/ImageDetail';
 import NftMinter from '../NftMinter';
 const BottomTabs = createBottomTabNavigator();
 const setTabBarVisible = name => {
@@ -176,6 +177,16 @@ function TabsNavigator() {
               name="bitcoin"
             />
           ),
+        }}
+      />
+      <BottomTabs.Screen
+        name="ImageDetail"
+        component={ImageDetail}
+        options={{
+          title: 'Quiz',
+          tabBarVisible: false,
+          headerShown: false, // Hide the header for this screen
+          tabBarButton: props => null,
         }}
       />
     </BottomTabs.Navigator>
