@@ -142,9 +142,15 @@ const printDebug = (routine: string, error: any, debug) => {
   }
 };
 const replaceStringByKey = (inputString, key, replacement) => {
-  console.log('[replaceStringByKey] inputString: ', JSON.stringify(inputString));
+  console.log(
+    '[replaceStringByKey] inputString: ',
+    JSON.stringify(inputString),
+  );
   console.log('[replaceStringByKey] key: ', JSON.stringify(key));
-  console.log('[replaceStringByKey] replacement: ', JSON.stringify(replacement));
+  console.log(
+    '[replaceStringByKey] replacement: ',
+    JSON.stringify(replacement),
+  );
   // const clean = inputString.split(`{${key}}`).join(replacement);
   const regex = new RegExp(key, 'g');
   const clean = inputString.replace(regex, replacement);

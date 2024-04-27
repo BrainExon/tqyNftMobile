@@ -108,6 +108,10 @@ const UserModal: React.FC<UserModalProps> = ({
   onClose,
   showActivity,
 }) => {
+  console.log(`[UserModal]: visible: ${visible}`);
+  console.log(`[UserModal]: messagae: ${JSON.stringify(message)}`);
+  console.log(`[UserModal]: error: ${JSON.stringify(error)}`);
+  console.log(`[UserModal]: showActivity: ${JSON.stringify(showActivity)}`);
   const pUsize = useWindowDimensions();
   const styles = generateUModalStyles(pUsize);
 

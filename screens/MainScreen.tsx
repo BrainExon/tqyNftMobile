@@ -14,9 +14,9 @@ export default function MainScreen() {
     <>
       <View style={styles.mainContainer}>
         <ScrollView contentContainerStyle={styles.scrollContainer}>
-            <>
-              <NftMinter />
-            </>
+          <>
+            <NftMinter />
+          </>
         </ScrollView>
         <Text>Selected cluster: {connection.rpcEndpoint}</Text>
       </View>
@@ -33,7 +33,7 @@ const styles = StyleSheet.create({
   scrollContainer: {
     height: '100%',
   },
-  buttonGroup: {
+  mainButtonGroup: {
     flexDirection: 'column',
     paddingVertical: 4,
   },
