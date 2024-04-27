@@ -53,9 +53,9 @@ function UserScreen() {
     setShowModal(false);
   };
 
-  let bucketArray = [];
   useEffect(() => {
     const fetchData = async () => {
+      console.log('fetch user data....');
       try {
         const foundNfts = await dbFetchNFTs({endPoint: 'get_nfts'});
         if (foundNfts.data) {

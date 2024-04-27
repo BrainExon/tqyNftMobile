@@ -26,12 +26,13 @@ export async function dbFindOne({endPoint, conditions, setError}) {
       },
     );
 
+    /*
     console.log(
       `[dbFindOne] end point "${endPoint}" response: ${JSON.stringify(
         response.data,
       )}`,
     );
-
+    */
     if (response.status === 200) {
       console.log('[dbFindOne] Data retrieved successfully:', response.data);
       return response.data;
