@@ -103,9 +103,7 @@ export async function dbFetchNFTs({endPoint, setError}) {
       requestOptions,
     );
     //const result = await response.text();
-    const result = await response.json();
-    console.log(typeof result);
-    return result;
+    return await response.json();
   } catch (error) {
     console.error('dbFetchNFTs error: ', JSON.stringify(error));
     setError(error);

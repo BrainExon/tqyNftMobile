@@ -1,5 +1,6 @@
 import React, {useState, useEffect} from 'react';
 import {
+  TouchableOpacity,
   FlatList,
   View,
   Image,
@@ -8,12 +9,13 @@ import {
   Dimensions,
 } from 'react-native';
 import Config from 'react-native-config';
+import {useNavigation} from '@react-navigation/native';
 const path = require('path');
 
 const ImageList = ({items}) => {
   const [imageUris, setImageUris] = useState([]);
   const [numColumns, setNumColumns] = useState(3);
-
+  const navigation = useNavigation();
   useEffect(() => {
     const fetchImageUri = async filename => {
       try {
@@ -29,20 +31,28 @@ const ImageList = ({items}) => {
       const uris = await Promise.all(items.map(item => fetchImageUri(item)));
       setImageUris(uris);
     };
-    fetchData();
+    fetchData().catch(e =>
+      console.log(`fetchData error: ${JSON.stringify(e)}`),
+    );
   }, [items]);
+  const handleImagePress = index => {
+    navigation.navigate('ImageDetail', {uri: imageUris[index]});
+  };
   const renderItem = ({item, index}) => {
     if (!imageUris[index]) {
       return null;
     }
+
     return (
-      <View style={styles.itemContainer}>
-        <Image source={{uri: imageUris[index]}} style={styles.image} />
-      </View>
+      <TouchableOpacity onPress={() => handleImagePress(index)}>
+        <View style={styles.itemContainer}>
+          <Image source={{uri: imageUris[index]}} style={styles.image} />
+        </View>
+      </TouchableOpacity>
     );
   };
   const windowWidth = Dimensions.get('window').width;
-  const imageWidth = windowWidth / numColumns - 20;
+  //const imageWidth = windowWidth / numColumns - 20;
   const keyExtractor = (item, index) => `${index}-${numColumns}`;
   return (
     <FlatList
