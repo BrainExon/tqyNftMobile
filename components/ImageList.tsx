@@ -25,45 +25,38 @@ const ImageList = ({items}) => {
         return null;
       }
     };
-
     const fetchData = async () => {
       const uris = await Promise.all(items.map(item => fetchImageUri(item)));
       setImageUris(uris);
     };
-
     fetchData();
   }, [items]);
-
   const renderItem = ({item, index}) => {
     if (!imageUris[index]) {
-      return null; // Return null if the image URI is null
+      return null;
     }
-
     return (
       <View style={styles.itemContainer}>
         <Image source={{uri: imageUris[index]}} style={styles.image} />
       </View>
     );
   };
-
   const windowWidth = Dimensions.get('window').width;
-  const imageWidth = windowWidth / numColumns - 20; // Calculate image width based on the number of columns
-
+  const imageWidth = windowWidth / numColumns - 20;
   const keyExtractor = (item, index) => `${index}-${numColumns}`;
-
   return (
     <FlatList
       data={items}
       renderItem={renderItem}
       keyExtractor={keyExtractor}
       numColumns={numColumns}
-      extraData={numColumns} // Force a fresh render when changing the number of columns
+      extraData={numColumns}
     />
   );
 };
 
 const windowWidth = Dimensions.get('window').width;
-const imageWidth = windowWidth / 3 - 20; // Calculate image width based on screen width
+const imageWidth = windowWidth / 3 - 20;
 
 const styles = StyleSheet.create({
   itemContainer: {
