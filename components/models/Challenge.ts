@@ -6,6 +6,7 @@ export class Challenge {
   users: string[];
   doubloon: string;
   nft: string;
+  dataTxId: string;
   nftVersion: number;
   category: string;
   description: string;
@@ -17,6 +18,7 @@ export class Challenge {
     users: string[] = [],
     doubloon: string,
     nft: string,
+    dataTxId: string,
     nftVersion: number,
     category: string,
     description: string,
@@ -28,6 +30,7 @@ export class Challenge {
     this.users = users;
     this.doubloon = doubloon;
     this.nft = nft;
+    this.dataTxId = dataTxId;
     this.nftVersion = nftVersion;
     this.category = category;
     this.description = description;

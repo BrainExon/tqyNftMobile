@@ -60,10 +60,16 @@ function UserScreen() {
         if (foundNfts.data) {
           const updatedBucketArray = [];
           foundNfts.data.forEach(item => {
+            const nftId = item.nftId;
             item.created.forEach(createdItem => {
               if (createdItem.sourceUri) {
                 const uri = createdItem.sourceUri;
-                updatedBucketArray.push(uri);
+                const item = {
+                  uri: uri,
+                  dataTxId: createdItem.dataTxId,
+                  nftId: nftId,
+                };
+                updatedBucketArray.push(item);
               }
             });
           });
