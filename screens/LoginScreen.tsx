@@ -38,7 +38,13 @@ function LoginScreen() {
         );
         return;
       }
-      dispatch(setUser({phone: userAccount.phone, role: userAccount.role}));
+      dispatch(
+        setUser({
+          phone: userAccount.phone,
+          role: userAccount.role,
+          userId: userAccount.userId,
+        }),
+      );
       navigation.navigate('UserScreen');
     }
     setShowModal(false);
@@ -90,7 +96,6 @@ function LoginScreen() {
         }
         setUserAccount(queryResult.data ?? '');
       }
-      // update state if new user or updated user:
       dispatch(setUser({phone: userAccount.phone, role: userAccount.role}));
       setShowModal(true);
     } catch (e) {

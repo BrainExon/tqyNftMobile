@@ -119,7 +119,7 @@ function findIndexById(data, id) {
  * @returns {boolean}
  */
 function setOutline() {
-  return true;
+  return false;
 }
 
 const isObjectEmpty = obj => {
