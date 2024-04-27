@@ -1,18 +1,15 @@
 import React, {useState, useEffect, useCallback} from 'react';
-import {View, TextInput, StyleSheet} from 'react-native';
+import {View, StyleSheet} from 'react-native';
 import {useWindowDimensions} from 'react-native';
 import {dbFetchNFTs} from '../util/dbUtils';
 import ImageList from '../components/ImageList';
-import {isTablet, setOutline} from '../util/util';
-import {
-  heightPercentageToDP as hp,
-  widthPercentageToDP as wp,
-} from 'react-native-responsive-screen';
-import GlobalStyles from '../constants/GlobalStyles';
+import {isEmpty, isObjectEmpty, setOutline} from '../util/util';
+
+import UserModal from '../components/ui/UserModal';
 
 const generateItemStyles = (size: any) => {
   const baseItemStyles = StyleSheet.create({
-    container: {
+    userContainer: {
       flex: 1,
       justifyContent: 'flex-end',
       alignItems: 'center',
@@ -31,11 +28,30 @@ const generateItemStyles = (size: any) => {
   }
   return styles;
 };
+
 function UserScreen() {
   console.log('[UserScreen]');
   const boardSize = useWindowDimensions();
   const styles = generateItemStyles(boardSize);
   const [nfts, setNfts] = useState([]);
+  const [error, setError] = useState('');
+  const [showModal, setShowModal] = useState(false);
+
+  const handleErrorCallback = useCallback((error: any) => {
+    if (isObjectEmpty(error) || isEmpty(error)) {
+      return;
+    }
+    const errorMessage =
+      typeof error !== 'string' ? JSON.stringify(error) : error;
+    console.log(`[handleErrorCallback] errorMessage: ${errorMessage}`);
+    setError(errorMessage);
+    setShowModal(true);
+  }, []);
+
+  const handleModalButtonClose = () => {
+    setShowModal(false);
+    //navigation.navigate('LoginScreen');
+  };
 
   let bucketArray = [];
   useEffect(() => {
@@ -54,15 +70,25 @@ function UserScreen() {
           setNfts(bucketArray);
         }
       } catch (error) {
-        console.error(`[UserScreen] Error fetching NFTs: ${error}`);
+        handleErrorCallback(`[UserScreen] Error fetching NFTs: ${error}`);
+        return;
       }
     };
-
     fetchData();
   }, []);
   return (
-    <View style={styles.container}>
-      <ImageList items={nfts} />
+    <View style={styles.userContainer}>
+      {showModal ? (
+        <UserModal
+          visible={showModal}
+          message={''}
+          error={error ?? ''}
+          onClose={handleModalButtonClose}
+          showActivity={false}
+        />
+      ) : (
+        <ImageList items={nfts} />
+      )}
     </View>
   );
 }

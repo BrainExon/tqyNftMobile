@@ -15,11 +15,6 @@ import {
 } from 'react-native-responsive-screen';
 import GenButton from './GenButton';
 
-interface UserModalProps {
-  visible: boolean;
-  onClose: () => void;
-}
-
 function generateUModalStyles(size: any) {
   const uModalStyles = StyleSheet.create({
     uModalContainer: {
@@ -81,11 +76,6 @@ function generateUModalStyles(size: any) {
       fontSize: isTablet(size.width, size.height) ? hp('6') : wp('4'),
       textAlign: 'center',
     },
-    uModalButtonText: {
-      color: 'white',
-      fontSize: isTablet(size.width, size.height) ? hp('6') : wp('4'),
-      textAlign: 'center',
-    },
   });
   const styles = JSON.parse(JSON.stringify(uModalStyles));
   if (setOutline()) {
@@ -99,6 +89,14 @@ function generateUModalStyles(size: any) {
   }
   return styles;
   // eslint-enable
+}
+
+interface UserModalProps {
+  visible: boolean;
+  message: string | null;
+  error: string | null;
+  onClose: (error: string) => void;
+  showActivity: boolean;
 }
 
 const UserModal: React.FC<UserModalProps> = ({
