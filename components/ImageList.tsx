@@ -1,5 +1,4 @@
 import React, {useState, useEffect} from 'react';
-import ImageDetail from '../screens/ImageDetail';
 import {
   TouchableOpacity,
   FlatList,
