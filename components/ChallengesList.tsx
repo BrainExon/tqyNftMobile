@@ -1,5 +1,7 @@
 import React from 'react';
+
 import {
+  TouchableOpacity,
   View,
   Text,
   FlatList,
@@ -12,6 +14,8 @@ import {
   heightPercentageToDP as hp,
   widthPercentageToDP as wp,
 } from 'react-native-responsive-screen';
+import {useNavigation} from '@react-navigation/native';
+import GlobalStyles from '../constants/GlobalStyles';
 
 /**
  * {
@@ -22,26 +26,20 @@ import {
  */
 const generateChListStyles = (size: any) => {
   const chListStyles = StyleSheet.create({
-    chListContainer: {
-      flex: 1,
-      justifyContent: 'flex-end',
-      alignItems: 'center',
-      backgroundColor: 'rgba(0, 0, 0, 0.9)',
-    },
     chListItem: {
-      backgroundColor: 'rgba(0, 0, 0, 0.9)',
       flexDirection: 'row',
-      alignItems: 'center',
-      marginHorizontal: isTablet(size.width, size.height) ? hp('6') : wp('4'),
-      padding: isTablet(size.width, size.height) ? hp('6') : wp('4'),
+      //justifyContent: 'center',
+      //alignItems: 'center',
+      //width: isTablet(size.width, size.height) ? hp('40') : wp('100'),
+      padding: isTablet(size.width, size.height) ? hp('40') : wp('4'),
     },
     chListImage: {
-      width: isTablet(size.width, size.height) ? hp('40') : wp('20'),
-      height: isTablet(size.width, size.height) ? hp('40') : wp('20'),
-      marginRight: isTablet(size.width, size.height) ? hp('8') : wp('8'),
+      width: isTablet(size.width, size.height) ? hp('20') : wp('15'),
+      height: isTablet(size.width, size.height) ? hp('20') : wp('15'),
+      marginRight: isTablet(size.width, size.height) ? hp('40') : wp('4'),
     },
-    chListText: {
-      marginHorizontal: isTablet(size.width, size.height) ? hp('40') : wp('4'),
+    textContainer: {
+      marginLeft: isTablet(size.width, size.height) ? hp('40') : wp('4'),
     },
     chListText: {
       marginBottom: 5,
@@ -60,24 +58,36 @@ const generateChListStyles = (size: any) => {
   return styles;
 };
 const ChallengesList = ({items}) => {
-  console.log(`[ChallengesList] items: ${JSON.stringify(items, null, 2)}`);
+  //console.log(`[ChallengesList] items: ${JSON.stringify(items, null, 2)}`);
   const chListSize = useWindowDimensions();
   const styles = generateChListStyles(chListSize);
-  /*
-  const renderItem = ({item}) => (
+  const navigation = useNavigation();
+  const handleImagePress = () => {
+    navigation.navigate('AcceptChallenge', {
+      doubloonUri: item.doubloonUri,
+      nft: item.nft,
+      chId: item.chId,
+      doubloon: item.doubloon,
+    });
+  };
+  /* eslint-disable */
+  /**
+   * {
+   *   name: "Test_add87",
+   *   doubloon: "http://127.0.0.1:3030/image/e22a1b9d-b604-4a53-88cb-667ccddb3bfb.png",
+   *   nft: "8848d458-34eb-4b45-81da-b19e6b696258",
+   *   chId: "d005d7d2-c3a3-4f9e-8f07-fdebf66f3b3a",
+   *   description: "default description"
+   * }
+   */
+  const renderItem = ({ item }) => (
     <View style={styles.chListItem}>
-      <Image source={{uri: item.doubloon}} style={styles.chListImage} />
-      <Text style={styles.chListText}>Challenge: "{item.name}"</Text>
-      <Text>Description: "{item.description}"</Text>
-    </View>
-  );
-  */
-  const renderItem = ({item}) => (
-    <View style={styles.chListItem}>
-      <Image source={{uri: item.doubloon}} style={styles.chListImage} />
-      <View>
+      <TouchableOpacity onPress={() => handleImagePress()}>
+        <Image source={{ uri: item.doubloon }} style={styles.chListImage} />
+      </TouchableOpacity>
+      <View style={styles.textContainer}>
         <Text style={styles.chListText}>Challenge: "{item.name}"</Text>
-        <Text>Description: "{item.description}"</Text>
+        <Text style={styles.chListText}>Description: "{item.description}"</Text>
       </View>
     </View>
   );

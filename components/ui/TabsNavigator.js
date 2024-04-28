@@ -9,6 +9,7 @@ import ChallengeScreen from '../../screens/ChallengeScreen';
 import {useWindowDimensions} from 'react-native';
 import {isTablet} from '../../util/util';
 import GlobalStyles from '../../constants/GlobalStyles';
+import UserChallenge from '../UserChallenge';
 import CreateChallenge from '../CreateChallenge';
 import SignupScreen from '../../screens/SignupScreen';
 import UserScreen from '../../screens/UserScreen';
@@ -161,6 +162,26 @@ function TabsNavigator() {
         }}
       />
       <BottomTabs.Screen
+        name="NftMinter"
+        component={NftMinter}
+        options={{
+          title: 'NftMinter',
+          tabBarLabel: 'Mint',
+          headerShown: false, // Hide the header for this screen
+          tabBarIcon: ({color, size}) => (
+            <Icon
+              color={color}
+              size={
+                isTablet(screenSize.width, screenSize.height)
+                  ? hp('3')
+                  : wp('5')
+              }
+              name="bitcoin"
+            />
+          ),
+        }}
+      />
+      <BottomTabs.Screen
         name="ImageDetail"
         component={ImageDetail}
         options={{
@@ -175,6 +196,16 @@ function TabsNavigator() {
         component={CreateChallenge}
         options={{
           title: 'CreateChallenge',
+          tabBarVisible: false,
+          headerShown: false, // Hide the header for this screen
+          tabBarButton: props => null,
+        }}
+      />
+      <BottomTabs.Screen
+        name="AcceptChallenge"
+        component={UserChallenge}
+        options={{
+          title: 'UserChallenge',
           tabBarVisible: false,
           headerShown: false, // Hide the header for this screen
           tabBarButton: props => null,

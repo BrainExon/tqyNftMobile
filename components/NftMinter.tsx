@@ -134,6 +134,7 @@ const NftMinter = () => {
     MintingStep.None,
   );
   const [nftName, setNftName] = useState('xyz');
+  const [ownerId, setOwnerId] = useState('');
   const [nftDescription, setNftDescription] = useState('zyc');
   const [imageType, setImageType] = useState<string | null>(null);
   const [imageName, setImageName] = useState<string | null>(null);
@@ -160,6 +161,8 @@ const NftMinter = () => {
 
   // check user permissions
   useEffect(() => {
+    console.log(`\n========\n OWNER id: ${userState.userId}`);
+    setOwnerId(userState.userId);
     const checkUserRole = () => {
       if (userState.role !== 'creator') {
         const errorMessage = Config.AUTH_ERROR?.replace(
@@ -199,10 +202,16 @@ const NftMinter = () => {
     async (nftImage: string) => {
       console.log('\n---------\n[mintNft]\n---------\n');
       console.log('[mintNft] nftImage', JSON.stringify(nftImage));
+      console.log(
+        '\n-----\n[mintNft] OwnerId: ',
+        JSON.stringify(ownerId),
+        '\n------\n',
+      );
       setMintProgressStep(MintingStep.UploadingImage);
       setShowModal(true);
       try {
         const ipfsData: PinNft = await pinNft({
+          ownerId: ownerId,
           imagePath: nftImage,
           imageType: imageType,
           imageName: imageName,

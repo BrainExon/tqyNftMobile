@@ -2,12 +2,14 @@ import Config from 'react-native-config';
 import {replaceStringByKey} from '../util/util';
 
 const arDriveUpload = async (
+  ownerId: string,
   imagePath: string,
   imageType: string | null,
   imageName: string | null,
   callback: (error: any) => void,
 ) => {
   console.log('[Blockchain]  ARDrive image upload...');
+  console.log(`[arDriveUpload] ownerId: ${ownerId}`);
   console.log(`[arDriveUpload] imagePath: ${imagePath}`);
   console.log(`[arDriveUpload] imageType: ${imageType}`);
   console.log(`[arDriveUpload] imageName: ${imageName}`);
@@ -30,11 +32,15 @@ const arDriveUpload = async (
       'rn_image_picker_lib_temp_',
       '',
     );
+
     formData.append('files', {
       uri: imagePath,
       type: imageType,
       name: cleanName,
     });
+
+    formData.append('ownerId', ownerId);
+
     const requestOptions = {
       method: 'POST',
       body: formData,
@@ -78,6 +84,7 @@ const arDriveUpload = async (
 };
 
 export interface PinNft {
+  ownerId: string;
   imagePath: string;
   imageType: string;
   imageName: string;
@@ -85,6 +92,7 @@ export interface PinNft {
 }
 
 export const pinNft = async ({
+  ownerId,
   imagePath,
   imageType,
   imageName,
@@ -96,7 +104,13 @@ export const pinNft = async ({
     callback(error.message);
   };
   try {
-    const data = await arDriveUpload(imagePath, imageType, imageName, callback);
+    const data = await arDriveUpload(
+      ownerId,
+      imagePath,
+      imageType,
+      imageName,
+      callback,
+    );
     if (!data.data) {
       handleError('Error pinning NFT to arweave blockchain.');
       return;
