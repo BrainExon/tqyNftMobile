@@ -23,7 +23,7 @@ import {useSelector} from 'react-redux';
 import {getUserState} from '../redux/userSlice';
 import {useNavigation} from '@react-navigation/native';
 
-const CreateChallenge = ({route}) => {
+const UserChallenge = ({route}) => {
   const {doubloonUri, dataTxId, nftId} = route.params;
   const navigation = useNavigation();
   const userState = useSelector(getUserState);
@@ -77,8 +77,8 @@ const CreateChallenge = ({route}) => {
        * date: string,
        * owner: string,
        * users: string[] = [],
-       * doubloon: string, // image used to create the NFT
-       * nft: string, // id of the NFT used to create this challenge
+       * doubloon: string,
+       * nft: string,
        * dataTxId: string,
        * nftVersion: number,
        * category: string,
@@ -206,7 +206,6 @@ function generateChallengeStyles(size: any) {
       textAlign: 'center',
     },
     chInput: {
-      color: 'white',
       height: 40,
       borderColor: 'gray',
       borderWidth: 1,
@@ -214,7 +213,6 @@ function generateChallengeStyles(size: any) {
       paddingHorizontal: 10,
     },
     chInputDesc: {
-      color: 'white',
       borderColor: 'gray',
       borderWidth: 1,
       marginBottom: 10,
@@ -235,4 +233,4 @@ function generateChallengeStyles(size: any) {
   // eslint-enable
 }
 
-export default CreateChallenge;
+export default UserChallenge;

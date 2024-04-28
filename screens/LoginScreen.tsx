@@ -179,9 +179,9 @@ function generateLoginStyles(size: any) {
       textAlign: 'center',
       borderRadius: isTablet(size.width, size.height) ? hp('4') : wp('4'),
       backgroundColor: 'rgba(0, 0, 0, 0.7)',
+      color: 'white',
     },
     loginText: {
-      color: 'black',
       fontSize: isTablet(size.width, size.height) ? hp('4') : wp('6'),
     },
   });
