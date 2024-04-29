@@ -1,5 +1,6 @@
 import {
   View,
+  Text,
   Button,
   StyleSheet,
   useWindowDimensions,
@@ -17,11 +18,11 @@ import {v4 as uuidv4} from 'uuid';
 import UserModal from './ui/UserModal';
 import {useNavigation} from '@react-navigation/native';
 import {UserChallenge} from './models/UserChallenge';
-import NftImage from '../../../../../../../Express/functions/models/NftImage';
-import {pinNft, PinNft, pinNftVersion} from '../ipfs/blockchain';
+import {pinNftVersion} from '../ipfs/blockchain';
 
 const CreateUserChallenge = ({route}) => {
-  const {ownerId, nftId, chId, doubloon} = route.params;
+  console.log('[CreateUserChallenge]....');
+  const {ownerId, nftId, chId, doubloon, name, description} = route.params;
   const navigation = useNavigation();
   const chSize = useWindowDimensions();
   const styles = generateChallengeStyles(chSize);
@@ -34,57 +35,69 @@ const CreateUserChallenge = ({route}) => {
     setShowModal(true);
   };
 
-  const generateNftVersion = useCallback(async image => {
-    try {
-      const filename = getUrlFileName(image);
-      const versionImage = `version_image?filename=${filename}`;
-      console.log(`endpoint: ${versionImage}`);
-      const versionedImage = await dbFetch(
-        {endPoint: versionImage},
-        handleErrorCallback,
-      );
-      console.log(
-        `versioned image: ${JSON.stringify(versionedImage, null, 2)}`,
-      );
-      const vFilename = getUrlFileName(versionedImage.data);
-      const mimeType = getMimeType(vFilename);
-      console.log(`versioned vFilename: ${JSON.stringify(vFilename)}`);
-      console.log(`versioned ownerId: ${JSON.stringify(ownerId)}`);
-      console.log(`versioned mimeType: ${JSON.stringify(mimeType)}`);
-      console.log(`versioned imagePath: ${JSON.stringify(filename)}`);
-      const ipfsData: PinNft = await pinNftVersion({
-        ownerId: ownerId,
-        imagePath: `images_store/${vFilename}`,
-        imageType: mimeType,
-        imageName: vFilename,
-        callback: handleErrorCallback,
-      });
-      if (!ipfsData.data.created[0].dataTxId) {
-        const err = '[generateNftVersion] null dataTxId!';
-        handleErrorCallback(err);
-      }
-      return ipfsData;
-    } catch (error: any) {
-      handleErrorCallback(
-        `[generateNftVersion] Error fetching versioned image: ${JSON.stringify(
-          error ?? 'unknown error',
-        )}`,
-      );
-    }
-  }, []);
-
   const handleUserChPress = () => {
     setShowModal(false);
-    navigation.navigate('ChallengeScreen');
+    navigation.navigate('UserScreen');
   };
 
   const handleButtonClose = () => {
     setShowModal(false);
-    navigation.navigate('ChallengeScreen');
+    navigation.navigate('UserScreen');
   };
 
+  /**
+   * Function to create an NFT version of the original NFT used in the Challenge
+   * the user has chosen to accept. This is done by versioning the image used
+   * in the original NFT. Once the versioned NFT is created, we then create a
+   * User Challenge entry in the DB.
+   */
+  const generateNftVersion = useCallback(
+    async image => {
+      setErrorMsg('');
+      try {
+        const filename = getUrlFileName(image);
+        const versionImage = `version_image?filename=${filename}`;
+        console.log(`[generateNftVersion] endpoint: ${versionImage}`);
+        const versionedImage = await dbFetch(
+          {endPoint: versionImage},
+          handleErrorCallback,
+        );
+        console.log(
+          `versioned image: ${JSON.stringify(versionedImage, null, 2)}`,
+        );
+        const vFilename = getUrlFileName(versionedImage.data);
+        const mimeType = getMimeType(vFilename);
+        const ipfsData = await pinNftVersion({
+          ownerId: ownerId,
+          imagePath: `images_store/${vFilename}`,
+          imageType: mimeType,
+          imageName: vFilename,
+          callback: handleErrorCallback,
+        });
+        console.log(
+          `[generateNftVersion] IPFS response: ${JSON.stringify(ipfsData)}`,
+        );
+        if (ipfsData?.data && !ipfsData?.data?.created[0].dataTxId) {
+          const err = '[generateNftVersion] null dataTxId!';
+          handleErrorCallback(err);
+        }
+        return ipfsData;
+      } catch (error: any) {
+        handleErrorCallback(
+          `[generateNftVersion] Error generating versioned NFT: ${JSON.stringify(
+            error ?? 'unknown error',
+          )}`,
+        );
+      }
+    },
+    [ownerId],
+  );
+
   const handleSubmit = async () => {
+    console.log('[CreateUserChallenge][handleSubmit]....');
     try {
+      console.log('[CreateUserChallenge] generate NFT Version....');
+      const nftVersion = await generateNftVersion(doubloon);
       /**
        * userChallengeId: string;
        * userId: string,
@@ -93,8 +106,14 @@ const CreateUserChallenge = ({route}) => {
        * doubloon: string;
        * date: number;
        * dateCompleted: number | null;
+       * status;
        */
-      const nftVersion = await generateNftVersion(doubloon);
+      if (!nftVersion.data) {
+        handleErrorCallback(
+          'Error generating a new NFT version while creating a new User Challenge. Please try again.',
+        );
+      }
+      console.log('[CreateUserChallenge] create new User Challenge....');
       const userChallenge = new UserChallenge(
         uuidv4(),
         ownerId,
@@ -102,32 +121,29 @@ const CreateUserChallenge = ({route}) => {
         nftVersion.data.nftId,
         nftVersion.data.created[0].sourceUri,
         Date.now(),
-        null,
+        0,
+        'active',
       );
       console.log(
-        `[CreateUserChallenge] new Challenge: ${JSON.stringify(
+        `[CreateUserChallenge] new User Challenge: ${JSON.stringify(
           userChallenge,
           null,
           2,
         )}`,
       );
+      console.log('[CreateUserChallenge] db upsert new User Challenge....');
       await dbUpsert({
         endPoint: 'upsert_user_challenge',
         conditions: userChallenge,
         callback: handleErrorCallback,
       });
-      //const nftImage = new NftImage();
       setShowModal(true);
-      setMessage('User Challenge created!');
+      console.log('[CreateUserChallenge] all finished, show modal....');
+      setMessage('New User Challenge created!');
     } catch (e: any) {
-      console.log(
-        '[CreateUserChallenge] Error adding user challenge:',
-        e.message,
+      handleErrorCallback(
+        'Failed to create a new Toqyn User Challenge. Please check your network connection and try again.',
       );
-      setErrorMsg(
-        'Failed to create a Toqyn User Challenge. Please check your network connection and try again.',
-      );
-      setShowModal(true);
     }
   };
 
@@ -146,6 +162,10 @@ const CreateUserChallenge = ({route}) => {
           <Image source={{uri: doubloon}} style={styles.uchImgImage} />
         </View>
       </TouchableOpacity>
+      <View style={styles.uchTextContainer}>
+        <Text style={styles.uchTextTitle}>{name}</Text>
+        <Text>{description}</Text>
+      </View>
       <View style={styles.uchImgButtonGroup}>
         <View style={styles.uchChButton}>
           <Button title="Accept Challenge" onPress={() => handleSubmit()} />
@@ -179,7 +199,7 @@ function generateChallengeStyles(size: any) {
       borderWidth: isTablet(size.width, size.height) ? hp('2') : wp('1'),
       borderRadius: isTablet(size.width, size.height) ? hp('12') : wp('6'),
     },
-    chText: {
+    uchText: {
       fontSize: isTablet(size.width, size.height) ? hp('2') : wp('4'),
       lineHeight: isTablet(size.width, size.height) ? hp('2') : wp('7'),
       flexDirection: 'row',
@@ -187,7 +207,7 @@ function generateChallengeStyles(size: any) {
       color: 'white',
       textAlign: 'center',
     },
-    chButton: {
+    uchButton: {
       width: isTablet(size.width, size.height) ? hp('48') : wp('38'),
       backgroundColor: 'rgba(200, 200, 200, 0.75)',
       borderStyle: 'solid',
@@ -196,19 +216,19 @@ function generateChallengeStyles(size: any) {
       borderWidth: isTablet(size.width, size.height) ? hp('2') : wp('1'),
       borderRadius: isTablet(size.width, size.height) ? hp('6') : wp('3'),
     },
-    chButtonText: {
+    uchButtonText: {
       color: 'black',
       fontSize: isTablet(size.width, size.height) ? hp('6') : wp('4'),
       textAlign: 'center',
     },
-    chInput: {
+    uchInput: {
       height: 40,
       borderColor: 'gray',
       borderWidth: 1,
       marginBottom: 10,
       paddingHorizontal: 10,
     },
-    chInputDesc: {
+    uchInputDesc: {
       borderColor: 'gray',
       borderWidth: 1,
       marginBottom: 10,
@@ -239,17 +259,23 @@ function generateChallengeStyles(size: any) {
       paddingHorizontal: isTablet(size.width, size.height) ? hp('2') : wp('2'),
       marginHorizontal: isTablet(size.width, size.height) ? hp('2') : wp('2'),
     },
-    modalImage: {
+    uchModalImage: {
       width: isTablet(size.width, size.height) ? hp('80') : wp('60'),
       height: isTablet(size.width, size.height) ? hp('80') : wp('60'),
       marginBottom: isTablet(size.width, size.height) ? hp('20') : wp('35'),
       backgroundColor: 'transparent',
     },
-    textTitle: {
-      paddingTop: isTablet(size.width, size.height) ? hp('4') : wp('3'),
-      paddingHorizontal: isTablet(size.width, size.height) ? hp('5') : wp('3'),
+    uchTextTitle: {
+      fontWeight: 'bold',
+      fontSize: isTablet(size.width, size.height) ? hp('7') : wp('5'),
+      margin: isTablet(size.width, size.height) ? hp('4') : wp('3'),
     },
-    centeredView: {
+    uchTextContainer: {
+      alignItems: 'center',
+      margin: isTablet(size.width, size.height) ? hp('4') : wp('2'),
+      padding: isTablet(size.width, size.height) ? hp('8') : wp('4'),
+    },
+    uchCenteredView: {
       flex: 1,
       justifyContent: 'center',
       alignItems: 'center',

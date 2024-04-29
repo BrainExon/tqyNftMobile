@@ -75,7 +75,7 @@ export async function dbUpsert({endPoint, conditions, callback}) {
     console.log(`[dbUpsert] response.ok: ${JSON.stringify(response.ok)}`);
     if (response.ok) {
       const data = await response.json();
-      console.log('[dbUpsert] ${endPoint} success:', data);
+      console.log(`[dbUpsert] ${endPoint} success: ${JSON.stringify(data)}`);
       return data;
     } else {
       const er = `[dbUpsert] ${endPoint}  : ${JSON.stringify(
