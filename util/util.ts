@@ -162,7 +162,33 @@ function getUrlFileName(url) {
   const parts = url.split('/');
   return parts[parts.length - 1];
 }
+function getMimeType(filename) {
+  const extension = filename.split('.').pop().toLowerCase();
+  console.log(`[getMimeType] ext: ${extension}`);
+  switch (extension) {
+    case 'png':
+      return 'image/png';
+    case 'jpg':
+    case 'jpeg':
+      return 'image/jpeg';
+    case 'gif':
+      return 'image/gif';
+    case 'pdf':
+      return 'application/pdf';
+    case 'txt':
+      return 'text/plain';
+    case 'html':
+      return 'text/html';
+    case 'json':
+      return 'application/json';
+    case 'xml':
+      return 'application/xml';
+    default:
+      return 'application/octet-stream';
+  }
+}
 export {
+  getMimeType,
   getUrlFileName,
   printDebug,
   isArray,

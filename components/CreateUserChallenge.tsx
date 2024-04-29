@@ -8,7 +8,7 @@ import {
 } from 'react-native';
 import {dbFetch, dbUpsert} from '../util/dbUtils';
 import React, {useState, useCallback} from 'react';
-import {getUrlFileName, isTablet, setOutline} from '../util/util';
+import {getMimeType, getUrlFileName, isTablet, setOutline} from '../util/util';
 import {
   heightPercentageToDP as hp,
   widthPercentageToDP as wp,
@@ -18,6 +18,7 @@ import UserModal from './ui/UserModal';
 import {useNavigation} from '@react-navigation/native';
 import {UserChallenge} from './models/UserChallenge';
 import NftImage from '../../../../../../../Express/functions/models/NftImage';
+import {pinNft, PinNft, pinNftVersion} from '../ipfs/blockchain';
 
 const CreateUserChallenge = ({route}) => {
   const {ownerId, nftId, chId, doubloon} = route.params;
@@ -33,15 +34,39 @@ const CreateUserChallenge = ({route}) => {
     setShowModal(true);
   };
 
-  const getDoubloonVersion = useCallback(async image => {
+  const generateNftVersion = useCallback(async image => {
     try {
       const filename = getUrlFileName(image);
       const versionImage = `version_image?filename=${filename}`;
       console.log(`endpoint: ${versionImage}`);
-      return await dbFetch({endPoint: versionImage}, handleErrorCallback);
+      const versionedImage = await dbFetch(
+        {endPoint: versionImage},
+        handleErrorCallback,
+      );
+      console.log(
+        `versioned image: ${JSON.stringify(versionedImage, null, 2)}`,
+      );
+      const vFilename = getUrlFileName(versionedImage.data);
+      const mimeType = getMimeType(vFilename);
+      console.log(`versioned vFilename: ${JSON.stringify(vFilename)}`);
+      console.log(`versioned ownerId: ${JSON.stringify(ownerId)}`);
+      console.log(`versioned mimeType: ${JSON.stringify(mimeType)}`);
+      console.log(`versioned imagePath: ${JSON.stringify(filename)}`);
+      const ipfsData: PinNft = await pinNftVersion({
+        ownerId: ownerId,
+        imagePath: `images_store/${vFilename}`,
+        imageType: mimeType,
+        imageName: vFilename,
+        callback: handleErrorCallback,
+      });
+      if (!ipfsData.data.created[0].dataTxId) {
+        const err = '[generateNftVersion] null dataTxId!';
+        handleErrorCallback(err);
+      }
+      return ipfsData;
     } catch (error: any) {
       handleErrorCallback(
-        `[getDoubloonVersion] Error fetching versioned image: ${JSON.stringify(
+        `[generateNftVersion] Error fetching versioned image: ${JSON.stringify(
           error ?? 'unknown error',
         )}`,
       );
@@ -69,13 +94,13 @@ const CreateUserChallenge = ({route}) => {
        * date: number;
        * dateCompleted: number | null;
        */
-      const doubloonVersion = await getDoubloonVersion(doubloon);
+      const nftVersion = await generateNftVersion(doubloon);
       const userChallenge = new UserChallenge(
         uuidv4(),
         ownerId,
         chId,
-        nftId,
-        doubloonVersion.data,
+        nftVersion.data.nftId,
+        nftVersion.data.created[0].sourceUri,
         Date.now(),
         null,
       );
