@@ -1,8 +1,7 @@
 import React, {useState, useEffect, useCallback} from 'react';
 import {View, StyleSheet, Text} from 'react-native';
 import {useWindowDimensions} from 'react-native';
-import {dbFetchNFTs} from '../util/dbUtils';
-import ImageList from '../components/ImageList';
+import {dbFetch} from '../util/dbUtils';
 import {isEmpty, isObjectEmpty, setOutline} from '../util/util';
 import {useNavigation} from '@react-navigation/native';
 import UserModal from '../components/ui/UserModal';
@@ -35,7 +34,7 @@ function ChallengeScreen() {
   const navigation = useNavigation();
   const boardSize = useWindowDimensions();
   const styles = generateItemStyles(boardSize);
-  const [nfts, setNfts] = useState([]);
+  const [challenges, setChallenges] = useState([]);
   const [error, setError] = useState('');
   const [showModal, setShowModal] = useState(false);
 
@@ -57,14 +56,7 @@ function ChallengeScreen() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const foundChallenges = await dbFetchNFTs({endPoint: 'get_challenges'});
-        console.log(
-          `[ChallengeScreen] foundChallenges: ${JSON.stringify(
-            foundChallenges,
-            null,
-            2,
-          )}`,
-        );
+        const foundChallenges = await dbFetch({endPoint: 'get_challenges'});
         if (foundChallenges.data) {
           const updatedBucketArray = [];
           foundChallenges.data.forEach(challenge => {
@@ -79,10 +71,12 @@ function ChallengeScreen() {
               updatedBucketArray.push(item);
             }
           });
-          setNfts(updatedBucketArray);
+          setChallenges(updatedBucketArray);
         }
       } catch (error) {
-        handleErrorCallback(`[ChallengeScreen] Error fetching NFTs: ${error}`);
+        handleErrorCallback(
+          `[ChallengeScreen] Error fetching Challenges: ${error}`,
+        );
         return;
       }
     };
@@ -93,9 +87,6 @@ function ChallengeScreen() {
 
     return onFocus;
   }, [navigation]);
-  if (nfts) {
-    console.log(`[ChallengScreen] nFts: ${JSON.stringify(nfts)}`);
-  }
   return (
     <View style={styles.userContainer}>
       {showModal ? (
@@ -108,7 +99,7 @@ function ChallengeScreen() {
         />
       ) : (
         <View>
-          <ChallengesList items={nfts} />
+          <ChallengesList items={challenges} />
         </View>
       )}
     </View>

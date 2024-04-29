@@ -9,7 +9,7 @@ import {
 import {dbUpsert} from '../util/dbUtils';
 import Config from 'react-native-config';
 import React, {useState, useEffect} from 'react';
-import {isTablet, setOutline} from '../util/util';
+import {getUrlFileName, isTablet, setOutline} from '../util/util';
 import {Picker} from '@react-native-picker/picker';
 import {
   heightPercentageToDP as hp,
@@ -37,6 +37,7 @@ const CreateChallenge = ({route}) => {
   const [message, setMessage] = useState('');
 
   const handleErrorCallback = (errMsg: any) => {
+    console.log(`[CreateChallenge] error: ${JSON.stringify(errMsg)}`);
     setError(errMsg);
   };
   const handleButtonClose = () => {
@@ -56,12 +57,12 @@ const CreateChallenge = ({route}) => {
           '${APP_NAME}',
           Config.APP_NAME,
         )?.replace('${DOUBLOON_DESIGNER}', Config.DOUBLOON_DESIGNER);
-        setError(errorMessage);
+        handleErrorCallback(errorMessage);
         setShowModal(true);
       }
     };
     checkUserRole();
-  }, []);
+  }, [userState.role]);
 
   const handleValueChange = itemValue => {
     setCategory(itemValue);
@@ -70,22 +71,11 @@ const CreateChallenge = ({route}) => {
     console.log('Category:', category);
     console.log('Name:', name);
     console.log('Description:', description);
+
     try {
-      /**
-       * chId: string,
-       * name: string,
-       * date: string,
-       * owner: string,
-       * users: string[] = [],
-       * doubloon: string, // image used to create the NFT
-       * nft: string, // id of the NFT used to create this challenge
-       * dataTxId: string,
-       * nftVersion: number,
-       * category: string,
-       * description: string,
-       */
+      const challengeId = uuidv4();
       const challenge = new Challenge(
-        uuidv4(),
+        challengeId,
         name,
         Date.now(),
         userState.userId,
@@ -97,6 +87,7 @@ const CreateChallenge = ({route}) => {
         category,
         description,
       );
+
       console.log(
         `[CreateChallenge] new Challenge: ${JSON.stringify(
           challenge,
@@ -104,15 +95,17 @@ const CreateChallenge = ({route}) => {
           2,
         )}`,
       );
+
       await dbUpsert({
         endPoint: 'upsert_challenge',
         conditions: challenge,
-        setError: handleErrorCallback,
+        callback: handleErrorCallback,
       });
+
       setShowModal(true);
       setMessage('Challenge created!');
-    } catch (e: any) {
-      console.log('[CreateChallenge] Error adding challenge:', e.message);
+    } catch (error) {
+      console.log('[CreateChallenge] Error adding challenge:', error.message);
       setError(
         'Failed to create a Toqyn Challenge. Please check your network connection and try again.',
       );
@@ -159,6 +152,7 @@ const CreateChallenge = ({route}) => {
           message={message ?? ''}
           error={error ?? ''}
           onClose={handleButtonClose}
+          showActivity={false}
         />
       )}
     </View>

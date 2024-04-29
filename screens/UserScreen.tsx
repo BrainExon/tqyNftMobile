@@ -1,7 +1,7 @@
 import React, {useState, useEffect, useCallback} from 'react';
 import {View, StyleSheet} from 'react-native';
 import {useWindowDimensions} from 'react-native';
-import {dbFetchNFTs} from '../util/dbUtils';
+import {dbFetch} from '../util/dbUtils';
 import ImageList from '../components/ImageList';
 import {isEmpty, isObjectEmpty, setOutline} from '../util/util';
 import {useNavigation} from '@react-navigation/native';
@@ -56,7 +56,7 @@ function UserScreen() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const foundNfts = await dbFetchNFTs({endPoint: 'get_nfts'});
+        const foundNfts = await dbFetch({endPoint: 'get_nfts'});
         if (foundNfts.data) {
           const updatedBucketArray = [];
           foundNfts.data.forEach(item => {

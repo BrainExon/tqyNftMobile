@@ -161,8 +161,8 @@ const NftMinter = () => {
 
   // check user permissions
   useEffect(() => {
-    console.log(`\n========\n OWNER id: ${userState.userId}`);
     setOwnerId(userState.userId);
+    console.log('[NftMinter] permissions check...');
     const checkUserRole = () => {
       if (userState.role !== 'creator') {
         const errorMessage = Config.AUTH_ERROR?.replace(
@@ -175,6 +175,17 @@ const NftMinter = () => {
       }
     };
     checkUserRole();
+
+    const handleFocus = () => {
+      // Your onFocus event handling logic goes here
+      console.log('Component focused');
+    };
+
+    window.addEventListener('focus', handleFocus);
+
+    return () => {
+      window.removeEventListener('focus', handleFocus);
+    };
   }, [handleErrorCallback]);
 
   const handleSelectImage = async () => {
@@ -346,7 +357,7 @@ const NftMinter = () => {
                       onPress={async () => {
                         if (!selectedImage) {
                           handleErrorCallback(
-                            '[NftMinter] error: Image not selected.',
+                            '[NftMinter] error: NftImage not selected.',
                           );
                           return;
                         }
@@ -358,11 +369,13 @@ const NftMinter = () => {
                           const explorerUrl =
                             Config.ARWEAVE_PREVIEW_URL + '/' + mint;
                           urlExists(explorerUrl, (err, exists) => {
+                            /*
                             if (err) {
                               setMintProgressStep(MintingStep.Error);
                               handleErrorCallback(err);
                               return;
                             }
+                             */
                             setMintProgressStep(MintingStep.Success);
                           });
                         } catch (error) {
