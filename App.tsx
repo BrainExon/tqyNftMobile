@@ -99,7 +99,6 @@ export default function App() {
               },
             ]}
             imageStyle={styles.logo}>
-            <Header />
             <NavigationContainer theme={MyTheme}>
               <Stack.Navigator>
                 <Stack.Screen

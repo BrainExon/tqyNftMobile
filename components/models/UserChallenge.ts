@@ -1,39 +1,27 @@
 export class UserChallenge {
   userChallengeId: string;
-  userId: string,
+  userId: string;
   chId: string;
-  chName: string;
-  dateStarted: string;
-  dateCompleted: string;
+  nftId: string;
   doubloon: string;
-  nft: string;
-  dataTxId: string;
-  nftVersion: number;
-  category: string;
-  description: string;
+  date: number;
+  dateCompleted: number | null;
+
   constructor(
+    userChallengeId: string,
+    userId: string,
     chId: string,
-    name: string,
-    date: string,
-    owner: string,
-    users: string[] = [],
+    nftId: string,
     doubloon: string,
-    nft: string,
-    dataTxId: string,
-    nftVersion: number,
-    category: string,
-    description: string,
+    date: number,
+    dateCompleted: number | null,
   ) {
+    this.userChallengeId = userChallengeId;
+    this.userId = userId;
     this.chId = chId;
-    this.name = name;
-    this.date = date;
-    this.owner = owner;
-    this.users = users;
+    this.nftId = nftId;
     this.doubloon = doubloon;
-    this.nft = nft;
-    this.dataTxId = dataTxId;
-    this.nftVersion = nftVersion;
-    this.category = category;
-    this.description = description;
+    this.date = date;
+    this.dateCompleted = dateCompleted;
   }
 }

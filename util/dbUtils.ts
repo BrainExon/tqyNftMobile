@@ -16,23 +16,19 @@ export async function dbFindOne({endPoint, conditions, setError}) {
   }
 
   try {
-    const response = await axios.post(
-      `${Config.NODEJS_EXPRESS_SERVER}/${endPoint}`,
-      conditions,
-      {
-        headers: {
-          'Content-Type': 'application/json',
-        },
+    const url = `${Config.NODEJS_EXPRESS_SERVER}/${endPoint}`;
+    console.log(`\n----\nURL: ${JSON.stringify(url)}\n----\n`);
+    const response = await axios.post(url, conditions, {
+      headers: {
+        'Content-Type': 'application/json',
       },
-    );
+    });
 
-    /*
     console.log(
       `[dbFindOne] end point "${endPoint}" response: ${JSON.stringify(
         response.data,
       )}`,
     );
-    */
     if (response.status === 200) {
       console.log('[dbFindOne] Data retrieved successfully:', response.data);
       return response.data;
@@ -50,11 +46,11 @@ export async function dbFindOne({endPoint, conditions, setError}) {
   }
 }
 
-export async function dbUpsert({endPoint, conditions, setError}) {
+export async function dbUpsert({endPoint, conditions, callback}) {
   if (!conditions) {
     const err = `[dbUpsert] "conditions" is null for endpoint ${endPoint}`;
     console.log(err);
-    setError(err);
+    callback(err);
     return;
   }
   const myHeaders = new Headers();
@@ -85,19 +81,20 @@ export async function dbUpsert({endPoint, conditions, setError}) {
       const er = `[dbUpsert] ${endPoint}  : ${JSON.stringify(
         response.statusText,
       )}`;
-      setError(er);
+      callback(er);
     }
   } catch (error) {
     const er = `[dbUpsert] An error occurred while upserting endpoint: ${JSON.stringify(
       endPoint,
     )}`;
-    setError(er);
+    callback(er);
   }
 }
 
-export async function dbFetchNFTs({endPoint, setError}) {
+/*
+export async function dbFetch({endPoint, setError}) {
   try {
-    //console.log( `[dbFetchNFTs] URL: ${Config.NODEJS_EXPRESS_SERVER}/${endPoint}`, );
+    //console.log( `[dbFetch] URL: ${Config.NODEJS_EXPRESS_SERVER}/${endPoint}`, );
     const requestOptions = {method: 'GET', redirect: 'follow'};
     const response = await fetch(
       `${Config.NODEJS_EXPRESS_SERVER}/${endPoint}`,
@@ -106,11 +103,26 @@ export async function dbFetchNFTs({endPoint, setError}) {
     //const result = await response.text();
     return await response.json();
   } catch (error) {
-    console.error('dbFetchNFTs error: ', JSON.stringify(error));
+    console.error('dbFetch error: ', JSON.stringify(error));
     setError(error);
   }
 }
-
+*/
+interface DbFetch {
+  endPoint: string;
+  setError: (error: any) => void;
+}
+export async function dbFetch({endPoint, setError}) {
+  try {
+    const url = `${Config.NODEJS_EXPRESS_SERVER}/${endPoint}`;
+    //console.log(`[dbFetch] url: ${JSON.stringify(url)}`);
+    const response = await axios.get(url);
+    return response.data;
+  } catch (error) {
+    console.error('dbFetch error: ', JSON.stringify(error));
+    setError(error);
+  }
+}
 interface FetchImageParams {
   endPoint: string;
   imageName: string;

@@ -6,7 +6,7 @@ interface UrlExists {
   ): void;
 }
 
-export const urlExists: UrlExists = (url, callback, retries = 3) => {
+export const urlExists: UrlExists = (url, callback, retries = 1) => {
   const makeRequest = (retryCount: number) => {
     fetch(url, {method: 'GET'})
       .then(res => {

@@ -9,13 +9,14 @@ import ChallengeScreen from '../../screens/ChallengeScreen';
 import {useWindowDimensions} from 'react-native';
 import {isTablet} from '../../util/util';
 import GlobalStyles from '../../constants/GlobalStyles';
-import UserChallenge from '../UserChallenge';
+import CreateUserChallenge from '../CreateUserChallenge';
 import CreateChallenge from '../CreateChallenge';
 import SignupScreen from '../../screens/SignupScreen';
 import UserScreen from '../../screens/UserScreen';
 import LoginScreen from '../../screens/LoginScreen';
 import ImageDetail from '../../screens/ImageDetail';
 import NftMinter from '../NftMinter';
+import {Header} from '../Header';
 const BottomTabs = createBottomTabNavigator();
 const setTabBarVisible = name => {
   switch (name) {
@@ -37,16 +38,21 @@ function TabsNavigator() {
       screenOptions={({route}) => {
         const options = {
           headerStyle: {
-            backgroundColor: GlobalStyles.accent.blue200,
+            backgroundColor: 'rgba(0, 0, 0, 0.9)',
+            borderTopColor: 'rgba(0, 0, 0, 0.9)',
+            borderBottomColor: 'rgba(0, 0, 0, 0.9)',
+            borderLeftColor: 'rgba(0, 0, 0, 0.9)',
+            borderRightColor: 'rgba(0, 0, 0, 0.9)',
             height: isTablet(screenSize.width, screenSize.height)
-              ? hp('88')
-              : wp('32'),
+              ? hp('25')
+              : wp('20'),
           },
           headerTitleStyle: {
             fontSize: isTablet(screenSize.width, screenSize.height)
-              ? hp('2')
-              : wp('4'),
+              ? hp('10')
+              : wp('8'),
           },
+          headerTitleAlign: 'center',
           headerTintColor: GlobalStyles.colors.primary30,
           tabBarStyle: {
             borderTopWidth: 2,
@@ -84,9 +90,9 @@ function TabsNavigator() {
         name="LoginScreen"
         component={LoginScreen}
         options={{
-          title: 'Login',
+          title: 'Toqyn',
           tabBarLabel: 'Login',
-          headerShown: false, // Hide the header for this screen
+          headerShown: true, // Hide the header for this screen
           tabBarIcon: ({color, size}) => (
             <Icon
               color={color}
@@ -104,9 +110,9 @@ function TabsNavigator() {
         name="UserScreen"
         component={UserScreen}
         options={{
-          title: 'Home',
+          title: 'Toqyn',
           tabBarLabel: 'Home',
-          headerShown: false, // Hide the header for this screen
+          headerShown: true,
           // eslint-disable-next-line react/no-unstable-nested-components
           tabBarIcon: ({color, size}) => (
             <Icon
@@ -125,7 +131,7 @@ function TabsNavigator() {
         name="SignupScreen"
         component={SignupScreen}
         options={{
-          title: 'Signup',
+          title: 'Toqyn',
           tabBarLabel: 'Signup',
           headerShown: false, // Hide the header for this screen
           tabBarIcon: ({color, size}) => (
@@ -145,9 +151,9 @@ function TabsNavigator() {
         name="ChallengeScreen"
         component={ChallengeScreen}
         options={{
-          title: 'ChallengeScreen',
+          title: 'Toqyn',
           tabBarLabel: 'Challenges',
-          headerShown: false, // Hide the header for this screen
+          headerShown: true, // Hide the header for this screen
           tabBarIcon: ({color, size}) => (
             <Icon
               color={color}
@@ -165,7 +171,7 @@ function TabsNavigator() {
         name="NftMinter"
         component={NftMinter}
         options={{
-          title: 'NftMinter',
+          title: 'Toqyn',
           tabBarLabel: 'Mint',
           headerShown: false, // Hide the header for this screen
           tabBarIcon: ({color, size}) => (
@@ -185,7 +191,7 @@ function TabsNavigator() {
         name="ImageDetail"
         component={ImageDetail}
         options={{
-          title: 'ImageDetail',
+          title: 'Toqyn',
           tabBarVisible: false,
           headerShown: false, // Hide the header for this screen
           tabBarButton: props => null,
@@ -195,19 +201,19 @@ function TabsNavigator() {
         name="CreateChallenge"
         component={CreateChallenge}
         options={{
-          title: 'CreateChallenge',
-          tabBarVisible: false,
-          headerShown: false, // Hide the header for this screen
+          title: 'Toqyn',
+          tabBarVisible: true,
+          headerShown: true, // Hide the header for this screen
           tabBarButton: props => null,
         }}
       />
       <BottomTabs.Screen
-        name="AcceptChallenge"
-        component={UserChallenge}
+        name="CreateUserChallenge"
+        component={CreateUserChallenge}
         options={{
-          title: 'UserChallenge',
+          title: 'Toqyn',
           tabBarVisible: false,
-          headerShown: false, // Hide the header for this screen
+          headerShown: false,
           tabBarButton: props => null,
         }}
       />

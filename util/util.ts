@@ -157,7 +157,13 @@ const replaceStringByKey = (inputString, key, replacement) => {
   console.log('[replaceStringByKey] clean: ', JSON.stringify(clean));
   return clean;
 };
+
+function getUrlFileName(url) {
+  const parts = url.split('/');
+  return parts[parts.length - 1];
+}
 export {
+  getUrlFileName,
   printDebug,
   isArray,
   setOutline,

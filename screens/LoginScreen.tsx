@@ -86,7 +86,7 @@ function LoginScreen() {
         const queryResult = await dbUpsert({
           endPoint: 'upsert_user',
           conditions: newUser,
-          setError: handleErrorCallback,
+          callback: handleErrorCallback,
         });
         if (!queryResult.data) {
           setError(
@@ -134,6 +134,7 @@ function LoginScreen() {
           message={'Login success!'}
           error={error}
           onClose={handleButtonClose}
+          showActivity={false}
         />
       )}
       <View style={styles.boxFooter} />
