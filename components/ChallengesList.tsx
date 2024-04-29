@@ -66,6 +66,8 @@ const ChallengesList = ({items}) => {
       nftId: item.nft,
       chId: item.chId,
       doubloon: item.doubloon,
+      name: item.name,
+      description: item.description,
     });
   };
 

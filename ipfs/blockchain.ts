@@ -131,6 +131,44 @@ export const pinNft = async ({
   }
 };
 
+/**
+ * Returns a response something like this:
+ * {
+ *   success: true,
+ *   data: {
+ *     _id: "66300d54f283363d967a15e6",
+ *     date: 1714425172072,
+ *     ownerId: "dc6ddf89-37fc-4224-a0d7-5c03ae4353e7",
+ *     nftId: "2142d9ea-1c86-4125-9bf1-344691946687",
+ *     created: [
+ *       {
+ *         type: "file",
+ *         entityName: "03642d02-c51c-4a48-aec7-5f3d431ed6bd_v1.png",
+ *         entityId: "3559eb2e-d197-4e2b-a628-5c00138bdea4",
+ *         dataTxId: "Hsy7HgR-l03KS1HbK1cX8GtlHNrsZLFMTF95TX0qrJU",
+ *         metadataTxId: "DKR_AytSe2tvnAd0_nXuYL9shZAyFXpc1opSYotT4fk",
+ *         bundledIn: "cquaZKIeEfscT6y7YpZOYfqmdFsq5gmP1PBnKMXb9kA",
+ *         sourceUri: "file:///Users/chellax/Projects/Express/functions/images_store/03642d02-c51c-4a48-aec7-5f3d431ed6bd_v1.png"
+ *       },
+ *       {
+ *         type: "bundle",
+ *         bundleTxId: "cquaZKIeEfscT6y7YpZOYfqmdFsq5gmP1PBnKMXb9kA"
+ *       }
+ *     ],
+ *     tips: [
+ *       {
+ *         recipient: "mrilKP-FPWEoicO0CUL2Ts0MvsM3G5IJELABV7g2XQI",
+ *         txId: "cquaZKIeEfscT6y7YpZOYfqmdFsq5gmP1PBnKMXb9kA",
+ *         winston: "137422921"
+ *       }
+ *     ],
+ *     fees: {
+ *       cquaZKIeEfscT6y7YpZOYfqmdFsq5gmP1PBnKMXb9kA: "916152809"
+ *     }
+ *   },
+ *   error: ""
+ * }
+ */
 export const pinNftVersion = async ({
   ownerId,
   imagePath,
@@ -155,15 +193,28 @@ export const pinNftVersion = async ({
       imageName: imageName,
       ownerId: ownerId,
     };
-    console.log(`[pinNftVersion] data: ${JSON.stringify(data, null, 2)}`);
     const url = `${Config.NODEJS_EXPRESS_SERVER}/mint_nft_version`;
     const response = await axios.post(url, data, {
       headers: {
         'Content-Type': 'application/json',
+        Accept: 'application/json',
       },
     });
-
-    return response;
+    console.log(
+      `[pinNftVersion] Newly Minted User Challenge versioned NFT response: ${JSON.stringify(
+        response.data.success,
+        null,
+        2,
+      )}`,
+    );
+    console.log(
+      `[pinNftVersion] RESPONSE.DATA: ${JSON.stringify(
+        response.data,
+        null,
+        2,
+      )}`,
+    );
+    return response.data;
   } catch (error: any) {
     const er = `[pinNftVersion] Error: ${
       error.message || 'Unknown error occurred'

@@ -6,7 +6,7 @@ export class UserChallenge {
   doubloon: string;
   date: number;
   dateCompleted: number | null;
-
+  status: string;
   constructor(
     userChallengeId: string,
     userId: string,
@@ -14,7 +14,8 @@ export class UserChallenge {
     nftId: string,
     doubloon: string,
     date: number,
-    dateCompleted: number | null,
+    dateCompleted: number,
+    status: string,
   ) {
     this.userChallengeId = userChallengeId;
     this.userId = userId;
@@ -23,5 +24,6 @@ export class UserChallenge {
     this.doubloon = doubloon;
     this.date = date;
     this.dateCompleted = dateCompleted;
+    this.status = status;
   }
 }
