@@ -212,7 +212,11 @@ const NftMinter = () => {
   const mintNft = useCallback(
     async (nftImage: string) => {
       console.log('\n---------\n[mintNft]\n---------\n');
+      console.log(`[mintNFT] errorMessage? ${errorMessage}`);
+      console.log(`[mintNFT] showModal? ${showModal}`);
+      console.log(`[mintNFT] mintProgressStep? ${mintProgressStep}`);
       console.log('[mintNft] nftImage', JSON.stringify(nftImage));
+      console.log('\n---------\n');
       console.log(
         '\n-----\n[mintNft] OwnerId: ',
         JSON.stringify(ownerId),
@@ -325,7 +329,7 @@ const NftMinter = () => {
                   <UserModal
                     visible={showModal}
                     message={Config.MINT_SUCCESS}
-                    error={errorMessage ?? ''}
+                    error={''}
                     onClose={handleModalButtonClose}
                     showActivity={false}
                   />
@@ -376,6 +380,7 @@ const NftMinter = () => {
                               return;
                             }
                              */
+                            setErrorMessage('');
                             setMintProgressStep(MintingStep.Success);
                           });
                         } catch (error) {

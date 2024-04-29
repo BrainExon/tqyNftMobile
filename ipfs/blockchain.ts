@@ -1,21 +1,23 @@
 import Config from 'react-native-config';
 import {replaceStringByKey} from '../util/util';
-
-const arDriveUpload = async (
+import axios from 'axios';
+const arDriveClient = async (
   ownerId: string,
   imagePath: string,
   imageType: string | null,
   imageName: string | null,
   callback: (error: any) => void,
 ) => {
+  console.log('\n-------\n');
   console.log('[Blockchain]  ARDrive image upload...');
-  console.log(`[arDriveUpload] ownerId: ${ownerId}`);
-  console.log(`[arDriveUpload] imagePath: ${imagePath}`);
-  console.log(`[arDriveUpload] imageType: ${imageType}`);
-  console.log(`[arDriveUpload] imageName: ${imageName}`);
+  console.log(`[arDriveClient] ownerId: ${ownerId}`);
+  console.log(`[arDriveClient] imagePath: ${imagePath}`);
+  console.log(`[arDriveClient] imageType: ${imageType}`);
+  console.log(`[arDriveClient] imageName: ${imageName}`);
+  console.log('\n-------\n');
 
   const handleError = (error: any) => {
-    console.log('[Blockchain][mint] Error:', JSON.stringify(error));
+    console.log('[arDriveClient][mint] Error:', JSON.stringify(error));
     callback(error.message);
   };
 
@@ -46,12 +48,13 @@ const arDriveUpload = async (
       body: formData,
       redirect: 'follow',
     };
-    console.log(`[blockchain] formData: ${JSON.stringify(formData)}`);
+    console.log(
+      `[arDriveClient] formData: ${JSON.stringify(formData, null, 2)}`,
+    );
+    const url = `${Config.NODEJS_EXPRESS_SERVER}/mint_nft`;
+    console.log(`[arDriveClient] URL: ${JSON.stringify(url)}`);
     try {
-      const response = await fetch(
-        `${Config.NODEJS_EXPRESS_SERVER}/upload_files`,
-        requestOptions,
-      );
+      const response = await fetch(url, requestOptions);
       return await response.json();
     } catch (error) {
       handleError(`[mint] error: ${JSON.stringify(error)}`);
@@ -63,13 +66,13 @@ const arDriveUpload = async (
     console.log(`[ArdriveUpload] minting response: ${JSON.stringify(minting)}`);
     if (minting.error) {
       console.log(
-        `[arDriveUpload][mint] error: ${JSON.stringify(minting.error)}`,
+        `[arDriveClient][mint] error: ${JSON.stringify(minting.error)}`,
       );
-      handleError(minting.error);
+      handleError(`[arDriveClient][mint] error: ${minting.error}`);
     }
 
     if (!minting.data) {
-      const err = `[arDriveUpload][mint] 'data' response: ${JSON.stringify(
+      const err = `[arDriveClient][mint] 'data' response: ${JSON.stringify(
         minting.data,
       )}`;
       console.log(err);
@@ -98,13 +101,18 @@ export const pinNft = async ({
   imageName,
   callback,
 }: PinNft) => {
-  console.log('\n---------\n[handleMintNFt]\n---------\n');
+  console.log('\n-------\n');
+  console.log(`[pintNft] ownerId: ${ownerId}`);
+  console.log(`[pintNft] imagePath: ${imagePath}`);
+  console.log(`[pintNft] imageType: ${imageType}`);
+  console.log(`[pintNft] imageName: ${imageName}`);
+  console.log('\n-------\n');
   const handleError = (error: any) => {
-    console.log('[Blockchain][mint] Error:', JSON.stringify(error));
+    console.log('[Blockchain][pintNft] Error:', JSON.stringify(error));
     callback(error.message);
   };
   try {
-    const data = await arDriveUpload(
+    const data = await arDriveClient(
       ownerId,
       imagePath,
       imageType,
@@ -112,12 +120,54 @@ export const pinNft = async ({
       callback,
     );
     if (!data.data) {
-      handleError('Error pinning NFT to arweave blockchain.');
+      handleError('[pintNft] Error pinning NFT to arweave blockchain.');
       return;
     }
     return data;
   } catch (error: any) {
     const er = `[pintNft] Error: ${error.message || 'Unknown error occurred'}`;
+    handleError(er);
+    return;
+  }
+};
+
+export const pinNftVersion = async ({
+  ownerId,
+  imagePath,
+  imageType,
+  imageName,
+  callback,
+}: PinNft) => {
+  console.log('\n-------\n');
+  console.log(`[pinNftVersion] ownerId: ${ownerId}`);
+  console.log(`[pinNftVersion] imagePath: ${imagePath}`);
+  console.log(`[pinNftVersion] imageType: ${imageType}`);
+  console.log(`[pinNftVersion] imageName: ${imageName}`);
+  console.log('\n-------\n');
+  const handleError = (error: any) => {
+    console.log('[pinNftVersion] Error:', JSON.stringify(error));
+    callback(error.message);
+  };
+  try {
+    const data = {
+      imagePath: imagePath,
+      imageType: imageType,
+      imageName: imageName,
+      ownerId: ownerId,
+    };
+    console.log(`[pinNftVersion] data: ${JSON.stringify(data, null, 2)}`);
+    const url = `${Config.NODEJS_EXPRESS_SERVER}/mint_nft_version`;
+    const response = await axios.post(url, data, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    return response;
+  } catch (error: any) {
+    const er = `[pinNftVersion] Error: ${
+      error.message || 'Unknown error occurred'
+    }`;
     handleError(er);
     return;
   }

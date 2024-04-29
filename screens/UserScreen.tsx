@@ -1,5 +1,6 @@
 import React, {useState, useEffect, useCallback} from 'react';
 import {View, StyleSheet} from 'react-native';
+import Config from 'react-native-config';
 import {useWindowDimensions} from 'react-native';
 import {dbFetch} from '../util/dbUtils';
 import ImageList from '../components/ImageList';
@@ -57,21 +58,30 @@ function UserScreen() {
     const fetchData = async () => {
       try {
         const foundNfts = await dbFetch({endPoint: 'get_nfts'});
+        console.log(`[UserScreen] NFT date: ${foundNfts.date}`);
         if (foundNfts.data) {
           const updatedBucketArray = [];
           foundNfts.data.forEach(item => {
             const nftId = item.nftId;
-            item.created.forEach(createdItem => {
-              if (createdItem.sourceUri) {
-                const uri = createdItem.sourceUri;
-                const item = {
-                  uri: uri,
-                  dataTxId: createdItem.dataTxId,
-                  nftId: nftId,
-                };
-                updatedBucketArray.push(item);
-              }
-            });
+            const oneDayInMilliseconds = 24 * 60 * 60 * 1000;
+            const yesterdayTimestamp = Date.now() - oneDayInMilliseconds;
+            if (
+              Config.SORT_BY_YESTERDAY &&
+              item.date &&
+              item.date > yesterdayTimestamp
+            ) {
+              item.created.forEach(createdItem => {
+                if (createdItem.sourceUri) {
+                  const uri = createdItem.sourceUri;
+                  const item = {
+                    uri: uri,
+                    dataTxId: createdItem.dataTxId,
+                    nftId: nftId,
+                  };
+                  updatedBucketArray.push(item);
+                }
+              });
+            }
           });
           setNfts(updatedBucketArray);
         }
