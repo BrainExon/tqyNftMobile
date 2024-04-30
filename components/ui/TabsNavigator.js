@@ -133,7 +133,7 @@ function TabsNavigator() {
         options={{
           title: 'Toqyn',
           tabBarLabel: 'Signup',
-          headerShown: false, // Hide the header for this screen
+          headerShown: true, // Hide the header for this screen
           tabBarIcon: ({color, size}) => (
             <Icon
               color={color}

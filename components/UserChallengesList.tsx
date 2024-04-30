@@ -54,7 +54,7 @@ const generateChListStyles = (size: any) => {
   }
   return styles;
 };
-const ChallengesList = ({items}) => {
+const UserChallengeList = ({items}) => {
   const userState = useSelector(getUserState);
   const chListSize = useWindowDimensions();
   const styles = generateChListStyles(chListSize);
@@ -92,4 +92,4 @@ const ChallengesList = ({items}) => {
   );
 };
 
-export default ChallengesList;
+export default UserChallengeList;
