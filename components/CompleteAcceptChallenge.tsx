@@ -15,7 +15,7 @@ import {
   widthPercentageToDP as wp,
 } from 'react-native-responsive-screen';
 import {v4 as uuidv4} from 'uuid';
-import UserModal from './ui/UserModal';
+import PromptModal from './ui/PromptModal';
 import {useNavigation} from '@react-navigation/native';
 import {UserChallenge} from './models/UserChallenge';
 import {pinNftVersion} from '../ipfs/blockchain';
@@ -39,6 +39,12 @@ const CompleteAcceptChallenge = ({route}) => {
   const handleUserChPress = () => {
     setShowModal(false);
     navigation.navigate('SignupScreen');
+  };
+
+  const handleOnAccept = () => {
+    setShowModal(false);
+    console.log('[handleOnAccept] ...');
+    //navigation.navigate('SignupScreen');
   };
 
   const handleButtonClose = () => {
@@ -102,12 +108,25 @@ const CompleteAcceptChallenge = ({route}) => {
   };
 
   return showModal ? (
-    <UserModal
+    /**
+     * visible: boolean;
+     * title: string;
+     * message: string | null;
+     * showActivity: boolean;
+     * imageSource: string | null;
+     * error: string | null;
+     * onAccept: (error: string | null) => void;
+     * onClose: (error: string | null) => void;
+     */
+    <PromptModal
       visible={showModal}
+      title={name}
       message={message}
-      error={errorMsg}
-      onClose={handleButtonClose}
       showActivity={showActivity}
+      imageSource={''}
+      error={errorMsg}
+      onAccept={handleOnAccept}
+      onClose={handleButtonClose}
     />
   ) : (
     <View style={styles.uchContainer}>

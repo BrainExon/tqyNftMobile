@@ -75,21 +75,11 @@ function SignupScreen() {
         const foundChallenges = await dbFetch({
           endPoint: 'get_user_challenges',
         });
-        console.log(
-          `[SignupScreen] foundChallenges: ${JSON.stringify(
-            foundChallenges,
-            null,
-            2,
-          )}`,
-        );
         if (foundChallenges.data) {
           const updatedBucketArray = [];
           foundChallenges.data.forEach(challenge => {
             const oneDayInMilliseconds = 24 * 60 * 60 * 1000;
             const yesterdayTimestamp = Date.now() - oneDayInMilliseconds;
-            console.log(
-              `[SignupScreen] Challenge: ${JSON.stringify(challenge)}`,
-            );
             if (
               !isEmpty(challenge.description) &&
               challenge.date > yesterdayTimestamp

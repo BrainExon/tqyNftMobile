@@ -21,7 +21,7 @@ import {UserChallenge} from './models/UserChallenge';
 import {pinNftVersion} from '../ipfs/blockchain';
 
 const CompleteUserChallenge = ({route}) => {
-  console.log('[CompleteAcceptChallenge]....');
+  console.log('[CompleteUserChallenge]....');
   const {ownerId, nftId, chId, doubloon, name, description} = route.params;
   const navigation = useNavigation();
   const chSize = useWindowDimensions();
@@ -95,9 +95,9 @@ const CompleteUserChallenge = ({route}) => {
   );
 
   const handleSubmit = async () => {
-    console.log('[CompleteAcceptChallenge][handleSubmit]....');
+    console.log('[CompleteUserChallenge][handleSubmit]....');
     try {
-      console.log('[CompleteAcceptChallenge] generate NFT Version....');
+      console.log('[CompleteUserChallenge] generate NFT Version....');
       setShowModal(true);
       setShowActivity(true);
       setMessage(`Generating challenge "${name}"`);
@@ -115,7 +115,7 @@ const CompleteUserChallenge = ({route}) => {
       console.log(
         `[CompleteUserChallenge] nftVersion: ${JSON.stringify(nftVersion)}`,
       );
-      console.log('[CompleteAcceptChallenge] create new User Challenge....');
+      console.log('[CompleteUserChallenge] create new User Challenge....');
       /**
        *  {
        *    "_id": "663033a811deec502d5daee5",
@@ -150,13 +150,13 @@ const CompleteUserChallenge = ({route}) => {
           2,
         )}`,
       );
-      console.log('[CompleteAcceptChallenge] db upsert new User Challenge....');
+      console.log('[CompleteUserChallenge] db upsert new User Challenge....');
       await dbUpsert({
         endPoint: 'upsert_user_challenge',
         conditions: userChallenge,
         callback: handleErrorCallback,
       });
-      console.log('[CompleteAcceptChallenge] all finished, show modal....');
+      console.log('[CompleteUserChallenge] all finished, show modal....');
       setShowModal(true);
       setShowActivity(false);
       setMessage(`New User Challenge "${name}" created!`);
