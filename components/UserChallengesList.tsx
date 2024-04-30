@@ -8,7 +8,7 @@ import {
   StyleSheet,
   useWindowDimensions,
 } from 'react-native';
-import {isTablet, setOutline} from '../util/util';
+import {formatDate, isTablet, setOutline} from '../util/util';
 import {
   heightPercentageToDP as hp,
   widthPercentageToDP as wp,
@@ -27,18 +27,28 @@ import {getUserState} from '../redux/userSlice';
 const generateChListStyles = (size: any) => {
   const chListStyles = StyleSheet.create({
     chListItem: {
-      flexDirection: 'row',
-      padding: isTablet(size.width, size.height) ? hp('40') : wp('4'),
+      flexDirection: 'column',
+      alignItems: 'center',
+      padding: 10,
+      borderBottomWidth: 1,
+      borderBottomColor: '#ccc',
+    },
+    imageContainer: {
+      flex: 1,
+      alignItems: 'center',
     },
     chListImage: {
-      width: isTablet(size.width, size.height) ? hp('20') : wp('15'),
-      height: isTablet(size.width, size.height) ? hp('20') : wp('15'),
-      marginRight: isTablet(size.width, size.height) ? hp('40') : wp('4'),
+      width: 50,
+      height: 50,
+      borderRadius: 25,
     },
     textContainer: {
-      marginLeft: isTablet(size.width, size.height) ? hp('40') : wp('4'),
+      flex: 3,
+      justifyContent: 'center',
+      paddingLeft: 10,
     },
     chListText: {
+      fontSize: 16,
       marginBottom: 5,
     },
   });
@@ -61,7 +71,7 @@ const UserChallengeList = ({items}) => {
   const navigation = useNavigation();
 
   const handleChallengeItem = item => {
-    navigation.navigate('CreateUserChallenge', {
+    navigation.navigate('CompleteUserChallenge', {
       ownerId: userState.userId,
       nftId: item.nft,
       chId: item.chId,
@@ -71,17 +81,24 @@ const UserChallengeList = ({items}) => {
     });
   };
 
-  const renderItem = ({item}) => (
-    <View style={styles.chListItem}>
-      <TouchableOpacity onPress={() => handleChallengeItem(item)}>
-        <Image source={{uri: item.doubloon}} style={styles.chListImage} />
-      </TouchableOpacity>
-      <View style={styles.textContainer}>
-        <Text style={styles.chListText}>Challenge: "{item.name}"</Text>
-        <Text style={styles.chListText}>Description: "{item.description}"</Text>
+  const renderItem = ({item}) => {
+    const date = formatDate(item.date);
+    return (
+      <View style={styles.chListItem}>
+        <TouchableOpacity onPress={() => handleChallengeItem(item)}>
+          <Image source={{uri: item.doubloon}} style={styles.chListImage} />
+        </TouchableOpacity>
+        <View style={styles.textContainer}>
+          <Text style={styles.chListText}>Challenge: "{item.name}"</Text>
+          <Text style={styles.chListText}>
+            Description: "{item.description}"
+          </Text>
+          <Text style={styles.chListText}>Date: {date}</Text>
+          <Text style={styles.chListText}>Status: "{item.status}"</Text>
+        </View>
       </View>
-    </View>
-  );
+    );
+  };
 
   return (
     <FlatList

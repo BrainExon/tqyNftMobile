@@ -8,7 +8,7 @@ import {
   StyleSheet,
   useWindowDimensions,
 } from 'react-native';
-import {isTablet, setOutline} from '../util/util';
+import {formatDate, isEmpty, isTablet, setOutline} from '../util/util';
 import {
   heightPercentageToDP as hp,
   widthPercentageToDP as wp,
@@ -28,6 +28,7 @@ const generateChListStyles = (size: any) => {
   const chListStyles = StyleSheet.create({
     chListItem: {
       flexDirection: 'row',
+      alignItems: 'center',
       padding: isTablet(size.width, size.height) ? hp('40') : wp('4'),
     },
     chListImage: {
@@ -35,10 +36,14 @@ const generateChListStyles = (size: any) => {
       height: isTablet(size.width, size.height) ? hp('20') : wp('15'),
       marginRight: isTablet(size.width, size.height) ? hp('40') : wp('4'),
     },
-    textContainer: {
-      marginLeft: isTablet(size.width, size.height) ? hp('40') : wp('4'),
+    chTextContainerWrapper: {
+      width: isTablet(size.width, size.height) ? hp('20') : wp('70%'),
+    },
+    chTextContainer: {
+      marginLeft: isTablet(size.width, size.height) ? hp('40') : wp('2'),
     },
     chListText: {
+      flexWrap: 'wrap',
       marginBottom: 5,
     },
   });
@@ -71,17 +76,28 @@ const ChallengesList = ({items}) => {
     });
   };
 
-  const renderItem = ({item}) => (
-    <View style={styles.chListItem}>
-      <TouchableOpacity onPress={() => handleChallengeItem(item)}>
-        <Image source={{uri: item.doubloon}} style={styles.chListImage} />
-      </TouchableOpacity>
-      <View style={styles.textContainer}>
-        <Text style={styles.chListText}>Challenge: "{item.name}"</Text>
-        <Text style={styles.chListText}>Description: "{item.description}"</Text>
+  const renderItem = ({item}) => {
+    console.log(`item: ${JSON.stringify(item, null, 2)}`);
+    const date = formatDate(item.date);
+    const cat = isEmpty(item.category) ? 'default' : item.category;
+    return (
+      <View style={styles.chListItem}>
+        <TouchableOpacity onPress={() => handleChallengeItem(item)}>
+          <Image source={{uri: item.doubloon}} style={styles.chListImage} />
+        </TouchableOpacity>
+        <View style={styles.chTextContainerWrapper}>
+          <View style={styles.chTextContainer}>
+            <Text style={styles.chListText}>Challenge: "{item.name}"</Text>
+            <Text style={styles.chListText}>
+              Description: "{item.description}"
+            </Text>
+            <Text style={styles.chListText}>Date: {date}</Text>
+            <Text style={styles.chListText}>Category: {cat}</Text>
+          </View>
+        </View>
       </View>
-    </View>
-  );
+    );
+  };
 
   return (
     <FlatList

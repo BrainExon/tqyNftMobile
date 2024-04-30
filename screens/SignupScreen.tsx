@@ -106,6 +106,7 @@ function SignupScreen() {
                 nft: challenge.nftId,
                 chId: challenge.chId,
                 description: challenge.description,
+                date: challenge.date,
               };
               updatedBucketArray.push(item);
             }
