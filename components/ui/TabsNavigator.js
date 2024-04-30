@@ -1,6 +1,7 @@
 import React from 'react';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import CompleteUserChallenge from '../CompleteUserChallenge';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -210,6 +211,16 @@ function TabsNavigator() {
       <BottomTabs.Screen
         name="CreateUserChallenge"
         component={CreateUserChallenge}
+        options={{
+          title: 'Toqyn',
+          tabBarVisible: false,
+          headerShown: false,
+          tabBarButton: props => null,
+        }}
+      />
+      <BottomTabs.Screen
+        name="CompleteUserChallenge"
+        component={CompleteUserChallenge}
         options={{
           title: 'Toqyn',
           tabBarVisible: false,

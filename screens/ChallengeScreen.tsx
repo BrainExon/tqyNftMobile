@@ -88,7 +88,9 @@ function ChallengeScreen() {
                 doubloon: challenge.doubloon,
                 nft: challenge.nft,
                 chId: challenge.chId,
+                date: challenge.date,
                 description: challenge.description,
+                category: challenge.category,
               };
               updatedBucketArray.push(item);
             }
