@@ -6,7 +6,7 @@ import {getUrlFileName, isEmpty, isObjectEmpty, setOutline} from '../util/util';
 import {useNavigation} from '@react-navigation/native';
 import UserModal from '../components/ui/UserModal';
 import Config from 'react-native-config';
-import UserChallengeList from '../components/UserChallengesList';
+import UserAcceptChallengeList from '../components/UserAcceptChallengesList';
 
 const generateItemStyles = (size: any) => {
   const baseItemStyles = StyleSheet.create({
@@ -144,7 +144,7 @@ function SignupScreen() {
         />
       ) : (
         <View>
-          <UserChallengeList items={challenges} />
+          <UserAcceptChallengeList items={challenges} />
         </View>
       )}
     </View>
