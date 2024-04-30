@@ -1,11 +1,13 @@
 import React from 'react';
 import {
   Modal,
+  Image,
   View,
   Text,
   StyleSheet,
   useWindowDimensions,
   ActivityIndicator,
+  TouchableOpacity,
 } from 'react-native';
 import GlobalStyles from '../../constants/GlobalStyles';
 import {isTablet, setOutline} from '../../util/util';
@@ -13,7 +15,6 @@ import {
   heightPercentageToDP as hp,
   widthPercentageToDP as wp,
 } from 'react-native-responsive-screen';
-import GenButton from './GenButton';
 
 function generateUModalStyles(size: any) {
   const uModalStyles = StyleSheet.create({
@@ -95,8 +96,9 @@ interface UserModalProps {
   visible: boolean;
   message: string | null;
   error: string | null;
-  onClose: (error: string) => void;
+  onClose: (error: string | null) => void;
   showActivity: boolean;
+  imageSource: string | null;
 }
 
 const UserModal: React.FC<UserModalProps> = ({
@@ -105,41 +107,43 @@ const UserModal: React.FC<UserModalProps> = ({
   error,
   onClose,
   showActivity,
+  imageSource,
 }) => {
   console.log(`[UserModal]: visible: ${visible}`);
-  console.log(`[UserModal]: messagae: ${JSON.stringify(message)}`);
+  console.log(`[UserModal]: message: ${JSON.stringify(message)}`);
   console.log(`[UserModal]: error: ${JSON.stringify(error)}`);
   console.log(`[UserModal]: showActivity: ${JSON.stringify(showActivity)}`);
-  const pUsize = useWindowDimensions();
-  const styles = generateUModalStyles(pUsize);
+
+  const puSize = useWindowDimensions();
+  const styles = generateUModalStyles(puSize);
 
   return (
     <Modal transparent={visible} animationType="fade" visible={visible}>
-      <View style={styles.uModalContainer}>
-        {error && (
-          <View style={styles.uModalContentError}>
-            <Text style={styles.uModalText}>{error ? error : message}</Text>
-          </View>
-        )}
-        {!error && (
-          <View style={styles.uModalContent}>
-            <Text style={styles.uModalText}>{error ? error : message}</Text>
-          </View>
-        )}
-        {showActivity && (
-          <View style={styles.activityIndicatorContainer}>
-            <ActivityIndicator size="large" color="#0000ff" />
-          </View>
-        )}
-        <GenButton
-          onPress={() => onClose && onClose(error)}
-          style={error ? styles.uModalButtonError : styles.uModalButton}
-          textStyle={
-            error ? styles.uModalButtonTextError : styles.uModalButtonText
-          }>
-          {'>>>'}
-        </GenButton>
-      </View>
+      <TouchableOpacity
+        activeOpacity={1}
+        onPress={() => onClose && onClose(error)}
+        style={styles.uModalContainer}>
+        <View>
+          {error && (
+            <View style={styles.uModalContentError}>
+              <Text style={styles.uModalText}>{error ? error : message}</Text>
+            </View>
+          )}
+          {!error && (
+            <View style={styles.uModalContent}>
+              {imageSource && (
+                <Image source={{uri: imageSource}} style={styles.uModalImage} />
+              )}
+              <Text style={styles.uModalText}>{error ? error : message}</Text>
+            </View>
+          )}
+          {showActivity && (
+            <View style={styles.activityIndicatorContainer}>
+              <ActivityIndicator size="large" color="#0000ff" />
+            </View>
+          )}
+        </View>
+      </TouchableOpacity>
     </Modal>
   );
 };

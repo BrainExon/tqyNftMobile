@@ -8,7 +8,7 @@ import {
   StyleSheet,
   useWindowDimensions,
 } from 'react-native';
-import {formatDate, isTablet, setOutline} from '../util/util';
+import {formatDate, setOutline} from '../util/util';
 import {
   heightPercentageToDP as hp,
   widthPercentageToDP as wp,
@@ -64,7 +64,7 @@ const generateChListStyles = (size: any) => {
   }
   return styles;
 };
-const UserChallengeList = ({items}) => {
+const UserAcceptChallengeList = ({items}) => {
   const userState = useSelector(getUserState);
   const chListSize = useWindowDimensions();
   const styles = generateChListStyles(chListSize);
@@ -109,4 +109,4 @@ const UserChallengeList = ({items}) => {
   );
 };
 
-export default UserChallengeList;
+export default UserAcceptChallengeList;
