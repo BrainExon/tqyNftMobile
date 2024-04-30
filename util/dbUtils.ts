@@ -2,12 +2,6 @@ import Config from 'react-native-config';
 import axios from 'axios';
 
 export async function dbFindOne({endPoint, conditions, setError}) {
-  console.log(
-    `[dbFindOne] endpoint: ${endPoint} conditions: ${JSON.stringify(
-      conditions,
-    )}`,
-  );
-
   if (!conditions) {
     const err = `[dbFindOne] "conditions" is null for endpoint ${endPoint}`;
     console.log(err);
@@ -17,18 +11,19 @@ export async function dbFindOne({endPoint, conditions, setError}) {
 
   try {
     const url = `${Config.NODEJS_EXPRESS_SERVER}/${endPoint}`;
-    console.log(`\n----\nURL: ${JSON.stringify(url)}\n----\n`);
     const response = await axios.post(url, conditions, {
       headers: {
         'Content-Type': 'application/json',
       },
     });
 
+    console.log('\n--------\n');
     console.log(
       `[dbFindOne] end point "${endPoint}" response: ${JSON.stringify(
         response.data,
       )}`,
     );
+    console.log('\n--------\n');
     if (response.status === 200) {
       console.log('[dbFindOne] Data retrieved successfully:', response.data);
       return response.data;
@@ -91,23 +86,6 @@ export async function dbUpsert({endPoint, conditions, callback}) {
   }
 }
 
-/*
-export async function dbFetch({endPoint, setError}) {
-  try {
-    //console.log( `[dbFetch] URL: ${Config.NODEJS_EXPRESS_SERVER}/${endPoint}`, );
-    const requestOptions = {method: 'GET', redirect: 'follow'};
-    const response = await fetch(
-      `${Config.NODEJS_EXPRESS_SERVER}/${endPoint}`,
-      requestOptions,
-    );
-    //const result = await response.text();
-    return await response.json();
-  } catch (error) {
-    console.error('dbFetch error: ', JSON.stringify(error));
-    setError(error);
-  }
-}
-*/
 interface DbFetch {
   endPoint: string;
   setError: (error: any) => void;

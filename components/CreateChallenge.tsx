@@ -22,6 +22,7 @@ import UserModal from './ui/UserModal';
 import {useSelector} from 'react-redux';
 import {getUserState} from '../redux/userSlice';
 import {useNavigation} from '@react-navigation/native';
+import {generateQrCode} from '../util/httpUtils';
 
 const CreateChallenge = ({route}) => {
   const {doubloonUri, dataTxId, nftId} = route.params;
@@ -95,17 +96,19 @@ const CreateChallenge = ({route}) => {
           2,
         )}`,
       );
-
       await dbUpsert({
         endPoint: 'upsert_challenge',
         conditions: challenge,
         callback: handleErrorCallback,
       });
-
+      // create QR verification code
+      const qrCode = generateQrCode(challengeId);
+      if (qrCode.error) {
+        setError('Error generating QR code: ', JSON.stringify(qrCode.error));
+      }
       setShowModal(true);
       setMessage('Challenge created!');
-    } catch (error) {
-      console.log('[CreateChallenge] Error adding challenge:', error.message);
+    } catch (e: any) {
       setError(
         'Failed to create a Toqyn Challenge. Please check your network connection and try again.',
       );

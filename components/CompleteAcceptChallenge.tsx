@@ -20,8 +20,8 @@ import {useNavigation} from '@react-navigation/native';
 import {UserChallenge} from './models/UserChallenge';
 import {pinNftVersion} from '../ipfs/blockchain';
 
-const CompleteUserChallenge = ({route}) => {
-  console.log('[CompleteUserChallenge]....');
+const CompleteAcceptChallenge = ({route}) => {
+  console.log('[CompleteAcceptChallenge]....');
   const {ownerId, nftId, chId, doubloon, name, description} = route.params;
   const navigation = useNavigation();
   const chSize = useWindowDimensions();
@@ -95,7 +95,7 @@ const CompleteUserChallenge = ({route}) => {
   );
 
   const handleSubmit = async () => {
-    console.log('[CompleteUserChallenge][handleSubmit]....');
+    console.log('[CompleteAcceptChallenge][handleSubmit]....');
     setShowModal(true);
     setErrorMsg('');
     setMessage('Finish this verification component.');
@@ -249,4 +249,4 @@ function generateChallengeStyles(size: any) {
   // eslint-enable
 }
 
-export default CompleteUserChallenge;
+export default CompleteAcceptChallenge;

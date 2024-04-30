@@ -1,7 +1,7 @@
 import React from 'react';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import CompleteUserChallenge from '../CompleteUserChallenge';
+import CompleteAcceptChallenge from '../CompleteAcceptChallenge';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -10,7 +10,7 @@ import ChallengeScreen from '../../screens/ChallengeScreen';
 import {useWindowDimensions} from 'react-native';
 import {isTablet} from '../../util/util';
 import GlobalStyles from '../../constants/GlobalStyles';
-import CreateUserChallenge from '../CreateUserChallenge';
+import CreateAcceptChallenge from '../CreateAcceptChallenge';
 import CreateChallenge from '../CreateChallenge';
 import SignupScreen from '../../screens/SignupScreen';
 import UserScreen from '../../screens/UserScreen';
@@ -210,7 +210,7 @@ function TabsNavigator() {
       />
       <BottomTabs.Screen
         name="CreateUserChallenge"
-        component={CreateUserChallenge}
+        component={CreateAcceptChallenge}
         options={{
           title: 'Toqyn',
           tabBarVisible: false,
@@ -220,7 +220,7 @@ function TabsNavigator() {
       />
       <BottomTabs.Screen
         name="CompleteUserChallenge"
-        component={CompleteUserChallenge}
+        component={CompleteAcceptChallenge}
         options={{
           title: 'Toqyn',
           tabBarVisible: false,
