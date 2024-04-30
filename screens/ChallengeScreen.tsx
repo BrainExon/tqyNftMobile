@@ -56,6 +56,17 @@ function ChallengeScreen() {
   useEffect(() => {
     const fetchData = async () => {
       try {
+        /**
+         * {
+         *   "_id":"662fb442570342281f8b25d7",
+         *   "userChallengeId":"d249da41-2e26-4df7-b7eb-2e396f0fdf8c",
+         *   "userId":"dc6ddf89-37fc-4224-a0d7-5c03ae4353e7",
+         *   "chId":"c0003a5f-35fc-4315-b6a4-6962547d7ea7",
+         *   "nftId":"394aa4bc-4807-4b07-b0ac-dfe11653cb9d",
+         *   "doubloon":"/Users/chellax/Projects/Express/functions/images_store/1842c321-c47c-4e44-9c5d-2375f84f3162_v1.png",
+         *   "date":1714402370049,
+         *   "dateCompleted":null
+         */
         const foundChallenges = await dbFetch({endPoint: 'get_challenges'});
         if (foundChallenges.data) {
           const updatedBucketArray = [];
@@ -72,6 +83,7 @@ function ChallengeScreen() {
               challenge.date > yesterdayTimestamp
             ) {
               const item = {
+                _id: challenge._id,
                 name: challenge.name,
                 doubloon: challenge.doubloon,
                 nft: challenge.nft,

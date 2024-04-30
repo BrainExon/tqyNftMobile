@@ -20,8 +20,8 @@ import {useNavigation} from '@react-navigation/native';
 import {UserChallenge} from './models/UserChallenge';
 import {pinNftVersion} from '../ipfs/blockchain';
 
-const CreateUserChallenge = ({route}) => {
-  console.log('[CreateUserChallenge]....');
+const CompleteUserChallenge = ({route}) => {
+  console.log('[CompleteUserChallenge]....');
   const {ownerId, nftId, chId, doubloon, name, description} = route.params;
   const navigation = useNavigation();
   const chSize = useWindowDimensions();
@@ -95,9 +95,9 @@ const CreateUserChallenge = ({route}) => {
   );
 
   const handleSubmit = async () => {
-    console.log('[CreateUserChallenge][handleSubmit]....');
+    console.log('[CompleteUserChallenge][handleSubmit]....');
     try {
-      console.log('[CreateUserChallenge] generate NFT Version....');
+      console.log('[CompleteUserChallenge] generate NFT Version....');
       setShowModal(true);
       setShowActivity(true);
       setMessage(`Generating challenge "${name}"`);
@@ -113,9 +113,9 @@ const CreateUserChallenge = ({route}) => {
        * status;
        */
       console.log(
-        `[CreateUserChallenge] nftVersion: ${JSON.stringify(nftVersion)}`,
+        `[CompleteUserChallenge] nftVersion: ${JSON.stringify(nftVersion)}`,
       );
-      console.log('[CreateUserChallenge] create new User Challenge....');
+      console.log('[CompleteUserChallenge] create new User Challenge....');
       /**
        *  {
        *    "_id": "663033a811deec502d5daee5",
@@ -144,19 +144,19 @@ const CreateUserChallenge = ({route}) => {
         description,
       );
       console.log(
-        `[CreateUserChallenge] new User Challenge: ${JSON.stringify(
+        `[CompleteUserChallenge] new User Challenge: ${JSON.stringify(
           userChallenge,
           null,
           2,
         )}`,
       );
-      console.log('[CreateUserChallenge] db upsert new User Challenge....');
+      console.log('[CompleteUserChallenge] db upsert new User Challenge....');
       await dbUpsert({
         endPoint: 'upsert_user_challenge',
         conditions: userChallenge,
         callback: handleErrorCallback,
       });
-      console.log('[CreateUserChallenge] all finished, show modal....');
+      console.log('[CompleteUserChallenge] all finished, show modal....');
       setShowModal(true);
       setShowActivity(false);
       setMessage(`New User Challenge "${name}" created!`);
@@ -315,4 +315,4 @@ function generateChallengeStyles(size: any) {
   // eslint-enable
 }
 
-export default CreateUserChallenge;
+export default CompleteUserChallenge;
