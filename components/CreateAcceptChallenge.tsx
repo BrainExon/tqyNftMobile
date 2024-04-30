@@ -7,7 +7,7 @@ import {
   TouchableOpacity,
   Image,
 } from 'react-native';
-import {dbFetch, dbUpsert} from '../util/dbUtils';
+import {dbFetch, dbFindOne, dbUpsert} from '../util/dbUtils';
 import React, {useState, useCallback} from 'react';
 import {getMimeType, getUrlFileName, isTablet, setOutline} from '../util/util';
 import {
@@ -19,9 +19,10 @@ import UserModal from './ui/UserModal';
 import {useNavigation} from '@react-navigation/native';
 import {UserChallenge} from './models/UserChallenge';
 import {pinNftVersion} from '../ipfs/blockchain';
+import {insertChallengeUser} from '../util/dataUtils';
 
-const CreateUserChallenge = ({route}) => {
-  console.log('[CreateUserChallenge]....');
+const CreateAcceptChallenge = ({route}) => {
+  console.log('[CreateAcceptChallenge]....');
   const {ownerId, nftId, chId, doubloon, name, description} = route.params;
   const navigation = useNavigation();
   const chSize = useWindowDimensions();
@@ -53,7 +54,7 @@ const CreateUserChallenge = ({route}) => {
    * User Challenge entry in the DB.
    */
   const generateNftVersion = useCallback(
-    async image => {
+    async (image: string) => {
       setErrorMsg('');
       try {
         const filename = getUrlFileName(image);
@@ -95,9 +96,9 @@ const CreateUserChallenge = ({route}) => {
   );
 
   const handleSubmit = async () => {
-    console.log('[CreateUserChallenge][handleSubmit]....');
+    console.log('[CreateAcceptChallenge][handleSubmit]....');
     try {
-      console.log('[CreateUserChallenge] generate NFT Version....');
+      console.log('[CreateAcceptChallenge] generate NFT Version....');
       setShowModal(true);
       setShowActivity(true);
       setMessage(`Generating challenge "${name}"`);
@@ -115,7 +116,7 @@ const CreateUserChallenge = ({route}) => {
       console.log(
         `[CreateUserChallenge] nftVersion: ${JSON.stringify(nftVersion)}`,
       );
-      console.log('[CreateUserChallenge] create new User Challenge....');
+      console.log('[CreateAcceptChallenge] create new User Challenge....');
       /**
        *  {
        *    "_id": "663033a811deec502d5daee5",
@@ -150,13 +151,36 @@ const CreateUserChallenge = ({route}) => {
           2,
         )}`,
       );
-      console.log('[CreateUserChallenge] db upsert new User Challenge....');
+      console.log('[CreateAcceptChallenge] db upsert new User Challenge....');
       await dbUpsert({
         endPoint: 'upsert_user_challenge',
         conditions: userChallenge,
         callback: handleErrorCallback,
       });
-      console.log('[CreateUserChallenge] all finished, show modal....');
+      // Update the challenge's participants list with the user's ID.
+      const challengeFind = {
+        collection: 'challenges',
+        conditions: {
+          chId: chId,
+        },
+      };
+      const challenge = await dbFindOne({
+        endPoint: 'find_one',
+        conditions: challengeFind,
+        setError: handleErrorCallback,
+      });
+      if (challenge.error || !challenge.data) {
+        handleErrorCallback(
+          `Error creating the accepted challenge for userId: ${ownerId}`,
+        );
+      }
+      const updatedChallenge = insertChallengeUser(challenge.data, ownerId);
+      if (updatedChallenge.error) {
+        handleErrorCallback(
+          `Error updating accepted challenge with userId: ${ownerId}`,
+        );
+      }
+      console.log('[CreateAcceptChallenge] all finished, show modal....');
       setShowModal(true);
       setShowActivity(false);
       setMessage(`New User Challenge "${name}" created!`);
@@ -315,4 +339,4 @@ function generateChallengeStyles(size: any) {
   // eslint-enable
 }
 
-export default CreateUserChallenge;
+export default CreateAcceptChallenge;

@@ -33,18 +33,18 @@ const generateItemStyles = (size: any) => {
 function UserScreen() {
   console.log('[UserScreen]');
   const navigation = useNavigation();
-  const boardSize = useWindowDimensions();
-  const styles = generateItemStyles(boardSize);
+  const userSize = useWindowDimensions();
+  const styles = generateItemStyles(userSize);
   const [nfts, setNfts] = useState([]);
   const [error, setError] = useState('');
   const [showModal, setShowModal] = useState(false);
 
-  const handleErrorCallback = useCallback((error: any) => {
-    if (isObjectEmpty(error) || isEmpty(error)) {
+  const handleErrorCallback = useCallback((errorMsg: any) => {
+    if (isObjectEmpty(errorMsg) || isEmpty(errorMsg)) {
       return;
     }
     const errorMessage =
-      typeof error !== 'string' ? JSON.stringify(error) : error;
+      typeof errorMsg !== 'string' ? JSON.stringify(errorMsg) : errorMsg;
     console.log(`[handleErrorCallback] errorMessage: ${errorMessage}`);
     setError(errorMessage);
     setShowModal(true);
@@ -58,19 +58,21 @@ function UserScreen() {
     const fetchData = async () => {
       try {
         const foundNfts = await dbFetch({endPoint: 'get_nfts'});
-        console.log(`[UserScreen] NFT date: ${foundNfts.date}`);
+        //console.log(`[UserScreen] NFT date: ${foundNfts.date}`);
+
         if (foundNfts.data) {
           const updatedBucketArray = [];
-          foundNfts.data.forEach(item => {
-            const nftId = item.nftId;
+          foundNfts.data.forEach(nft => {
+            const nftId = nft.nftId;
             const oneDayInMilliseconds = 24 * 60 * 60 * 1000;
             const yesterdayTimestamp = Date.now() - oneDayInMilliseconds;
+
             if (
               Config.SORT_BY_YESTERDAY &&
-              item.date &&
-              item.date > yesterdayTimestamp
+              nft.date &&
+              nft.date > yesterdayTimestamp
             ) {
-              item.created.forEach(createdItem => {
+              nft.created.forEach(createdItem => {
                 if (createdItem.sourceUri) {
                   const uri = createdItem.sourceUri;
                   const item = {
@@ -83,20 +85,26 @@ function UserScreen() {
               });
             }
           });
+
           setNfts(updatedBucketArray);
         }
-      } catch (error) {
-        handleErrorCallback(`[UserScreen] Error fetching NFTs: ${error}`);
+      } catch (err) {
+        handleErrorCallback(`[UserScreen] Error fetching NFTs: ${err}`);
         return;
       }
     };
 
-    const onFocus = navigation.addListener('focus', () => {
+    const onFocus = () => {
       fetchData();
-    });
+    };
 
-    return onFocus;
+    const focusListener = navigation.addListener('focus', onFocus);
+
+    return () => {
+      focusListener();
+    };
   }, [navigation]);
+
   return (
     <View style={styles.userContainer}>
       {showModal ? (
