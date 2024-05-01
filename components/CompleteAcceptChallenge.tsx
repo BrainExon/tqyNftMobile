@@ -6,6 +6,7 @@ import {
   useWindowDimensions,
   TouchableOpacity,
   Image,
+  Linking,
 } from 'react-native';
 import Config from 'react-native-config';
 import {dbFetch, dbUpsert, verifyChallenge} from '../util/dbUtils';
@@ -30,13 +31,15 @@ import PromptModal from './ui/PromptModal';
 
 const CompleteAcceptChallenge = ({route}) => {
   console.log('[CompleteAcceptChallenge]....');
-  const {userId, nftId, chId, doubloon, name, description} = route.params;
-  console.log(`[CompleteAcceptChallenge] userId: ${userId}`);
+  const {userId, nftId, chId, doubloon, name, description, status} =
+    route.params;
+  console.log(`\n----\n[CompleteAcceptChallenge] userId: ${userId}`);
   console.log(`[CompleteAcceptChallenge] nftId: ${nftId}`);
   console.log(`[CompleteAcceptChallenge] chId: ${chId}`);
   console.log(`[CompleteAcceptChallenge] doubloon: ${doubloon}`);
   console.log(`[CompleteAcceptChallenge] name: ${name}`);
   console.log(`[CompleteAcceptChallenge] description: ${description}`);
+  console.log(`[CompleteAcceptChallenge] STATUS: ${status}\n----\n`);
   const navigation = useNavigation();
   const chSize = useWindowDimensions();
   const styles = generateChallengeStyles(chSize);
@@ -47,11 +50,6 @@ const CompleteAcceptChallenge = ({route}) => {
   const [showActivity, setShowActivity] = useState(false);
   const [image, setImage] = useState('');
 
-  const handleErrorCallback = (errMsg: any) => {
-    setErrorMsg(errMsg);
-    setShowModal(true);
-  };
-
   const handleUserChPress = () => {
     setShowModal(false);
     navigation.navigate('SignupScreen');
@@ -59,19 +57,12 @@ const CompleteAcceptChallenge = ({route}) => {
 
   const handleImagePress = () => {
     setShowModal(false);
-    console.log(
-      `[CompleteAcceptChallenge][handleImagePress] image: ${JSON.stringify(
-        image,
-      )}`,
-    );
+    console.log(`QRCODE PRESS image: ${JSON.stringify(image)}`);
     const filename = getUrlFileName(image);
     const challengeId = removeExtension(filename);
     console.log('\n-------\n');
-    console.log(
-      `[CompleteAcceptChallenge][handleImagePress] Challenge ID: ${JSON.stringify(
-        challengeId,
-      )}`,
-    );
+    console.log(`QRCODE PRESS Challenge ID: ${JSON.stringify(challengeId)}`);
+    console.log(`QRCODE PRESS user ID: ${JSON.stringify(userId)}`);
     console.log('\n-------\n');
     const verified = verifyChallenge(challengeId, userId);
     console.log(
@@ -88,7 +79,7 @@ const CompleteAcceptChallenge = ({route}) => {
   const handleSubmit = async () => {
     console.log('[CompleteAcceptChallenge][handleSubmit]....');
     setShowModal(true);
-    const filename = getUrlFileName(doubloon);
+    // const filename = getUrlFileName(doubloon);
     const qrCodeSource = `${Config.NODEJS_EXPRESS_SERVER}/qrcodes/${chId}.png`;
     console.log(
       '[CompleteAcceptChallenge] qrCodeSource: ',
@@ -114,31 +105,50 @@ const CompleteAcceptChallenge = ({route}) => {
       handleImagePress={handleImagePress}
     />
   ) : (
-    <View style={styles.uchContainer}>
+    <View style={styles.compUchContainer}>
       <TouchableOpacity onPress={() => handleUserChPress()}>
-        <View style={styles.uchImgContainer}>
+        <View style={styles.compUchImgContainer}>
           <Image source={{uri: doubloon}} style={styles.uchImgImage} />
         </View>
       </TouchableOpacity>
-      <View style={styles.uchTextContainer}>
+      <View style={styles.compUchTextContainer}>
         <Text style={styles.uchTextTitle}>{name}</Text>
         <Text>{description}</Text>
+        <Text>{status}</Text>
       </View>
-      <View style={styles.uchImgButtonGroup}>
-        <View style={styles.uchChButton}>
-          <Button title="Toqyn it!" onPress={() => handleSubmit()} />
-        </View>
-        <View style={styles.uchCancelButton}>
+      <View style={styles.compUchImgButtonGrp}>
+        {status === 'active' && (
+          <View style={styles.compChButton}>
+            <Button title="Toqyn It!" onPress={() => handleSubmit()} />
+          </View>
+        )}
+        <View style={styles.compUchCancel}>
           <Button title="Cancel" onPress={() => handleUserChPress()} />
         </View>
       </View>
+      {status === 'verified' && (
+        <View style={styles.compUchImgButtonGrp}>
+          <View style={styles.exploreChButton}>
+            <Button
+              title="Blockchain"
+              onPress={() => {
+                Linking.openURL(`${Config.BLOCKCHAIN_URI}/${dataTxId}`).catch(
+                  e => {
+                    e.message;
+                  },
+                );
+              }}
+            />
+          </View>
+        </View>
+      )}
     </View>
   );
 };
 
 function generateChallengeStyles(size: any) {
   const chStyles = StyleSheet.create({
-    uchContainer: {
+    compUchContainer: {
       flex: 1,
       alignItems: 'center',
       justifyContent: 'center',
@@ -192,7 +202,7 @@ function generateChallengeStyles(size: any) {
       marginBottom: 10,
       paddingHorizontal: 10,
     },
-    uchImgContainer: {
+    compUchImgContainer: {
       marginVertical: isTablet(size.width, size.height) ? hp('6') : wp('8'),
       alignItems: 'center',
       paddingVertical: isTablet(size.width, size.height) ? hp('2') : wp('2'),
@@ -202,17 +212,27 @@ function generateChallengeStyles(size: any) {
       height: 200,
       resizeMode: 'cover',
     },
-    uchImgButtonGroup: {
+    compUchImgButtonGrp: {
       width: '100%',
       flexDirection: 'row',
       justifyContent: 'center',
     },
-    uchChButton: {
+    compChButton: {
       flex: 1,
       paddingHorizontal: isTablet(size.width, size.height) ? hp('2') : wp('2'),
       marginHorizontal: isTablet(size.width, size.height) ? hp('2') : wp('2'),
     },
-    uchCancelButton: {
+    exploreChButton: {
+      flex: 1,
+      //width: isTablet(size.width, size.height) ? hp('58') : wp('48'),
+      paddingVertical: isTablet(size.width, size.height) ? hp('6') : wp('4'),
+      paddingHorizontal: isTablet(size.width, size.height) ? hp('2') : wp('2'),
+      marginHorizontal: isTablet(size.width, size.height) ? hp('2') : wp('2'),
+      //padding: isTablet(size.width, size.height) ? hp('4') : wp('2'),
+      //marginHorizontal: isTablet(size.width, size.height) ? hp('4') : wp('4'),
+      //paddingHorizontal: isTablet(size.width, size.height) ? hp('4') : wp('6'),
+    },
+    compUchCancel: {
       flex: 1,
       paddingHorizontal: isTablet(size.width, size.height) ? hp('2') : wp('2'),
       marginHorizontal: isTablet(size.width, size.height) ? hp('2') : wp('2'),
@@ -228,7 +248,7 @@ function generateChallengeStyles(size: any) {
       fontSize: isTablet(size.width, size.height) ? hp('7') : wp('5'),
       margin: isTablet(size.width, size.height) ? hp('4') : wp('3'),
     },
-    uchTextContainer: {
+    compUchTextContainer: {
       alignItems: 'center',
       margin: isTablet(size.width, size.height) ? hp('4') : wp('2'),
       padding: isTablet(size.width, size.height) ? hp('8') : wp('4'),

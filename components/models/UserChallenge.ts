@@ -9,6 +9,7 @@ export class UserChallenge {
   status: string;
   name: string;
   description: string;
+  dataTxId: string;
   constructor(
     userChallengeId: string,
     userId: string,
@@ -20,6 +21,7 @@ export class UserChallenge {
     status: string,
     name: string,
     description: string,
+    dataTxId: string,
   ) {
     this.userChallengeId = userChallengeId;
     this.userId = userId;
@@ -31,5 +33,6 @@ export class UserChallenge {
     this.status = status;
     this.name = name;
     this.description = description;
+    this.dataTxId = dataTxId;
   }
 }

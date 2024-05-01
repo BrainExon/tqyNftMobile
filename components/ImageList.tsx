@@ -33,6 +33,7 @@ const ImageList = ({items}) => {
       const uris = await Promise.all(
         items.map(async item => {
           const uri = await fetchImageUri(item.uri);
+          //console.log(`[ImageList] item: ${JSON.stringify(item, null, 2)}`);
           return {uri: uri, dataTxId: item.dataTxId, nftId: item.nftId};
         }),
       );

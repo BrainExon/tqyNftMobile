@@ -6,10 +6,16 @@ import {
   StyleSheet,
   useWindowDimensions,
 } from 'react-native';
-import {dbUpsert} from '../util/dbUtils';
+
+import {dbFindOne, dbUpsert} from '../util/dbUtils';
 import Config from 'react-native-config';
 import React, {useState, useEffect} from 'react';
-import {getUrlFileName, isTablet, setOutline} from '../util/util';
+import {
+  getUrlFileName,
+  isObjectEmpty,
+  isTablet,
+  setOutline,
+} from '../util/util';
 import {Picker} from '@react-native-picker/picker';
 import {
   heightPercentageToDP as hp,
@@ -37,9 +43,12 @@ const CreateChallenge = ({route}) => {
   const [showModal, setShowModal] = useState(false);
   const [message, setMessage] = useState('');
 
+  /**
+   */
   const handleErrorCallback = (errMsg: any) => {
     console.log(`[CreateChallenge] error: ${JSON.stringify(errMsg)}`);
     setError(errMsg);
+    setShowModal(true);
   };
   const handleButtonClose = () => {
     setShowModal(false);
@@ -74,6 +83,41 @@ const CreateChallenge = ({route}) => {
     console.log('Description:', description);
 
     try {
+      //check for existing challenge first
+      const challengeFind = {
+        collection: 'challenges',
+        conditions: {
+          dataTxId: dataTxId,
+        },
+      };
+      const existingChallenge = await dbFindOne({
+        endPoint: 'find_one',
+        conditions: challengeFind,
+        setError: handleErrorCallback,
+      });
+      console.log(
+        `\n====\n[CreateChallenge] EXISTING CHALLENGE: ${JSON.stringify(
+          existingChallenge,
+        )}\n====\n`,
+      );
+
+      setError('');
+      if (existingChallenge && !isObjectEmpty(existingChallenge.data)) {
+        console.log(
+          `[CreateChallenge] EXISTING CHALLENGE DATA OBject is empty: ${isObjectEmpty(
+            existingChallenge.data,
+          )}`,
+        );
+        console.log(
+          `\n----\n[CreateChallenge] EXISTING CHALLENGE DATA CH ID??? ${JSON.stringify(
+            existingChallenge.data.chId,
+          )}\n----\n`,
+        );
+        handleErrorCallback(
+          'Challenge already exists. Mint a new NFT and to create a New Challenge.',
+        );
+        return;
+      }
       const challengeId = uuidv4();
       const challenge = new Challenge(
         challengeId,
@@ -87,6 +131,7 @@ const CreateChallenge = ({route}) => {
         '',
         category,
         description,
+        '',
       );
 
       console.log(

@@ -66,13 +66,14 @@ const ChallengesList = ({items}) => {
   const navigation = useNavigation();
 
   const handleChallengeItem = item => {
-    navigation.navigate('CreateUserChallenge', {
+    navigation.navigate('CreateAcceptChallenge', {
       ownerId: userState.userId,
       nftId: item.nft,
       chId: item.chId,
       doubloon: item.doubloon,
       name: item.name,
       description: item.description,
+      dataTxId: item.dataTxId,
     });
   };
 
@@ -98,10 +99,11 @@ const ChallengesList = ({items}) => {
       </View>
     );
   };
+  const sortedData = items.slice().sort((a, b) => b.date - a.date);
 
   return (
     <FlatList
-      data={items}
+      data={sortedData}
       renderItem={renderItem}
       keyExtractor={item => item._id}
     />

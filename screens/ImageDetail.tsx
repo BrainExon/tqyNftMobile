@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import {
   heightPercentageToDP as hp,
   widthPercentageToDP as wp,
@@ -12,19 +12,24 @@ import {
   StyleSheet,
   TouchableOpacity,
   useWindowDimensions,
+  Linking,
 } from 'react-native';
 import {useNavigation} from '@react-navigation/native';
+import Config from 'react-native-config';
 
 const ImageDetail = ({route}) => {
   const {uri, dataTxId, nftId} = route.params;
   const boardSize = useWindowDimensions();
   const styles = generateDetailStyles(boardSize);
   const navigation = useNavigation();
-
   const handleImagePress = () => {
     navigation.navigate('UserScreen');
   };
-
+  //const chainUrl = ;
+  //setExplorerUrl(chainUrl);
+  console.log(
+    `[ImageDetail] blockchain url: ${Config.BLOCKCHAIN_URI}/${dataTxId}`,
+  );
   return (
     <View style={styles.container}>
       <TouchableOpacity onPress={() => handleImagePress()}>
@@ -48,6 +53,16 @@ const ImageDetail = ({route}) => {
         <View style={styles.cancelButton}>
           <Button title="Cancel" onPress={() => handleImagePress()} />
         </View>
+      </View>
+      <View style={styles.exploreButton}>
+        <Button
+          title="Blockchain"
+          onPress={() => {
+            Linking.openURL(`${Config.BLOCKCHAIN_URI}/${dataTxId}`).catch(e => {
+              e.message;
+            });
+          }}
+        />
       </View>
     </View>
   );
@@ -83,6 +98,13 @@ function generateDetailStyles(size: any) {
       flex: 1,
       paddingHorizontal: isTablet(size.width, size.height) ? hp('2') : wp('2'),
       marginHorizontal: isTablet(size.width, size.height) ? hp('2') : wp('2'),
+    },
+    exploreButton: {
+      width: isTablet(size.width, size.height) ? hp('58') : wp('48'),
+      paddingVertical: isTablet(size.width, size.height) ? hp('6') : wp('4'),
+      padding: isTablet(size.width, size.height) ? hp('4') : wp('2'),
+      marginHorizontal: isTablet(size.width, size.height) ? hp('4') : wp('4'),
+      paddingHorizontal: isTablet(size.width, size.height) ? hp('4') : wp('6'),
     },
     cancelButton: {
       flex: 1,
