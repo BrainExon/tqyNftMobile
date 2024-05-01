@@ -174,12 +174,19 @@ const CreateAcceptChallenge = ({route}) => {
           `Error creating the accepted challenge for userId: ${ownerId}`,
         );
       }
-      const updatedChallenge = insertChallengeUser(challenge.data, ownerId);
-      if (updatedChallenge.error) {
-        handleErrorCallback(
-          `Error updating accepted challenge with userId: ${ownerId}`,
-        );
-      }
+      //const updatedChallenge = insertChallengeUser(challenge.data, ownerId);
+      challenge.data.users.push(ownerId);
+      console.log(
+        `[CreateAcceptChallenge] updatedChallenge: ${JSON.stringify(
+          challenge,
+        )}`,
+      );
+      await dbUpsert({
+        endPoint: 'upsert_challenge',
+        conditions: challenge.data,
+        callback: handleErrorCallback,
+      });
+
       console.log('[CreateAcceptChallenge] all finished, show modal....');
       setShowModal(true);
       setShowActivity(false);

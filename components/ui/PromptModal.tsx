@@ -8,6 +8,7 @@ import {
   StyleSheet,
   useWindowDimensions,
   ActivityIndicator,
+  TouchableOpacity,
 } from 'react-native';
 import GlobalStyles from '../../constants/GlobalStyles';
 import {isTablet, setOutline} from '../../util/util';
@@ -117,8 +118,9 @@ interface PromptModalProps {
   showActivity: boolean;
   imageSource: string | null;
   error: string | null;
-  onAccept: (error: string | null) => void;
-  onClose: (error: string | null) => void;
+  onAccept: () => void | null;
+  onClose: () => void;
+  handleImagePress: (url: string | null) => void;
 }
 const PromptModal: React.FC<PromptModalProps> = ({
   visible,
@@ -129,6 +131,7 @@ const PromptModal: React.FC<PromptModalProps> = ({
   error,
   onAccept,
   onClose,
+  handleImagePress,
 }) => {
   console.log(`[PromptModal]: visible: ${visible}`);
   console.log(`[PromptModal]: message: ${JSON.stringify(message)}`);
@@ -149,7 +152,12 @@ const PromptModal: React.FC<PromptModalProps> = ({
         {!error && (
           <View style={styles.proModalContainer}>
             {imageSource && (
-              <Image source={{uri: imageSource}} style={styles.proModalImage} />
+              <TouchableOpacity onPress={handleImagePress}>
+                <Image
+                  source={{uri: imageSource}}
+                  style={styles.proModalImage}
+                />
+              </TouchableOpacity>
             )}
             <Text style={styles.proModalTitle}>{title}</Text>
             <Text style={styles.proModalText}>{message}</Text>
@@ -161,14 +169,19 @@ const PromptModal: React.FC<PromptModalProps> = ({
           </View>
         )}
         <View style={styles.proModalButtonGroup}>
-          <GenButton
-            onPress={onAccept}
-            style={error ? styles.proModalButtonError : styles.proModalButton}
-            textStyle={
-              error ? styles.proModalButtonTextError : styles.proModalButtonText
-            }>
-            {'Approve'}
-          </GenButton>
+          {onAccept && (
+            <GenButton
+              onPress={onAccept}
+              //onPress={onVerify}
+              style={error ? styles.proModalButtonError : styles.proModalButton}
+              textStyle={
+                error
+                  ? styles.proModalButtonTextError
+                  : styles.proModalButtonText
+              }>
+              {'Verify'}
+            </GenButton>
+          )}
           <GenButton
             onPress={() => onClose && onClose(error)}
             style={error ? styles.proModalButtonError : styles.proModalButton}

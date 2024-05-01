@@ -125,3 +125,22 @@ export async function fetchImage({endPoint, imageName, callback}) {
     callback('[fetchImage] error: ', JSON.stringify(error));
   }
 }
+
+export async function verifyChallenge(chId, userId) {
+  const formdata = new FormData();
+  formdata.append('challenge', chId);
+  formdata.append('participant', userId);
+
+  const requestOptions = {
+    method: 'POST',
+    body: formdata,
+    redirect: 'follow',
+  };
+
+  const url = `${Config.NODEJS_EXPRESS_SERVER}/verify`;
+  const verified = await fetch(url, requestOptions);
+  //.then(response => response.text())
+  //.then(result => console.log(result))
+  //.catch(error => console.error(error));
+  return await verified.text();
+}

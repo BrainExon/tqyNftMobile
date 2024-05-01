@@ -159,8 +159,11 @@ const replaceStringByKey = (inputString, key, replacement) => {
 };
 
 function getUrlFileName(url) {
-  const parts = url.split('/');
-  return parts[parts.length - 1];
+  if (url) {
+    const parts = url.split('/');
+    return parts[parts.length - 1];
+  }
+  return url;
 }
 function getMimeType(filename) {
   const extension = filename.split('.').pop().toLowerCase();
@@ -195,7 +198,17 @@ const formatDate = dateString => {
 
   return `${year}/${month}/${day}`;
 };
+function removeExtension(filename) {
+  // Split the filename based on the dot (.)
+  const parts = filename.split('.');
+
+  // Remove the last part (which is the extension)
+  const filenameWithoutExtension = parts.slice(0, -1).join('.');
+
+  return filenameWithoutExtension;
+}
 export {
+  removeExtension,
   formatDate,
   getMimeType,
   getUrlFileName,

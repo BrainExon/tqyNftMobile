@@ -105,15 +105,14 @@ const UserAcceptChallengeList = ({items}) => {
    * @param item
    */
   const handleChallengeItem = item => {
-    const imgName = getUrlFileName(item.doubloon);
-    const imgSrc = `${Config.NODEJS_EXPRESS_SERVER}/image/${imgName}`;
-    setVisible(true);
-    setTitle(item.name);
-    setMessage(item.description);
-    setShowActivity(false);
-    setImageSource(imgSrc);
-    setError('');
-    setShowPrompt(true);
+    navigation.navigate('CompleteAcceptChallenge', {
+      userId: userState.userId,
+      nftId: item.nft,
+      chId: item.chId,
+      doubloon: item.doubloon,
+      name: item.name,
+      description: item.description,
+    });
   };
 
   const renderItem = ({item}) => {
@@ -126,8 +125,7 @@ const UserAcceptChallengeList = ({items}) => {
         <View style={styles.textContainer}>
           <Text style={styles.chListText}>Challenge: "{item.name}"</Text>
           <Text style={styles.chListText}>
-            {' '}
-            Description: "{item.description}"{' '}
+            Description: "{item.description}"
           </Text>
           <Text style={styles.chListText}>Date: {date}</Text>
           <Text style={styles.chListText}>Status: "{item.status}"</Text>

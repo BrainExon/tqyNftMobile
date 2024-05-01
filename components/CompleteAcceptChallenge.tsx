@@ -7,29 +7,45 @@ import {
   TouchableOpacity,
   Image,
 } from 'react-native';
-import {dbFetch, dbUpsert} from '../util/dbUtils';
+import Config from 'react-native-config';
+import {dbFetch, dbUpsert, verifyChallenge} from '../util/dbUtils';
 import React, {useState, useCallback} from 'react';
-import {getMimeType, getUrlFileName, isTablet, setOutline} from '../util/util';
+import {
+  getMimeType,
+  getUrlFileName,
+  isTablet,
+  removeExtension,
+  setOutline,
+} from '../util/util';
 import {
   heightPercentageToDP as hp,
   widthPercentageToDP as wp,
 } from 'react-native-responsive-screen';
 import {v4 as uuidv4} from 'uuid';
-import PromptModal from './ui/PromptModal';
+import UserModal from './ui/UserModal';
 import {useNavigation} from '@react-navigation/native';
 import {UserChallenge} from './models/UserChallenge';
 import {pinNftVersion} from '../ipfs/blockchain';
+import PromptModal from './ui/PromptModal';
 
 const CompleteAcceptChallenge = ({route}) => {
   console.log('[CompleteAcceptChallenge]....');
-  const {ownerId, nftId, chId, doubloon, name, description} = route.params;
+  const {userId, nftId, chId, doubloon, name, description} = route.params;
+  console.log(`[CompleteAcceptChallenge] userId: ${userId}`);
+  console.log(`[CompleteAcceptChallenge] nftId: ${nftId}`);
+  console.log(`[CompleteAcceptChallenge] chId: ${chId}`);
+  console.log(`[CompleteAcceptChallenge] doubloon: ${doubloon}`);
+  console.log(`[CompleteAcceptChallenge] name: ${name}`);
+  console.log(`[CompleteAcceptChallenge] description: ${description}`);
   const navigation = useNavigation();
   const chSize = useWindowDimensions();
   const styles = generateChallengeStyles(chSize);
   const [errorMsg, setErrorMsg] = useState('');
   const [message, setMessage] = useState('');
   const [showModal, setShowModal] = useState(false);
+  const [visible, setVisible] = useState(false);
   const [showActivity, setShowActivity] = useState(false);
+  const [image, setImage] = useState('');
 
   const handleErrorCallback = (errMsg: any) => {
     setErrorMsg(errMsg);
@@ -41,10 +57,27 @@ const CompleteAcceptChallenge = ({route}) => {
     navigation.navigate('SignupScreen');
   };
 
-  const handleOnAccept = () => {
+  const handleImagePress = () => {
     setShowModal(false);
-    console.log('[handleOnAccept] ...');
-    //navigation.navigate('SignupScreen');
+    console.log(
+      `[CompleteAcceptChallenge][handleImagePress] image: ${JSON.stringify(
+        image,
+      )}`,
+    );
+    const filename = getUrlFileName(image);
+    const challengeId = removeExtension(filename);
+    console.log('\n-------\n');
+    console.log(
+      `[CompleteAcceptChallenge][handleImagePress] Challenge ID: ${JSON.stringify(
+        challengeId,
+      )}`,
+    );
+    console.log('\n-------\n');
+    const verified = verifyChallenge(challengeId, userId);
+    console.log(
+      `[CompleteAcceptChallenge] verified: ${JSON.stringify(verified)}`,
+    );
+    navigation.navigate('SignupScreen');
   };
 
   const handleButtonClose = () => {
@@ -52,81 +85,33 @@ const CompleteAcceptChallenge = ({route}) => {
     navigation.navigate('SignupScreen');
   };
 
-  /**
-   * Function to create an NFT version of the original NFT used in the Challenge
-   * the user has chosen to accept. This is done by versioning the image used
-   * in the original NFT. Once the versioned NFT is created, we then create a
-   * User Challenge entry in the DB.
-   */
-  const generateNftVersion = useCallback(
-    async image => {
-      setErrorMsg('');
-      try {
-        const filename = getUrlFileName(image);
-        const versionImage = `version_image?filename=${filename}`;
-        console.log(`[generateNftVersion] endpoint: ${versionImage}`);
-        const versionedImage = await dbFetch(
-          {endPoint: versionImage},
-          handleErrorCallback,
-        );
-        console.log(
-          `versioned image: ${JSON.stringify(versionedImage, null, 2)}`,
-        );
-        const vFilename = getUrlFileName(versionedImage.data);
-        const mimeType = getMimeType(vFilename);
-        const ipfsData = await pinNftVersion({
-          ownerId: ownerId,
-          imagePath: `images_store/${vFilename}`,
-          imageType: mimeType,
-          imageName: vFilename,
-          callback: handleErrorCallback,
-        });
-        console.log(
-          `[generateNftVersion] IPFS response: ${JSON.stringify(ipfsData)}`,
-        );
-        if (ipfsData?.data && !ipfsData?.data?.created[0].dataTxId) {
-          const err = '[generateNftVersion] null dataTxId!';
-          handleErrorCallback(err);
-        }
-        return ipfsData;
-      } catch (error: any) {
-        handleErrorCallback(
-          `[generateNftVersion] Error generating versioned NFT: ${JSON.stringify(
-            error ?? 'unknown error',
-          )}`,
-        );
-      }
-    },
-    [ownerId],
-  );
-
   const handleSubmit = async () => {
     console.log('[CompleteAcceptChallenge][handleSubmit]....');
     setShowModal(true);
+    const filename = getUrlFileName(doubloon);
+    const qrCodeSource = `${Config.NODEJS_EXPRESS_SERVER}/qrcodes/${chId}.png`;
+    console.log(
+      '[CompleteAcceptChallenge] qrCodeSource: ',
+      JSON.stringify(qrCodeSource),
+    );
+    setImage(qrCodeSource);
+    setVisible(true);
     setErrorMsg('');
-    setMessage('Finish this verification component.');
+    setShowActivity(false);
+    setMessage('Scan or click the QR code to verify the challenge.');
   };
 
   return showModal ? (
-    /**
-     * visible: boolean;
-     * title: string;
-     * message: string | null;
-     * showActivity: boolean;
-     * imageSource: string | null;
-     * error: string | null;
-     * onAccept: (error: string | null) => void;
-     * onClose: (error: string | null) => void;
-     */
     <PromptModal
-      visible={showModal}
+      visible={visible}
       title={name}
       message={message}
       showActivity={showActivity}
-      imageSource={''}
+      imageSource={image}
       error={errorMsg}
-      onAccept={handleOnAccept}
+      onAccept={''}
       onClose={handleButtonClose}
+      handleImagePress={handleImagePress}
     />
   ) : (
     <View style={styles.uchContainer}>

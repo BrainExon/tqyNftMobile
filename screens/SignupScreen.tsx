@@ -103,13 +103,6 @@ function SignupScreen() {
           });
           setChallenges(updatedBucketArray);
         }
-        console.log(
-          `[SignUpScreen] updatedBucketArray: ${JSON.stringify(
-            challenges,
-            null,
-            2,
-          )}`,
-        );
       } catch (error) {
         handleErrorCallback(
           `[SignupScreen] Error fetching Challenges: ${error}`,

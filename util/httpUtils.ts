@@ -67,3 +67,17 @@ export const generateQrCode = async (challenge: string) => {
   console.log(`[generateQrCode] response JSON: ${JSON.stringify(jsonData)} `);
   return jsonData;
 };
+
+export const getQrCode = async filename => {
+  const requestOptions = {
+    method: 'GET',
+    redirect: 'follow',
+  };
+  const getQrApi = `${Config.NODEJS_EXPRESS_SERVER}/qrcode${filename}`;
+  const qrCode = await fetch(getQrApi, requestOptions);
+  console.log(`[getQrCode] response: ${JSON.stringify(qrCode, null, 2)}`);
+  if (qrCode.error) {
+    return {success: false, data: '', error: qrCode.error};
+  }
+  return qrCode.data;
+};

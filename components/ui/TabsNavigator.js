@@ -1,11 +1,12 @@
 import React from 'react';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import CompleteAcceptChallenge from '../CompleteAcceptChallenge';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
+//import CompleteUserChallenge from '../CompleteUserChallenge';
+import CompleteAcceptChallenge from '../CompleteAcceptChallenge';
 import ChallengeScreen from '../../screens/ChallengeScreen';
 import {useWindowDimensions} from 'react-native';
 import {isTablet} from '../../util/util';
@@ -219,7 +220,7 @@ function TabsNavigator() {
         }}
       />
       <BottomTabs.Screen
-        name="CompleteUserChallenge"
+        name="CompleteAcceptChallenge"
         component={CompleteAcceptChallenge}
         options={{
           title: 'Toqyn',
