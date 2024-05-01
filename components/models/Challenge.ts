@@ -10,6 +10,7 @@ export class Challenge {
   nftVersion: number;
   category: string;
   description: string;
+  qrCode: string | null;
   constructor(
     chId: string,
     name: string,
@@ -22,6 +23,7 @@ export class Challenge {
     nftVersion: number,
     category: string,
     description: string,
+    qrCode: string | null,
   ) {
     this.chId = chId;
     this.name = name;
@@ -34,5 +36,6 @@ export class Challenge {
     this.nftVersion = nftVersion;
     this.category = category;
     this.description = description;
+    this.qrCode = qrCode;
   }
 }

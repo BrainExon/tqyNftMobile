@@ -77,7 +77,7 @@ const ChallengesList = ({items}) => {
   };
 
   const renderItem = ({item}) => {
-    console.log(`item: ${JSON.stringify(item, null, 2)}`);
+    //console.log(`item: ${JSON.stringify(item, null, 2)}`);
     const date = formatDate(item.date);
     const cat = isEmpty(item.category) ? 'default' : item.category;
     return (

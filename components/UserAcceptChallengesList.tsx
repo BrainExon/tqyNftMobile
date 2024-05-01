@@ -1,4 +1,5 @@
-import React from 'react';
+import React, {useState} from 'react';
+import Config from 'react-native-config';
 import {
   TouchableOpacity,
   View,
@@ -8,7 +9,7 @@ import {
   StyleSheet,
   useWindowDimensions,
 } from 'react-native';
-import {formatDate, setOutline} from '../util/util';
+import {formatDate, getUrlFileName, setOutline} from '../util/util';
 import {
   heightPercentageToDP as hp,
   widthPercentageToDP as wp,
@@ -16,6 +17,7 @@ import {
 import {useNavigation} from '@react-navigation/native';
 import {useSelector} from 'react-redux';
 import {getUserState} from '../redux/userSlice';
+import PromptModal from './ui/PromptModal';
 
 /**
  * {
@@ -69,10 +71,42 @@ const UserAcceptChallengeList = ({items}) => {
   const chListSize = useWindowDimensions();
   const styles = generateChListStyles(chListSize);
   const navigation = useNavigation();
+  const [showPrompt, setShowPrompt] = useState(false);
+  const [message, setMessage] = useState('');
+  const [vibsible, setVisible] = useState('');
+  const [title, setTitle] = useState('');
+  const [showMessage, setShowMessage] = useState('');
+  const [showActivity, setShowActivity] = useState(false);
+  const [imageSource, setImageSource] = useState('');
+  const [error, setError] = useState('');
 
+  const handleOnAccept = () => {
+    setShowPrompt(false);
+    console.log('[handleOnAccept] ...');
+    //navigation.navigate('SignupScreen');
+  };
+
+  const handleButtonClose = () => {
+    setShowPrompt(false);
+    navigation.navigate('SignupScreen');
+  };
+
+  /**
+   * <PromptModal
+   * visible={showPrompt}
+   * title={title}
+   * message={message}
+   * showActivity={showActivity}
+   * imageSource={imageSource}
+   * error={error}
+   * onAccept={handleOnAccept}
+   * onClose={handleButtonClose}
+   />
+   * @param item
+   */
   const handleChallengeItem = item => {
-    navigation.navigate('CompleteUserChallenge', {
-      ownerId: userState.userId,
+    navigation.navigate('CompleteAcceptChallenge', {
+      userId: userState.userId,
       nftId: item.nft,
       chId: item.chId,
       doubloon: item.doubloon,
@@ -101,11 +135,26 @@ const UserAcceptChallengeList = ({items}) => {
   };
 
   return (
-    <FlatList
-      data={items}
-      renderItem={renderItem}
-      keyExtractor={item => item._id}
-    />
+    <>
+      {showPrompt ? (
+        <PromptModal
+          visible={showPrompt}
+          title={title}
+          message={message}
+          showActivity={showActivity}
+          imageSource={imageSource}
+          error={error}
+          onAccept={handleOnAccept}
+          onClose={handleButtonClose}
+        />
+      ) : (
+        <FlatList
+          data={items}
+          renderItem={renderItem}
+          keyExtractor={item => item._id}
+        />
+      )}
+    </>
   );
 };
 
