@@ -144,7 +144,7 @@ const NftMinter = () => {
 
   const handleModalButtonClose = () => {
     setShowModal(false);
-    navigation.navigate('LoginScreen');
+    navigation.navigate('NftMinter');
   };
 
   const handleErrorCallback = useCallback((error: any) => {

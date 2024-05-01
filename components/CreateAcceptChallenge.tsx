@@ -19,11 +19,11 @@ import UserModal from './ui/UserModal';
 import {useNavigation} from '@react-navigation/native';
 import {UserChallenge} from './models/UserChallenge';
 import {pinNftVersion} from '../ipfs/blockchain';
-import {insertChallengeUser} from '../util/dataUtils';
 
 const CreateAcceptChallenge = ({route}) => {
   console.log('[CreateAcceptChallenge]....');
-  const {ownerId, nftId, chId, doubloon, name, description} = route.params;
+  const {ownerId, nftId, chId, doubloon, name, description, dataTxId} =
+    route.params;
   const navigation = useNavigation();
   const chSize = useWindowDimensions();
   const styles = generateChallengeStyles(chSize);
@@ -39,12 +39,12 @@ const CreateAcceptChallenge = ({route}) => {
 
   const handleUserChPress = () => {
     setShowModal(false);
-    navigation.navigate('UserScreen');
+    navigation.navigate('SignupScreen');
   };
 
   const handleButtonClose = () => {
     setShowModal(false);
-    navigation.navigate('UserScreen');
+    navigation.navigate('SignupScreen');
   };
 
   /**
@@ -55,6 +55,7 @@ const CreateAcceptChallenge = ({route}) => {
    */
   const generateNftVersion = useCallback(
     async (image: string) => {
+      console.log('[generateNftVersion]...');
       setErrorMsg('');
       try {
         const filename = getUrlFileName(image);
@@ -143,6 +144,7 @@ const CreateAcceptChallenge = ({route}) => {
         'active',
         name,
         description,
+        dataTxId,
       );
       console.log(
         `[CreateUserChallenge] new User Challenge: ${JSON.stringify(

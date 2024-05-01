@@ -113,7 +113,7 @@ function TabsNavigator() {
         component={UserScreen}
         options={{
           title: 'Toqyn',
-          tabBarLabel: 'Home',
+          tabBarLabel: 'NFTs',
           headerShown: true,
           // eslint-disable-next-line react/no-unstable-nested-components
           tabBarIcon: ({color, size}) => (
@@ -210,7 +210,7 @@ function TabsNavigator() {
         }}
       />
       <BottomTabs.Screen
-        name="CreateUserChallenge"
+        name="CreateAcceptChallenge"
         component={CreateAcceptChallenge}
         options={{
           title: 'Toqyn',

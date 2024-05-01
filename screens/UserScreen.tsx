@@ -79,6 +79,7 @@ function UserScreen() {
                     uri: uri,
                     dataTxId: createdItem.dataTxId,
                     nftId: nftId,
+                    date: nft.date,
                   };
                   updatedBucketArray.push(item);
                 }
@@ -105,6 +106,8 @@ function UserScreen() {
     };
   }, [navigation]);
 
+  const sortedData = nfts.slice().sort((a, b) => b.date - a.date);
+
   return (
     <View style={styles.userContainer}>
       {showModal ? (
@@ -116,7 +119,7 @@ function UserScreen() {
           showActivity={false}
         />
       ) : (
-        <ImageList items={nfts} />
+        <ImageList items={sortedData} />
       )}
     </View>
   );

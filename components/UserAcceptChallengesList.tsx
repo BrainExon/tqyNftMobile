@@ -9,7 +9,7 @@ import {
   StyleSheet,
   useWindowDimensions,
 } from 'react-native';
-import {formatDate, getUrlFileName, setOutline} from '../util/util';
+import {formatDate, isTablet, setOutline} from '../util/util';
 import {
   heightPercentageToDP as hp,
   widthPercentageToDP as wp,
@@ -27,34 +27,37 @@ import PromptModal from './ui/PromptModal';
  * }
  */
 const generateChListStyles = (size: any) => {
-  const chListStyles = StyleSheet.create({
-    chListItem: {
+  const uacListStyles = StyleSheet.create({
+    uacListItem: {
       flexDirection: 'column',
-      alignItems: 'center',
+      //alignItems: 'center',
       padding: 10,
-      borderBottomWidth: 1,
-      borderBottomColor: '#ccc',
     },
-    imageContainer: {
-      flex: 1,
-      alignItems: 'center',
-    },
-    chListImage: {
-      width: 50,
-      height: 50,
+    uacListImage: {
+      width: isTablet(size.width, size.height) ? hp('20') : wp('20'),
+      height: isTablet(size.width, size.height) ? hp('20') : wp('20'),
       borderRadius: 25,
     },
     textContainer: {
-      flex: 3,
-      justifyContent: 'center',
-      paddingLeft: 10,
+      alignItems: 'flex-start',
+      margin: isTablet(size.width, size.height) ? hp('6') : wp('4'),
+      paddingLeft: isTablet(size.width, size.height) ? hp('6') : wp('4'),
     },
-    chListText: {
+    uacListText: {
       fontSize: 16,
       marginBottom: 5,
+      textAlign: 'left',
+    },
+    mask: {
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      width: '100%',
+      height: '100%',
+      backgroundColor: 'rgba(0, 0, 0, 0.8)',
     },
   });
-  const styles = JSON.parse(JSON.stringify(chListStyles));
+  const styles = JSON.parse(JSON.stringify(uacListStyles));
   if (setOutline()) {
     Object.keys(styles).forEach(key => {
       Object.assign(styles[key], {
@@ -80,10 +83,11 @@ const UserAcceptChallengeList = ({items}) => {
   const [imageSource, setImageSource] = useState('');
   const [error, setError] = useState('');
 
+  console.log(`USER CH LIST: userstate userId ${userState.userId}`);
+
   const handleOnAccept = () => {
     setShowPrompt(false);
     console.log('[handleOnAccept] ...');
-    //navigation.navigate('SignupScreen');
   };
 
   const handleButtonClose = () => {
@@ -91,19 +95,6 @@ const UserAcceptChallengeList = ({items}) => {
     navigation.navigate('SignupScreen');
   };
 
-  /**
-   * <PromptModal
-   * visible={showPrompt}
-   * title={title}
-   * message={message}
-   * showActivity={showActivity}
-   * imageSource={imageSource}
-   * error={error}
-   * onAccept={handleOnAccept}
-   * onClose={handleButtonClose}
-   />
-   * @param item
-   */
   const handleChallengeItem = item => {
     navigation.navigate('CompleteAcceptChallenge', {
       userId: userState.userId,
@@ -112,27 +103,34 @@ const UserAcceptChallengeList = ({items}) => {
       doubloon: item.doubloon,
       name: item.name,
       description: item.description,
+      status: item.status,
     });
   };
 
   const renderItem = ({item}) => {
     const date = formatDate(item.date);
+    console.log(`[accept list] item: ${JSON.stringify(item, null, 2)}`);
+
     return (
-      <View style={styles.chListItem}>
+      <View style={styles.uacListItem}>
         <TouchableOpacity onPress={() => handleChallengeItem(item)}>
-          <Image source={{uri: item.doubloon}} style={styles.chListImage} />
+          <Image source={{uri: item.doubloon}} style={styles.uacListImage} />
+          {item.status === 'active' && <View style={styles.mask} />}
         </TouchableOpacity>
         <View style={styles.textContainer}>
-          <Text style={styles.chListText}>Challenge: "{item.name}"</Text>
-          <Text style={styles.chListText}>
-            Description: "{item.description}"
+          <Text style={styles.uacListText}>Challenge: "{item.name}"</Text>
+          <Text style={styles.uacListText}>
+            {' '}
+            Description: "{item.description}"{' '}
           </Text>
-          <Text style={styles.chListText}>Date: {date}</Text>
-          <Text style={styles.chListText}>Status: "{item.status}"</Text>
+          <Text style={styles.uacListText}>Date: {date}</Text>
+          <Text style={styles.uacListText}>Status: "{item.status}"</Text>
         </View>
       </View>
     );
   };
+
+  const sortedData = items.slice().sort((a, b) => b.date - a.date);
 
   return (
     <>
@@ -149,7 +147,7 @@ const UserAcceptChallengeList = ({items}) => {
         />
       ) : (
         <FlatList
-          data={items}
+          data={sortedData}
           renderItem={renderItem}
           keyExtractor={item => item._id}
         />
