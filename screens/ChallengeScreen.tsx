@@ -88,6 +88,7 @@ function ChallengeScreen() {
                 date: challenge.date,
                 description: challenge.description,
                 category: challenge.category,
+                dataTxId: challenge.dataTxId,
               };
               updatedBucketArray.push(item);
             }

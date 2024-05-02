@@ -3,7 +3,7 @@ import {View, StyleSheet} from 'react-native';
 import Config from 'react-native-config';
 import {useWindowDimensions} from 'react-native';
 import {dbFetch} from '../util/dbUtils';
-import ImageList from '../components/ImageList';
+import NftList from '../components/NftList';
 import {isEmpty, isObjectEmpty, setOutline} from '../util/util';
 import {useNavigation} from '@react-navigation/native';
 import UserModal from '../components/ui/UserModal';
@@ -80,6 +80,8 @@ function NFTScreen() {
                     dataTxId: createdItem.dataTxId,
                     nftId: nftId,
                     date: nft.date,
+                    name: nft.name,
+                    description: nft.description,
                   };
                   updatedBucketArray.push(item);
                 }
@@ -90,7 +92,7 @@ function NFTScreen() {
           setNfts(updatedBucketArray);
         }
       } catch (err) {
-        handleErrorCallback(`[UserScreen] Error fetching NFTs: ${err}`);
+        handleErrorCallback(`[NFTScreen] Error fetching NFTs: ${err}`);
         return;
       }
     };
@@ -119,7 +121,7 @@ function NFTScreen() {
           showActivity={false}
         />
       ) : (
-        <ImageList items={sortedData} />
+        <NftList items={sortedData} />
       )}
     </View>
   );

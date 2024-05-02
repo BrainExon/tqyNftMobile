@@ -10,9 +10,14 @@ import {
 } from 'react-native';
 import Config from 'react-native-config';
 import {useNavigation} from '@react-navigation/native';
+import {isTablet} from '../util/util';
+import {
+  heightPercentageToDP as hp,
+  widthPercentageToDP as wp,
+} from 'react-native-responsive-screen';
 const path = require('path');
 
-const ImageList = ({items}) => {
+const NftList = ({items}) => {
   const [imageUris, setImageUris] = useState([]);
   const [numColumns, setNumColumns] = useState(3);
   const navigation = useNavigation();
@@ -33,8 +38,13 @@ const ImageList = ({items}) => {
       const uris = await Promise.all(
         items.map(async item => {
           const uri = await fetchImageUri(item.uri);
-          //console.log(`[ImageList] item: ${JSON.stringify(item, null, 2)}`);
-          return {uri: uri, dataTxId: item.dataTxId, nftId: item.nftId};
+          //console.log(`[NftList] item: ${JSON.stringify(item, null, 2)}`);
+          return {
+            uri: uri,
+            dataTxId: item.dataTxId,
+            nftId: item.nftId,
+            name: item.name,
+          };
         }),
       );
       setImageUris(uris);
@@ -60,6 +70,7 @@ const ImageList = ({items}) => {
       <TouchableOpacity onPress={() => handleImagePress(index)}>
         <View style={styles.itemContainer}>
           <Image source={{uri: imageUris[index].uri}} style={styles.image} />
+          <Text style={styles.nftText}>{imageUris[index].name}</Text>
         </View>
       </TouchableOpacity>
     );
@@ -79,7 +90,7 @@ const ImageList = ({items}) => {
   );
 };
 
-export default ImageList;
+export default NftList;
 const windowWidth = Dimensions.get('window').width;
 const imageWidth = windowWidth / 3 - 20;
 
@@ -93,6 +104,11 @@ const styles = StyleSheet.create({
     width: imageWidth,
     height: imageWidth,
   },
+  nftText: {
+    color: 'white',
+    fontSize: 12,
+    textAlign: 'center',
+  },
 });
 
-export default ImageList;
+export default NftList;

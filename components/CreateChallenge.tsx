@@ -47,7 +47,7 @@ const CreateChallenge = ({route}) => {
   };
   const handleButtonClose = () => {
     setShowModal(false);
-    navigation.navigate('UserScreen');
+    navigation.navigate('NFTScreen');
   };
 
   useEffect(() => {

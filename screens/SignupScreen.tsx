@@ -75,6 +75,13 @@ function SignupScreen() {
         const foundChallenges = await dbFetch({
           endPoint: 'get_user_challenges',
         });
+        console.log(
+          `[SignupScreen] FOUND Challenges: ${JSON.stringify(
+            foundChallenges,
+            null,
+            2,
+          )}`,
+        );
         if (foundChallenges.data) {
           const updatedBucketArray = [];
           foundChallenges.data.forEach(challenge => {

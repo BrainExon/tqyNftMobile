@@ -133,9 +133,9 @@ const NftMinter = () => {
   const [mintProgressStep, setMintProgressStep] = useState<MintingStep>(
     MintingStep.None,
   );
-  const [nftName, setNftName] = useState('xyz');
+  const [nftName, setNftName] = useState('');
+  const [nftDescription, setNftDescription] = useState('');
   const [ownerId, setOwnerId] = useState('');
-  const [nftDescription, setNftDescription] = useState('zyc');
   const [imageType, setImageType] = useState<string | null>(null);
   const [imageName, setImageName] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState('');
@@ -210,12 +210,14 @@ const NftMinter = () => {
   };
 
   const mintNft = useCallback(
-    async (nftImage: string) => {
+    async (nftImage: string, nftName: string, nftDescription: string) => {
       console.log('\n---------\n[mintNft]\n---------\n');
       console.log(`[mintNFT] errorMessage? ${errorMessage}`);
       console.log(`[mintNFT] showModal? ${showModal}`);
       console.log(`[mintNFT] mintProgressStep? ${mintProgressStep}`);
       console.log('[mintNft] nftImage', JSON.stringify(nftImage));
+      console.log('[mintNft] nftName', JSON.stringify(nftName));
+      console.log('[mintNft] nftDescription', JSON.stringify(nftDescription));
       console.log('\n---------\n');
       console.log(
         '\n-----\n[mintNft] OwnerId: ',
@@ -231,6 +233,8 @@ const NftMinter = () => {
           imageType: imageType,
           imageName: imageName,
           callback: handleErrorCallback,
+          name: nftName,
+          description: nftDescription,
         });
         if (!ipfsData.data.created[0].dataTxId) {
           const err = '[NftMinter] null dataTxId!';
@@ -366,9 +370,17 @@ const NftMinter = () => {
                           return;
                         }
                         try {
+                          console.log(`[NftMinter] MINT nftName: ${nftName} `);
+                          console.log(
+                            `[NftMinter] MINT nftDescription: ${nftDescription} `,
+                          );
                           let mint,
                             signature = '';
-                          [mint, signature] = await mintNft(selectedImage);
+                          [mint, signature] = await mintNft(
+                            selectedImage,
+                            nftName,
+                            nftDescription,
+                          );
                           console.log(`Mint Address: "${mint}"`);
                           const explorerUrl =
                             Config.ARWEAVE_PREVIEW_URL + '/' + mint;
