@@ -7,6 +7,8 @@ const arDriveClient = async (
   imageType: string | null,
   imageName: string | null,
   callback: (error: any) => void,
+  name,
+  description,
 ) => {
   console.log('\n-------\n');
   console.log('[Blockchain]  ARDrive image upload...');
@@ -14,6 +16,8 @@ const arDriveClient = async (
   console.log(`[arDriveClient] imagePath: ${imagePath}`);
   console.log(`[arDriveClient] imageType: ${imageType}`);
   console.log(`[arDriveClient] imageName: ${imageName}`);
+  console.log(`[arDriveClient] name: ${name}`);
+  console.log(`[arDriveClient] description: ${description}`);
   console.log('\n-------\n');
 
   const handleError = (error: any) => {
@@ -42,6 +46,8 @@ const arDriveClient = async (
     });
 
     formData.append('ownerId', ownerId);
+    formData.append('name', name);
+    formData.append('description', description);
 
     const requestOptions = {
       method: 'POST',
@@ -100,12 +106,16 @@ export const pinNft = async ({
   imageType,
   imageName,
   callback,
+  name,
+  description,
 }: PinNft) => {
   console.log('\n-------\n');
   console.log(`[pintNft] ownerId: ${ownerId}`);
   console.log(`[pintNft] imagePath: ${imagePath}`);
   console.log(`[pintNft] imageType: ${imageType}`);
   console.log(`[pintNft] imageName: ${imageName}`);
+  console.log(`[pintNft] name: ${name}`);
+  console.log(`[pintNft] description: ${description}`);
   console.log('\n-------\n');
   const handleError = (error: any) => {
     console.log('[Blockchain][pintNft] Error:', JSON.stringify(error));
@@ -118,6 +128,8 @@ export const pinNft = async ({
       imageType,
       imageName,
       callback,
+      name,
+      description,
     );
     if (!data.data) {
       handleError('[pintNft] Error pinning NFT to arweave blockchain.');

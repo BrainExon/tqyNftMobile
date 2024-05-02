@@ -23,7 +23,7 @@ const ImageDetail = ({route}) => {
   const styles = generateDetailStyles(boardSize);
   const navigation = useNavigation();
   const handleImagePress = () => {
-    navigation.navigate('UserScreen');
+    navigation.navigate('NFTScreen');
   };
   //const chainUrl = ;
   //setExplorerUrl(chainUrl);

@@ -45,7 +45,7 @@ function LoginScreen() {
           userId: userAccount.userId,
         }),
       );
-      navigation.navigate('UserScreen');
+      navigation.navigate('NFTScreen');
     }
     setShowModal(false);
   };
