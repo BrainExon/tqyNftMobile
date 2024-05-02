@@ -10,12 +10,7 @@ import {
 import {dbFindOne, dbUpsert} from '../util/dbUtils';
 import Config from 'react-native-config';
 import React, {useState, useEffect} from 'react';
-import {
-  getUrlFileName,
-  isObjectEmpty,
-  isTablet,
-  setOutline,
-} from '../util/util';
+import {isObjectEmpty, isTablet, setOutline} from '../util/util';
 import {Picker} from '@react-native-picker/picker';
 import {
   heightPercentageToDP as hp,
@@ -29,6 +24,8 @@ import {useSelector} from 'react-redux';
 import {getUserState} from '../redux/userSlice';
 import {useNavigation} from '@react-navigation/native';
 import {generateQrCode} from '../util/httpUtils';
+import {challengeExist} from '../util/dataUtils';
+import GlobalStyles from '../constants/GlobalStyles';
 
 const CreateChallenge = ({route}) => {
   const {doubloonUri, dataTxId, nftId} = route.params;
@@ -43,8 +40,6 @@ const CreateChallenge = ({route}) => {
   const [showModal, setShowModal] = useState(false);
   const [message, setMessage] = useState('');
 
-  /**
-   */
   const handleErrorCallback = (errMsg: any) => {
     console.log(`[CreateChallenge] error: ${JSON.stringify(errMsg)}`);
     setError(errMsg);
@@ -81,6 +76,7 @@ const CreateChallenge = ({route}) => {
     console.log('Category:', category);
     console.log('Name:', name);
     console.log('Description:', description);
+    setError('');
 
     try {
       //check for existing challenge first
@@ -101,7 +97,6 @@ const CreateChallenge = ({route}) => {
         )}\n====\n`,
       );
 
-      setError('');
       if (existingChallenge && !isObjectEmpty(existingChallenge.data)) {
         console.log(
           `[CreateChallenge] EXISTING CHALLENGE DATA OBject is empty: ${isObjectEmpty(
@@ -163,19 +158,26 @@ const CreateChallenge = ({route}) => {
 
   return (
     <View style={styles.chContainer}>
-      <Text>Category:</Text>
-      <Picker
-        selectedValue={category}
-        onValueChange={(itemValue, itemIndex) => handleValueChange(itemValue)}>
-        {categories.map((category, index) => (
-          <Picker.Item
-            key={index}
-            label={category.label}
-            value={category.value}
-          />
-        ))}
-      </Picker>
-      <Text>Name:</Text>
+      <Text style={styles.chTitle}>Category:</Text>
+      <View style={{}}>
+        <Picker
+          style={styles.chPicker}
+          selectedValue={category}
+          onValueChange={(itemValue, itemIndex) =>
+            handleValueChange(itemValue)
+          }>
+          {categories.map((category, index) => (
+            <Picker.Item
+              style={styles.chPickerText}
+              key={index}
+              label={category.label}
+              value={category.value}
+            />
+          ))}
+        </Picker>
+      </View>
+
+      <Text style={styles.chTitle}>Name:</Text>
       <TextInput
         style={styles.chInput}
         value={name}
@@ -183,7 +185,7 @@ const CreateChallenge = ({route}) => {
         placeholder="Enter Name"
       />
 
-      <Text>Description:</Text>
+      <Text style={styles.chTitle}>Description:</Text>
       <TextInput
         style={styles.chInputDesc}
         value={description}
@@ -229,9 +231,17 @@ function generateChallengeStyles(size: any) {
       fontSize: isTablet(size.width, size.height) ? hp('2') : wp('4'),
       lineHeight: isTablet(size.width, size.height) ? hp('2') : wp('7'),
       flexDirection: 'row',
-      alignItems: 'center',
       color: 'white',
-      textAlign: 'center',
+      textAlign: 'left',
+      paddingVertical: isTablet(size.width, size.height) ? hp('2') : wp('4'),
+    },
+    chTitle: {
+      fontSize: isTablet(size.width, size.height) ? hp('6') : wp('5'),
+      lineHeight: isTablet(size.width, size.height) ? hp('2') : wp('7'),
+      flexDirection: 'row',
+      color: 'white',
+      textAlign: 'left',
+      paddingVertical: isTablet(size.width, size.height) ? hp('2') : wp('4'),
     },
     chButton: {
       width: isTablet(size.width, size.height) ? hp('48') : wp('38'),
@@ -261,6 +271,16 @@ function generateChallengeStyles(size: any) {
       borderWidth: 1,
       marginBottom: 10,
       paddingHorizontal: 10,
+    },
+    chPicker: {
+      marginBottom: isTablet(size.width, size.height) ? hp('4') : wp('2'),
+      overflow: 'hidden',
+      height: isTablet(size.width, size.height) ? hp('16') : wp('13'),
+      backgroundColor: '#FFF',
+    },
+    chPickerText: {
+      color: 'white',
+      backgroundColor: GlobalStyles.colors.primary700,
     },
   });
   const styles = JSON.parse(JSON.stringify(chStyles));

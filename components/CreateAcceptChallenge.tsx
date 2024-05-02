@@ -9,7 +9,13 @@ import {
 } from 'react-native';
 import {dbFetch, dbFindOne, dbUpsert} from '../util/dbUtils';
 import React, {useState, useCallback} from 'react';
-import {getMimeType, getUrlFileName, isTablet, setOutline} from '../util/util';
+import {
+  getMimeType,
+  getUrlFileName,
+  isObjectEmpty,
+  isTablet,
+  setOutline,
+} from '../util/util';
 import {
   heightPercentageToDP as hp,
   widthPercentageToDP as wp,
@@ -24,6 +30,14 @@ const CreateAcceptChallenge = ({route}) => {
   console.log('[CreateAcceptChallenge]....');
   const {ownerId, nftId, chId, doubloon, name, description, dataTxId} =
     route.params;
+  console.log(`[CreateAcceptChallenge] ownerId: ${ownerId}`);
+  console.log(`[CreateAcceptChallenge] nftId: ${nftId}`);
+  console.log(`[CreateAcceptChallenge] chId: ${chId}`);
+  console.log(`[CreateAcceptChallenge] doubloon: ${doubloon}`);
+  console.log(`[CreateAcceptChallenge] name: ${name}`);
+  console.log(`[CreateAcceptChallenge] description: ${description}`);
+  console.log(`[CreateAcceptChallenge] dataTxId: ${dataTxId}`);
+
   const navigation = useNavigation();
   const chSize = useWindowDimensions();
   const styles = generateChallengeStyles(chSize);
@@ -66,7 +80,7 @@ const CreateAcceptChallenge = ({route}) => {
           handleErrorCallback,
         );
         console.log(
-          `versioned image: ${JSON.stringify(versionedImage, null, 2)}`,
+          `versioned image: ${JSON.stringify(versionedImage.data, null, 2)}`,
         );
         const vFilename = getUrlFileName(versionedImage.data);
         const mimeType = getMimeType(vFilename);
@@ -100,6 +114,36 @@ const CreateAcceptChallenge = ({route}) => {
     console.log('[CreateAcceptChallenge][handleSubmit]....');
     try {
       console.log('[CreateAcceptChallenge] generate NFT Version....');
+      //check for existing user challenge first
+      const userChallengeFind = {
+        collection: 'user_challenges',
+        conditions: {
+          dataTxId: dataTxId,
+        },
+      };
+      const existingUserChallenge = await dbFindOne({
+        endPoint: 'find_one',
+        conditions: userChallengeFind,
+        setError: handleErrorCallback,
+      });
+      console.log(
+        `\n====\n[CreateChallenge] EXISTING User challenge: ${JSON.stringify(
+          existingUserChallenge,
+          null,
+          2,
+        )}\n====\n`,
+      );
+
+      if (existingUserChallenge && !isObjectEmpty(existingUserChallenge.data)) {
+        console.log(
+          `\n----\n[CreateChallenge] EXISTING User challenge DATA CH ID??? ${JSON.stringify(
+            existingUserChallenge.data.chId,
+          )}\n----\n`,
+        );
+        handleErrorCallback('Challenge already accepted.');
+        setShowActivity(false);
+        return;
+      }
       setShowModal(true);
       setShowActivity(true);
       setMessage(`Generating challenge "${name}"`);
@@ -146,6 +190,7 @@ const CreateAcceptChallenge = ({route}) => {
         description,
         dataTxId,
       );
+
       console.log(
         `[CreateUserChallenge] new User Challenge: ${JSON.stringify(
           userChallenge,
@@ -166,6 +211,7 @@ const CreateAcceptChallenge = ({route}) => {
           chId: chId,
         },
       };
+      console.log('[CreateAcceptChallenge] find original Challenge....');
       const challenge = await dbFindOne({
         endPoint: 'find_one',
         conditions: challengeFind,
@@ -177,19 +223,27 @@ const CreateAcceptChallenge = ({route}) => {
         );
       }
       //const updatedChallenge = insertChallengeUser(challenge.data, ownerId);
+      console.log(
+        '[CreateAcceptChallenge] add user to Original Challenge User list....',
+      );
       challenge.data.users.push(ownerId);
       console.log(
         `[CreateAcceptChallenge] updatedChallenge: ${JSON.stringify(
           challenge,
+          null,
+          2,
         )}`,
       );
+
       await dbUpsert({
         endPoint: 'upsert_challenge',
         conditions: challenge.data,
         callback: handleErrorCallback,
       });
 
-      console.log('[CreateAcceptChallenge] all finished, show modal....');
+      console.log(
+        '[CreateAcceptChallenge] user added to Original Challenge User list....\n-------\n',
+      );
       setShowModal(true);
       setShowActivity(false);
       setMessage(`New User Challenge "${name}" created!`);
@@ -217,7 +271,7 @@ const CreateAcceptChallenge = ({route}) => {
       </TouchableOpacity>
       <View style={styles.uchTextContainer}>
         <Text style={styles.uchTextTitle}>{name}</Text>
-        <Text>{description}</Text>
+        <Text style={styles.uchText}>{description}</Text>
       </View>
       <View style={styles.uchImgButtonGroup}>
         <View style={styles.uchChButton}>
@@ -322,6 +376,7 @@ function generateChallengeStyles(size: any) {
       fontWeight: 'bold',
       fontSize: isTablet(size.width, size.height) ? hp('7') : wp('5'),
       margin: isTablet(size.width, size.height) ? hp('4') : wp('3'),
+      color: 'white',
     },
     uchTextContainer: {
       alignItems: 'center',

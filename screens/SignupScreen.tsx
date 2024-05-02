@@ -1,5 +1,5 @@
 import React, {useState, useEffect, useCallback} from 'react';
-import {View, StyleSheet, Text} from 'react-native';
+import {View, StyleSheet} from 'react-native';
 import {useWindowDimensions} from 'react-native';
 import {dbFetch} from '../util/dbUtils';
 import {getUrlFileName, isEmpty, isObjectEmpty, setOutline} from '../util/util';
@@ -78,12 +78,9 @@ function SignupScreen() {
         if (foundChallenges.data) {
           const updatedBucketArray = [];
           foundChallenges.data.forEach(challenge => {
-            const oneDayInMilliseconds = 24 * 60 * 60 * 1000;
-            const yesterdayTimestamp = Date.now() - oneDayInMilliseconds;
-            if (
-              !isEmpty(challenge.description) &&
-              challenge.date > yesterdayTimestamp
-            ) {
+            //const oneDayInMilliseconds = 24 * 60 * 60 * 1000;
+            //const yesterdayTimestamp = Date.now() - oneDayInMilliseconds;
+            if (!isEmpty(challenge.description)) {
               const doubFilename = getUrlFileName(challenge.doubloon);
               const httpDoubloon = `${Config.NODEJS_EXPRESS_SERVER}/image/${doubFilename}`;
 
@@ -97,7 +94,11 @@ function SignupScreen() {
                 chId: challenge.chId,
                 description: challenge.description,
                 date: challenge.date,
+                dataTxId: challenge.dataTxId,
               };
+              console.log(
+                `[SignupScreen] pushing item: ${JSON.stringify(item)}`,
+              );
               updatedBucketArray.push(item);
             }
           });

@@ -14,7 +14,7 @@ import GlobalStyles from '../../constants/GlobalStyles';
 import CreateAcceptChallenge from '../CreateAcceptChallenge';
 import CreateChallenge from '../CreateChallenge';
 import SignupScreen from '../../screens/SignupScreen';
-import UserScreen from '../../screens/UserScreen';
+import NFTScreen from '../../screens/NFTScreen';
 import LoginScreen from '../../screens/LoginScreen';
 import ImageDetail from '../../screens/ImageDetail';
 import NftMinter from '../NftMinter';
@@ -109,8 +109,8 @@ function TabsNavigator() {
         }}
       />
       <BottomTabs.Screen
-        name="UserScreen"
-        component={UserScreen}
+        name="NFTScreen"
+        component={NFTScreen}
         options={{
           title: 'Toqyn',
           tabBarLabel: 'NFTs',
