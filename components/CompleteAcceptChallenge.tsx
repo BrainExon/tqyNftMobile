@@ -31,7 +31,7 @@ import PromptModal from './ui/PromptModal';
 
 const CompleteAcceptChallenge = ({route}) => {
   console.log('[CompleteAcceptChallenge]....');
-  const {userId, nftId, chId, doubloon, name, description, status} =
+  const {userId, nftId, chId, doubloon, name, description, status, dataTxId} =
     route.params;
   console.log(`\n----\n[CompleteAcceptChallenge] userId: ${userId}`);
   console.log(`[CompleteAcceptChallenge] nftId: ${nftId}`);
@@ -39,7 +39,8 @@ const CompleteAcceptChallenge = ({route}) => {
   console.log(`[CompleteAcceptChallenge] doubloon: ${doubloon}`);
   console.log(`[CompleteAcceptChallenge] name: ${name}`);
   console.log(`[CompleteAcceptChallenge] description: ${description}`);
-  console.log(`[CompleteAcceptChallenge] STATUS: ${status}\n----\n`);
+  console.log(`[CompleteAcceptChallenge] STATUS: ${status}`);
+  console.log(`[CompleteAcceptChallenge] dataTxId: ${dataTxId}\n----\n`);
   const navigation = useNavigation();
   const chSize = useWindowDimensions();
   const styles = generateChallengeStyles(chSize);
@@ -108,12 +109,12 @@ const CompleteAcceptChallenge = ({route}) => {
     <View style={styles.compUchContainer}>
       <TouchableOpacity onPress={() => handleUserChPress()}>
         <View style={styles.compUchImgContainer}>
-          <Image source={{uri: doubloon}} style={styles.uchImgImage} />
+          <Image source={{uri: doubloon}} style={styles.cacImgImage} />
         </View>
       </TouchableOpacity>
-      <View style={styles.compUchTextContainer}>
-        <Text style={styles.uchTextTitle}>{name}</Text>
-        <Text>{description}</Text>
+      <View style={styles.cacTextContainer}>
+        <Text style={styles.cacTextTitle}>{name}</Text>
+        <Text style={styles.cacText}>{description}</Text>
         <Text>{status}</Text>
       </View>
       <View style={styles.compUchImgButtonGrp}>
@@ -167,7 +168,7 @@ function generateChallengeStyles(size: any) {
       borderWidth: isTablet(size.width, size.height) ? hp('2') : wp('1'),
       borderRadius: isTablet(size.width, size.height) ? hp('12') : wp('6'),
     },
-    uchText: {
+    cacText: {
       fontSize: isTablet(size.width, size.height) ? hp('2') : wp('4'),
       lineHeight: isTablet(size.width, size.height) ? hp('2') : wp('7'),
       flexDirection: 'row',
@@ -175,7 +176,7 @@ function generateChallengeStyles(size: any) {
       color: 'white',
       textAlign: 'center',
     },
-    uchButton: {
+    cacButton: {
       width: isTablet(size.width, size.height) ? hp('48') : wp('38'),
       backgroundColor: 'rgba(200, 200, 200, 0.75)',
       borderStyle: 'solid',
@@ -184,19 +185,19 @@ function generateChallengeStyles(size: any) {
       borderWidth: isTablet(size.width, size.height) ? hp('2') : wp('1'),
       borderRadius: isTablet(size.width, size.height) ? hp('6') : wp('3'),
     },
-    uchButtonText: {
+    cacButtonText: {
       color: 'black',
       fontSize: isTablet(size.width, size.height) ? hp('6') : wp('4'),
       textAlign: 'center',
     },
-    uchInput: {
+    cacInput: {
       height: 40,
       borderColor: 'gray',
       borderWidth: 1,
       marginBottom: 10,
       paddingHorizontal: 10,
     },
-    uchInputDesc: {
+    cacInputDesc: {
       borderColor: 'gray',
       borderWidth: 1,
       marginBottom: 10,
@@ -207,7 +208,7 @@ function generateChallengeStyles(size: any) {
       alignItems: 'center',
       paddingVertical: isTablet(size.width, size.height) ? hp('2') : wp('2'),
     },
-    uchImgImage: {
+    cacImgImage: {
       width: 200,
       height: 200,
       resizeMode: 'cover',
@@ -237,23 +238,24 @@ function generateChallengeStyles(size: any) {
       paddingHorizontal: isTablet(size.width, size.height) ? hp('2') : wp('2'),
       marginHorizontal: isTablet(size.width, size.height) ? hp('2') : wp('2'),
     },
-    uchModalImage: {
+    cacModalImage: {
       width: isTablet(size.width, size.height) ? hp('80') : wp('60'),
       height: isTablet(size.width, size.height) ? hp('80') : wp('60'),
       marginBottom: isTablet(size.width, size.height) ? hp('20') : wp('35'),
       backgroundColor: 'transparent',
     },
-    uchTextTitle: {
+    cacTextTitle: {
       fontWeight: 'bold',
       fontSize: isTablet(size.width, size.height) ? hp('7') : wp('5'),
       margin: isTablet(size.width, size.height) ? hp('4') : wp('3'),
+      color: 'white',
     },
-    compUchTextContainer: {
+    cacTextContainer: {
       alignItems: 'center',
       margin: isTablet(size.width, size.height) ? hp('4') : wp('2'),
       padding: isTablet(size.width, size.height) ? hp('8') : wp('4'),
     },
-    uchCenteredView: {
+    cacCenteredView: {
       flex: 1,
       justifyContent: 'center',
       alignItems: 'center',

@@ -45,6 +45,7 @@ const generateChListStyles = (size: any) => {
     chListText: {
       flexWrap: 'wrap',
       marginBottom: 5,
+      color: 'white',
     },
   });
   const styles = JSON.parse(JSON.stringify(chListStyles));
@@ -78,7 +79,9 @@ const ChallengesList = ({items}) => {
   };
 
   const renderItem = ({item}) => {
-    //console.log(`item: ${JSON.stringify(item, null, 2)}`);
+    console.log('\n=====\n');
+    console.log(`[ChallengeList] item: ${JSON.stringify(item, null, 2)}`);
+    console.log('\n=====\n');
     const date = formatDate(item.date);
     const cat = isEmpty(item.category) ? 'default' : item.category;
     return (

@@ -47,6 +47,7 @@ const generateChListStyles = (size: any) => {
       fontSize: 16,
       marginBottom: 5,
       textAlign: 'left',
+      color: 'white',
     },
     mask: {
       position: 'absolute',
@@ -70,6 +71,9 @@ const generateChListStyles = (size: any) => {
   return styles;
 };
 const UserAcceptChallengeList = ({items}) => {
+  console.log(
+    `[UserAcceptChallengeList] Items List: ${JSON.stringify(items, null, 2)}`,
+  );
   const userState = useSelector(getUserState);
   const chListSize = useWindowDimensions();
   const styles = generateChListStyles(chListSize);
@@ -104,6 +108,7 @@ const UserAcceptChallengeList = ({items}) => {
       name: item.name,
       description: item.description,
       status: item.status,
+      dataTxId: item.dataTxId,
     });
   };
 
@@ -120,8 +125,7 @@ const UserAcceptChallengeList = ({items}) => {
         <View style={styles.textContainer}>
           <Text style={styles.uacListText}>Challenge: "{item.name}"</Text>
           <Text style={styles.uacListText}>
-            {' '}
-            Description: "{item.description}"{' '}
+            Description: "{item.description}"
           </Text>
           <Text style={styles.uacListText}>Date: {date}</Text>
           <Text style={styles.uacListText}>Status: "{item.status}"</Text>

@@ -71,17 +71,14 @@ function ChallengeScreen() {
         if (foundChallenges.data) {
           const updatedBucketArray = [];
           foundChallenges.data.forEach(challenge => {
-            // seconds in a day
-            const oneDayInMilliseconds = 24 * 60 * 60 * 1000;
-            const yesterdayTimestamp = Date.now() - oneDayInMilliseconds;
-            //console.log(`[ChallengeScreen] Challenge Date: ${challenge.date}`);
-            //console.log(
-            //`[ChallengeScreen] yesterdayTimestamp: ${yesterdayTimestamp}`,
-            //);
-            if (
-              challenge.doubloon.startsWith('http') &&
-              challenge.date > yesterdayTimestamp
-            ) {
+            console.log(
+              `[ChallengeScreen] Challenge: ${JSON.stringify(
+                challenge,
+                null,
+                2,
+              )}`,
+            );
+            if (challenge) {
               const item = {
                 _id: challenge._id,
                 name: challenge.name,

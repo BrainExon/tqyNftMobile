@@ -30,8 +30,8 @@ const generateItemStyles = (size: any) => {
   return styles;
 };
 
-function UserScreen() {
-  console.log('[UserScreen]');
+function NFTScreen() {
+  console.log('[NFTScreen]');
   const navigation = useNavigation();
   const userSize = useWindowDimensions();
   const styles = generateItemStyles(userSize);
@@ -58,7 +58,7 @@ function UserScreen() {
     const fetchData = async () => {
       try {
         const foundNfts = await dbFetch({endPoint: 'get_nfts'});
-        //console.log(`[UserScreen] NFT date: ${foundNfts.date}`);
+        //console.log(`[NFTScreen] NFT date: ${foundNfts.date}`);
 
         if (foundNfts.data) {
           const updatedBucketArray = [];
@@ -125,4 +125,4 @@ function UserScreen() {
   );
 }
 
-export default UserScreen;
+export default NFTScreen;

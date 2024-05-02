@@ -25,7 +25,7 @@ export async function dbFindOne({endPoint, conditions, setError}) {
     );
     console.log('\n--------\n');
     if (response.status === 200) {
-      console.log('[dbFindOne] Data retrieved successfully:', response.data);
+      //console.log('[dbFindOne] Data retrieved successfully:', response.data);
       return response.data;
     } else {
       const er = `[dbFindOne] Error retrieving data: ${JSON.stringify(
@@ -65,6 +65,8 @@ export async function dbUpsert({endPoint, conditions, callback}) {
     console.log(
       `[dbUpsert] end point "${endPoint}" response: ${JSON.stringify(
         response,
+        null,
+        2,
       )}`,
     );
     console.log(`[dbUpsert] response.ok: ${JSON.stringify(response.ok)}`);
