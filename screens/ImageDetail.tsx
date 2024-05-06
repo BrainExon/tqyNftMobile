@@ -23,7 +23,7 @@ const ImageDetail = ({route}) => {
   const styles = generateDetailStyles(boardSize);
   const navigation = useNavigation();
   const handleImagePress = () => {
-    navigation.navigate('NFTScreen');
+    navigation.navigate('NftScreen');
   };
   //const chainUrl = ;
   //setExplorerUrl(chainUrl);
