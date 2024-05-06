@@ -22,16 +22,9 @@ import {Header} from '../Header';
 import {useSelector} from 'react-redux';
 import {getUserState} from '../../redux/userSlice';
 const BottomTabs = createBottomTabNavigator();
-const setTabBarVisible = name => {
-  switch (name) {
-    case 'GameBoardScreen':
-      return 'none';
-    case 'GameCategoryScreen':
-      return 'none';
-    case 'GameQuizScreen':
-      return 'none';
-    default:
-      return 'flex';
+const setTabBarVisible = (name, role) => {
+  if (!role) {
+    return 'none';
   }
 };
 
@@ -71,7 +64,7 @@ function TabsNavigator() {
             borderRightWidth: 2,
             borderRightColor: GlobalStyles.colors.primary400,
             backgroundColor: 'rgba(0, 0, 0, 0.9)',
-            display: setTabBarVisible(route?.name),
+            display: setTabBarVisible(route?.name, userState.role),
             paddingTop: isTablet(screenSize.width, screenSize.height)
               ? hp('1')
               : wp('2'),
@@ -136,7 +129,7 @@ function TabsNavigator() {
           }}
         />
       )}
-      {userState.role === 'user' && (
+      {userState.role !== 'creator' && (
         <BottomTabs.Screen
           name="SignupScreen"
           component={SignupScreen}

@@ -71,9 +71,9 @@ const generateChListStyles = (size: any) => {
   return styles;
 };
 const UserAcceptChallengeList = ({items}) => {
-  console.log(
+  /*console.log(
     `[UserAcceptChallengeList] Items List: ${JSON.stringify(items, null, 2)}`,
-  );
+  );*/
   const userState = useSelector(getUserState);
   const chListSize = useWindowDimensions();
   const styles = generateChListStyles(chListSize);
@@ -87,7 +87,7 @@ const UserAcceptChallengeList = ({items}) => {
   const [imageSource, setImageSource] = useState('');
   const [error, setError] = useState('');
 
-  console.log(`USER CH LIST: userstate userId ${userState.userId}`);
+  //console.log(`USER CH LIST: userstate userId ${userState.userId}`);
 
   const handleOnAccept = () => {
     setShowPrompt(false);
@@ -114,7 +114,7 @@ const UserAcceptChallengeList = ({items}) => {
 
   const renderItem = ({item}) => {
     const date = formatDate(item.date);
-    console.log(`[accept list] item: ${JSON.stringify(item, null, 2)}`);
+    //console.log(`[accept list] item: ${JSON.stringify(item, null, 2)}`);
 
     return (
       <View style={styles.uacListItem}>
