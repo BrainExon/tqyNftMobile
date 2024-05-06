@@ -47,7 +47,7 @@ const CreateChallenge = ({route}) => {
   };
   const handleButtonClose = () => {
     setShowModal(false);
-    navigation.navigate('NFTScreen');
+    navigation.navigate('NftScreen');
   };
 
   useEffect(() => {

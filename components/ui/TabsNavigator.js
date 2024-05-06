@@ -14,11 +14,13 @@ import GlobalStyles from '../../constants/GlobalStyles';
 import CreateAcceptChallenge from '../CreateAcceptChallenge';
 import CreateChallenge from '../CreateChallenge';
 import SignupScreen from '../../screens/SignupScreen';
-import NFTScreen from '../../screens/NFTScreen';
+import NftScreen from '../../screens/NftScreen';
 import LoginScreen from '../../screens/LoginScreen';
 import ImageDetail from '../../screens/ImageDetail';
 import NftMinter from '../NftMinter';
 import {Header} from '../Header';
+import {useSelector} from 'react-redux';
+import {getUserState} from '../../redux/userSlice';
 const BottomTabs = createBottomTabNavigator();
 const setTabBarVisible = name => {
   switch (name) {
@@ -34,10 +36,13 @@ const setTabBarVisible = name => {
 };
 
 function TabsNavigator() {
+  const userState = useSelector(getUserState);
+  console.log(`[TabsNavigator] user role: ${userState.role}`);
   const screenSize = useWindowDimensions();
   return (
     <BottomTabs.Navigator
       screenOptions={({route}) => {
+        console.log(`[TabsNavigator] route: ${JSON.stringify(route.name)}`);
         const options = {
           headerStyle: {
             backgroundColor: 'rgba(0, 0, 0, 0.9)',
@@ -108,47 +113,51 @@ function TabsNavigator() {
           ),
         }}
       />
-      <BottomTabs.Screen
-        name="NFTScreen"
-        component={NFTScreen}
-        options={{
-          title: 'Toqyn',
-          tabBarLabel: 'NFTs',
-          headerShown: true,
-          // eslint-disable-next-line react/no-unstable-nested-components
-          tabBarIcon: ({color, size}) => (
-            <Icon
-              color={color}
-              size={
-                isTablet(screenSize.width, screenSize.height)
-                  ? hp('3')
-                  : wp('5')
-              }
-              name="home"
-            />
-          ),
-        }}
-      />
-      <BottomTabs.Screen
-        name="SignupScreen"
-        component={SignupScreen}
-        options={{
-          title: 'Toqyn',
-          tabBarLabel: 'Signup',
-          headerShown: true, // Hide the header for this screen
-          tabBarIcon: ({color, size}) => (
-            <Icon
-              color={color}
-              size={
-                isTablet(screenSize.width, screenSize.height)
-                  ? hp('3')
-                  : wp('5')
-              }
-              name="trophy"
-            />
-          ),
-        }}
-      />
+      {userState.role === 'creator' && (
+        <BottomTabs.Screen
+          name="NftScreen"
+          component={NftScreen}
+          options={{
+            title: 'Toqyn',
+            tabBarLabel: 'NFTs',
+            headerShown: true,
+            // eslint-disable-next-line react/no-unstable-nested-components
+            tabBarIcon: ({color, size}) => (
+              <Icon
+                color={color}
+                size={
+                  isTablet(screenSize.width, screenSize.height)
+                    ? hp('3')
+                    : wp('5')
+                }
+                name="home"
+              />
+            ),
+          }}
+        />
+      )}
+      {userState.role === 'user' && (
+        <BottomTabs.Screen
+          name="SignupScreen"
+          component={SignupScreen}
+          options={{
+            title: 'Toqyn',
+            tabBarLabel: 'Signup',
+            headerShown: true, // Hide the header for this screen
+            tabBarIcon: ({color, size}) => (
+              <Icon
+                color={color}
+                size={
+                  isTablet(screenSize.width, screenSize.height)
+                    ? hp('3')
+                    : wp('5')
+                }
+                name="trophy"
+              />
+            ),
+          }}
+        />
+      )}
       <BottomTabs.Screen
         name="ChallengeScreen"
         component={ChallengeScreen}
@@ -169,26 +178,28 @@ function TabsNavigator() {
           ),
         }}
       />
-      <BottomTabs.Screen
-        name="NftMinter"
-        component={NftMinter}
-        options={{
-          title: 'Toqyn',
-          tabBarLabel: 'Mint',
-          headerShown: false, // Hide the header for this screen
-          tabBarIcon: ({color, size}) => (
-            <Icon
-              color={color}
-              size={
-                isTablet(screenSize.width, screenSize.height)
-                  ? hp('3')
-                  : wp('5')
-              }
-              name="bitcoin"
-            />
-          ),
-        }}
-      />
+      {userState.role === 'creator' && (
+        <BottomTabs.Screen
+          name="NftMinter"
+          component={NftMinter}
+          options={{
+            title: 'Toqyn',
+            tabBarLabel: 'Mint',
+            headerShown: false, // Hide the header for this screen
+            tabBarIcon: ({color, size}) => (
+              <Icon
+                color={color}
+                size={
+                  isTablet(screenSize.width, screenSize.height)
+                    ? hp('3')
+                    : wp('5')
+                }
+                name="bitcoin"
+              />
+            ),
+          }}
+        />
+      )}
       <BottomTabs.Screen
         name="ImageDetail"
         component={ImageDetail}

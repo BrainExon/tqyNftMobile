@@ -30,8 +30,8 @@ const generateItemStyles = (size: any) => {
   return styles;
 };
 
-function NFTScreen() {
-  console.log('[NFTScreen]');
+function NftScreen() {
+  console.log('[NftScreen]');
   const navigation = useNavigation();
   const userSize = useWindowDimensions();
   const styles = generateItemStyles(userSize);
@@ -58,20 +58,16 @@ function NFTScreen() {
     const fetchData = async () => {
       try {
         const foundNfts = await dbFetch({endPoint: 'get_nfts'});
-        //console.log(`[NFTScreen] NFT date: ${foundNfts.date}`);
+        //console.log(`[NftScreen] NFT date: ${foundNfts.date}`);
 
         if (foundNfts.data) {
           const updatedBucketArray = [];
           foundNfts.data.forEach(nft => {
             const nftId = nft.nftId;
-            const oneDayInMilliseconds = 24 * 60 * 60 * 1000;
-            const yesterdayTimestamp = Date.now() - oneDayInMilliseconds;
+            //const oneDayInMilliseconds = 168 * 60 * 60 * 1000;
+            //const yesterdayTimestamp = Date.now() - oneDayInMilliseconds;
 
-            if (
-              Config.SORT_BY_YESTERDAY &&
-              nft.date &&
-              nft.date > yesterdayTimestamp
-            ) {
+            if (Config.SORT_BY_YESTERDAY) {
               nft.created.forEach(createdItem => {
                 if (createdItem.sourceUri) {
                   const uri = createdItem.sourceUri;
@@ -92,7 +88,7 @@ function NFTScreen() {
           setNfts(updatedBucketArray);
         }
       } catch (err) {
-        handleErrorCallback(`[NFTScreen] Error fetching NFTs: ${err}`);
+        handleErrorCallback(`[NftScreen] Error fetching NFTs: ${err}`);
         return;
       }
     };
@@ -127,4 +123,4 @@ function NFTScreen() {
   );
 }
 
-export default NFTScreen;
+export default NftScreen;

@@ -13,7 +13,7 @@ import {
 import {isTablet, setOutline} from '../util/util';
 import {useNavigation} from '@react-navigation/native';
 import {useDispatch} from 'react-redux';
-import {setUser} from '../redux/userSlice';
+import {getUserState, setUser} from '../redux/userSlice';
 
 function LoginScreen() {
   const dispatch = useDispatch();
@@ -45,7 +45,10 @@ function LoginScreen() {
           userId: userAccount.userId,
         }),
       );
-      navigation.navigate('NFTScreen');
+      console.log(`[LoginScreen] userAccount role: "${userAccount.role}"`);
+      const navScreen =
+        userAccount.role === 'creator' ? 'ChallengeScreen' : 'SignupScreen';
+      navigation.navigate(navScreen);
     }
     setShowModal(false);
   };
@@ -61,7 +64,8 @@ function LoginScreen() {
       const search = {
         collection: 'users',
         conditions: {
-          phone: '7702896960',
+          //phone: '7702896960',
+          phone: cleanPhoneNumber,
         },
       };
       const response = await dbFindOne({
@@ -69,8 +73,15 @@ function LoginScreen() {
         conditions: search,
         setError: handleErrorCallback,
       });
+      console.log(
+        `[Loginscreen] find user response: ${JSON.stringify(
+          response,
+          null,
+          2,
+        )} `,
+      );
       setUserAccount(response.data ?? '');
-      if (!response.data) {
+      if (!response.data.userId) {
         const userId = uuidv4();
         const cleanPhoneNumber = phoneNumber.replace(/\D/g, '');
         const newUser = new User(

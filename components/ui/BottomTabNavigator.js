@@ -1,6 +1,6 @@
 import React from 'react';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
-import NFTScreen from '../../screens/NFTScreen';
+import NftScreen from '../../screens/NftScreen';
 import CreateChallenge from '../CreateChallenge';
 import SignupScreen from '../../screens/SignupScreen';
 import BottomTabIcon from './BottomTabIcon';
@@ -19,7 +19,7 @@ const BottomTabNavigator = () => {
   return (
     <Tab.Navigator screenOptions={screenOptions}>
       <Tab.Screen name="LoginScreen" component={LoginScreen} />
-      <Tab.Screen name="UserScreen" component={NFTScreen} />
+      <Tab.Screen name="UserScreen" component={NftScreen} />
       <Tab.Screen name="ChallengeScreen" component={CreateChallenge} />
       <Tab.Screen name="SignupScreen" component={SignupScreen} />
     </Tab.Navigator>
