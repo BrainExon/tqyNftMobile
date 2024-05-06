@@ -2,6 +2,7 @@ import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {ImageBackground, useColorScheme} from 'react-native';
 import {clusterApiUrl} from '@solana/web3.js';
+import SignupScreen from './screens/SignupScreen';
 import LoginScreen from './screens/LoginScreen';
 import React from 'react';
 import {SafeAreaView, StyleSheet} from 'react-native';
@@ -109,6 +110,11 @@ export default function App() {
                 <Stack.Screen
                   name="Login Screen"
                   component={LoginScreen}
+                  options={{headerShown: false}}
+                />
+                <Stack.Screen
+                  name="SignupScreen"
+                  component={SignupScreen}
                   options={{headerShown: false}}
                 />
               </Stack.Navigator>
