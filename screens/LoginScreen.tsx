@@ -1,6 +1,6 @@
 import {TextInput, View, StyleSheet, useWindowDimensions} from 'react-native';
 import Config from 'react-native-config';
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import TransparentButton from '../components/ui/TransParentButton';
 import UserModal from '../components/ui/UserModal';
 import {v4 as uuidv4} from 'uuid';
@@ -10,7 +10,7 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
-import {isTablet, setOutline} from '../util/util';
+import {isEmpty, isTablet, setOutline} from '../util/util';
 import {useNavigation} from '@react-navigation/native';
 import {useDispatch} from 'react-redux';
 import {getUserState, setUser} from '../redux/userSlice';
@@ -23,8 +23,10 @@ function LoginScreen() {
   const [phone, setPhone] = useState('(770) 289-6960');
   const [error, setError] = useState('');
   const [showModal, setShowModal] = useState(false);
+  const [message, setMessage] = useState('');
   const [userAccount, setUserAccount] = useState('');
 
+  console.log(`[LoginScreen] user State: ${(userAccount, null, 2)}`);
   const handleErrorCallback = (errMsg: any) => {
     setError(`[Login] Error:  ${JSON.stringify(errMsg)}`);
     return;
@@ -45,14 +47,39 @@ function LoginScreen() {
           userId: userAccount.userId,
         }),
       );
+      console.log(
+        `\n====\n[LoginScreen] userAccount: "${JSON.stringify(
+          userAccount,
+        )}"\n====\n`,
+      );
+      /*
+      const user = userAccount[0];
+      console.log(
+        `\n====\n[LoginScreen] user: "${JSON.stringify(user)}"\n====\n`,
+      );
+      */
       console.log(`[LoginScreen] userAccount role: "${userAccount.role}"`);
       const navScreen =
-        userAccount.role === 'creator' ? 'ChallengeScreen' : 'SignupScreen';
+        userAccount.role === 'creator' ? 'ChallengeScreen' : 'ChallengeScreen';
+      console.log(
+        `\n----\n[LoginScreen] navigate page: "${navScreen}\n-----\n"`,
+      );
       navigation.navigate(navScreen);
+      //navigation.navigate('SignupScreen');
     }
     setShowModal(false);
   };
   // see if we have a user, if not create one...
+  /*
+  useEffect(() => {
+    if (!isEmpty(userAccount.role)) {
+      setMessage('welcome');
+      setShowModal(true);
+      return;
+    }
+  });
+
+   */
   const handlePress = async phoneNumber => {
     const cleanPhoneNumber = phoneNumber.replace(/\D/g, '');
     console.log(`[handlePress] cleanPhoneNumber: ${cleanPhoneNumber}`);
@@ -108,6 +135,7 @@ function LoginScreen() {
         setUserAccount(queryResult.data ?? '');
       }
       dispatch(setUser({phone: userAccount.phone, role: userAccount.role}));
+      setMessage('Logged in Successfully!');
       setShowModal(true);
     } catch (e) {
       setError(Config.LOGIN_ERROR?.replace('${APP_NAME}', Config.APP_NAME));
@@ -142,7 +170,7 @@ function LoginScreen() {
       {showModal && (
         <UserModal
           visible={showModal}
-          message={'Login success!'}
+          message={message}
           error={error}
           onClose={handleButtonClose}
           showActivity={false}

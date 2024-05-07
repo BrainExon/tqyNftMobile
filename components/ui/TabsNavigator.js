@@ -9,7 +9,7 @@ import {
 import CompleteAcceptChallenge from '../CompleteAcceptChallenge';
 import ChallengeScreen from '../../screens/ChallengeScreen';
 import {useWindowDimensions} from 'react-native';
-import {isTablet} from '../../util/util';
+import {isEmpty, isTablet} from '../../util/util';
 import GlobalStyles from '../../constants/GlobalStyles';
 import CreateAcceptChallenge from '../CreateAcceptChallenge';
 import CreateChallenge from '../CreateChallenge';
@@ -24,7 +24,7 @@ import {getUserState} from '../../redux/userSlice';
 const BottomTabs = createBottomTabNavigator();
 const setTabBarVisible = (name, role) => {
   if (!role) {
-    return 'none';
+    // return 'none';
   }
 };
 
@@ -35,7 +35,6 @@ function TabsNavigator() {
   return (
     <BottomTabs.Navigator
       screenOptions={({route}) => {
-        console.log(`[TabsNavigator] route: ${JSON.stringify(route.name)}`);
         const options = {
           headerStyle: {
             backgroundColor: 'rgba(0, 0, 0, 0.9)',
@@ -106,29 +105,6 @@ function TabsNavigator() {
           ),
         }}
       />
-      {userState.role === 'creator' && (
-        <BottomTabs.Screen
-          name="NftScreen"
-          component={NftScreen}
-          options={{
-            title: 'Toqyn',
-            tabBarLabel: 'NFTs',
-            headerShown: true,
-            // eslint-disable-next-line react/no-unstable-nested-components
-            tabBarIcon: ({color, size}) => (
-              <Icon
-                color={color}
-                size={
-                  isTablet(screenSize.width, screenSize.height)
-                    ? hp('3')
-                    : wp('5')
-                }
-                name="home"
-              />
-            ),
-          }}
-        />
-      )}
       {userState.role !== 'creator' && (
         <BottomTabs.Screen
           name="SignupScreen"
@@ -171,6 +147,29 @@ function TabsNavigator() {
           ),
         }}
       />
+      {userState.role === 'creator' && (
+        <BottomTabs.Screen
+          name="NftScreen"
+          component={NftScreen}
+          options={{
+            title: 'Toqyn',
+            tabBarLabel: 'NFTs',
+            headerShown: true,
+            // eslint-disable-next-line react/no-unstable-nested-components
+            tabBarIcon: ({color, size}) => (
+              <Icon
+                color={color}
+                size={
+                  isTablet(screenSize.width, screenSize.height)
+                    ? hp('3')
+                    : wp('5')
+                }
+                name="home"
+              />
+            ),
+          }}
+        />
+      )}
       {userState.role === 'creator' && (
         <BottomTabs.Screen
           name="NftMinter"

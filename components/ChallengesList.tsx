@@ -8,6 +8,7 @@ import {
   StyleSheet,
   useWindowDimensions,
 } from 'react-native';
+import EditChallenge from './EditChallenge';
 import {formatDate, isEmpty, isTablet, setOutline} from '../util/util';
 import {
   heightPercentageToDP as hp,
@@ -61,32 +62,44 @@ const generateChListStyles = (size: any) => {
   return styles;
 };
 const ChallengesList = ({items}) => {
+  console.log('\n------\n');
+  console.log('[ChallengeList]');
+  console.log('\n------\n');
   const userState = useSelector(getUserState);
   const chListSize = useWindowDimensions();
   const styles = generateChListStyles(chListSize);
   const navigation = useNavigation();
 
-  const handleChallengeItem = item => {
-    navigation.navigate('CreateAcceptChallenge', {
-      ownerId: userState.userId,
-      nftId: item.nft,
-      chId: item.chId,
-      doubloon: item.doubloon,
-      name: item.name,
-      description: item.description,
-      dataTxId: item.dataTxId,
-    });
+  const handleChallengeItem = (item, role) => {
+    console.log(`[ChallengeList] ROLE: ${JSON.stringify(role, null, 2)}`);
+    if (role === 'creator') {
+      console.log(`[ChallengeList] ROLE: ${JSON.stringify(role, null, 2)}`);
+      navigation.navigate('EditChallenge', {
+        challengeId: item.chId,
+      });
+    } else {
+      navigation.navigate('CreateAcceptChallenge', {
+        ownerId: userState.userId,
+        nftId: item.nft,
+        chId: item.chId,
+        doubloon: item.doubloon,
+        name: item.name,
+        description: item.description,
+        dataTxId: item.dataTxId,
+      });
+    }
   };
 
   const renderItem = ({item}) => {
-    console.log('\n=====\n');
-    console.log(`[ChallengeList] item: ${JSON.stringify(item, null, 2)}`);
-    console.log('\n=====\n');
+    //console.log('\n=====\n');
+    //console.log(`[ChallengeList] item: ${JSON.stringify(item, null, 2)}`);
+    //console.log('\n=====\n');
     const date = formatDate(item.date);
     const cat = isEmpty(item.category) ? 'default' : item.category;
     return (
       <View style={styles.chListItem}>
-        <TouchableOpacity onPress={() => handleChallengeItem(item)}>
+        <TouchableOpacity
+          onPress={() => handleChallengeItem(item, userState.role)}>
           <Image source={{uri: item.doubloon}} style={styles.chListImage} />
         </TouchableOpacity>
         <View style={styles.chTextContainerWrapper}>
