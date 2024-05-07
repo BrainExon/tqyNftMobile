@@ -7,6 +7,8 @@ import {useNavigation} from '@react-navigation/native';
 import UserModal from '../components/ui/UserModal';
 import Config from 'react-native-config';
 import UserAcceptChallengeList from '../components/UserAcceptChallengesList';
+import {useSelector} from 'react-redux';
+import {getUserState} from '../redux/userSlice';
 
 const generateItemStyles = (size: any) => {
   const baseItemStyles = StyleSheet.create({
@@ -33,11 +35,15 @@ const generateItemStyles = (size: any) => {
 function SignupScreen() {
   console.log('\n------\n[SignupScreen]\n-----\n');
   const navigation = useNavigation();
+  const userState = useSelector(getUserState);
   const boardSize = useWindowDimensions();
   const styles = generateItemStyles(boardSize);
   const [challenges, setChallenges] = useState([]);
   const [error, setError] = useState('');
   const [showModal, setShowModal] = useState(false);
+  console.log(
+    `[SignupScreen] userState: ${JSON.stringify(userState, null, 2)}`,
+  );
 
   const handleErrorCallback = useCallback((error: any) => {
     if (isObjectEmpty(error) || isEmpty(error)) {

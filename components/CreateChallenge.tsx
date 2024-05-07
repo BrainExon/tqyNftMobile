@@ -50,6 +50,7 @@ const CreateChallenge = ({route}) => {
     navigation.navigate('NftScreen');
   };
 
+  /*
   useEffect(() => {
     const checkUserRole = () => {
       setError('');
@@ -68,7 +69,7 @@ const CreateChallenge = ({route}) => {
     };
     checkUserRole();
   }, [userState.role]);
-
+  */
   const handleValueChange = itemValue => {
     setCategory(itemValue);
   };

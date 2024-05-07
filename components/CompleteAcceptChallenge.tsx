@@ -30,7 +30,6 @@ import {pinNftVersion} from '../ipfs/blockchain';
 import PromptModal from './ui/PromptModal';
 
 const CompleteAcceptChallenge = ({route}) => {
-  console.log('[CompleteAcceptChallenge]....');
   const {userId, nftId, chId, doubloon, name, description, status, dataTxId} =
     route.params;
   console.log(`\n----\n[CompleteAcceptChallenge] userId: ${userId}`);
@@ -123,9 +122,6 @@ const CompleteAcceptChallenge = ({route}) => {
             <Button title="Toqyn It!" onPress={() => handleSubmit()} />
           </View>
         )}
-        <View style={styles.compUchCancel}>
-          <Button title="Cancel" onPress={() => handleUserChPress()} />
-        </View>
       </View>
       {status === 'verified' && (
         <View style={styles.compUchImgButtonGrp}>

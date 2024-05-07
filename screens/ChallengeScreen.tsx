@@ -6,6 +6,8 @@ import {isEmpty, isObjectEmpty, setOutline} from '../util/util';
 import {useNavigation} from '@react-navigation/native';
 import UserModal from '../components/ui/UserModal';
 import ChallengesList from '../components/ChallengesList';
+import {useSelector} from 'react-redux';
+import {getUserState} from '../redux/userSlice';
 
 const generateItemStyles = (size: any) => {
   const baseItemStyles = StyleSheet.create({
@@ -37,6 +39,12 @@ function ChallengeScreen() {
   const [challenges, setChallenges] = useState([]);
   const [error, setError] = useState('');
   const [showModal, setShowModal] = useState(false);
+  const userState = useSelector(getUserState);
+  console.log(
+    `\n------\n[ChallengeScreen] userState: ${JSON.stringify(
+      userState,
+    )}\n-----\n`,
+  );
 
   const handleErrorCallback = useCallback((error: any) => {
     if (isObjectEmpty(error) || isEmpty(error)) {
@@ -48,11 +56,9 @@ function ChallengeScreen() {
     setError(errorMessage);
     setShowModal(true);
   }, []);
-
   const handleModalButtonClose = () => {
     setShowModal(false);
   };
-
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -71,6 +77,7 @@ function ChallengeScreen() {
         if (foundChallenges.data) {
           const updatedBucketArray = [];
           foundChallenges.data.forEach(challenge => {
+            /*
             console.log(
               `[ChallengeScreen] Challenge: ${JSON.stringify(
                 challenge,
@@ -78,6 +85,7 @@ function ChallengeScreen() {
                 2,
               )}`,
             );
+            */
             if (challenge) {
               const item = {
                 _id: challenge._id,
@@ -102,11 +110,9 @@ function ChallengeScreen() {
         return;
       }
     };
-
     const onFocus = navigation.addListener('focus', () => {
       fetchData();
     });
-
     return onFocus;
   }, [navigation]);
   return (

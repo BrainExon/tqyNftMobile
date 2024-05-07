@@ -53,7 +53,7 @@ const CreateAcceptChallenge = ({route}) => {
 
   const handleUserChPress = () => {
     setShowModal(false);
-    navigation.navigate('SignupScreen');
+    navigation.navigate('ChallengeScreen');
   };
 
   const handleButtonClose = () => {
@@ -127,7 +127,7 @@ const CreateAcceptChallenge = ({route}) => {
         setError: handleErrorCallback,
       });
       console.log(
-        `\n====\n[CreateChallenge] EXISTING User challenge: ${JSON.stringify(
+        `\n====\n[CreateAcceptChallenge] EXISTING User challenge: ${JSON.stringify(
           existingUserChallenge,
           null,
           2,
@@ -136,7 +136,7 @@ const CreateAcceptChallenge = ({route}) => {
 
       if (existingUserChallenge && !isObjectEmpty(existingUserChallenge.data)) {
         console.log(
-          `\n----\n[CreateChallenge] EXISTING User challenge DATA CH ID??? ${JSON.stringify(
+          `\n----\n[CreateAcceptChallenge] EXISTING User challenge DATA CH ID??? ${JSON.stringify(
             existingUserChallenge.data.chId,
           )}\n----\n`,
         );

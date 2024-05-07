@@ -19,7 +19,7 @@ import {
   MD3LightTheme,
   adaptNavigationTheme,
 } from 'react-native-paper';
-import {Header} from './components/Header';
+import EditChallenge from './components/EditChallenge';
 import TabsNavigator from './components/ui/TabsNavigator';
 const styles = StyleSheet.create({
   shell: {
@@ -101,7 +101,7 @@ export default function App() {
             ]}
             imageStyle={styles.logo}>
             <NavigationContainer theme={MyTheme}>
-              <Stack.Navigator>
+              <Stack.Navigator initialRouteName="LoginScreen">
                 <Stack.Screen
                   name="TabsNavigator"
                   component={TabsNavigator}
@@ -115,6 +115,11 @@ export default function App() {
                 <Stack.Screen
                   name="SignupScreen"
                   component={SignupScreen}
+                  options={{headerShown: false}}
+                />
+                <Stack.Screen
+                  name="EditChallenge"
+                  component={EditChallenge}
                   options={{headerShown: false}}
                 />
               </Stack.Navigator>
