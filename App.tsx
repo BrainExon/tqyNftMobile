@@ -21,6 +21,7 @@ import {
 } from 'react-native-paper';
 import EditChallenge from './components/EditChallenge';
 import TabsNavigator from './components/ui/TabsNavigator';
+import {Header} from './components/Header';
 const styles = StyleSheet.create({
   shell: {
     height: '100%',
@@ -101,6 +102,7 @@ export default function App() {
             ]}
             imageStyle={styles.logo}>
             <NavigationContainer theme={MyTheme}>
+              <Header />
               <Stack.Navigator initialRouteName="LoginScreen">
                 <Stack.Screen
                   name="TabsNavigator"

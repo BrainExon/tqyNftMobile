@@ -74,6 +74,7 @@ function generateDetailStyles(size: any) {
       flex: 1,
       alignItems: 'center',
       justifyContent: 'center',
+      backgroundColor: 'rgba(0, 0, 0, 0.9)',
     },
     imgContainer: {
       marginBottom: 20,
@@ -124,7 +125,6 @@ function generateDetailStyles(size: any) {
       width: isTablet(size.width, size.height) ? hp('80') : wp('60'),
       height: isTablet(size.width, size.height) ? hp('80') : wp('60'),
       marginBottom: isTablet(size.width, size.height) ? hp('20') : wp('35'),
-      backgroundColor: 'transparent',
     },
     textTitle: {
       paddingTop: isTablet(size.width, size.height) ? hp('4') : wp('3'),
