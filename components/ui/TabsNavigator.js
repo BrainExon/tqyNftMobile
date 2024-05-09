@@ -5,11 +5,10 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
-//import CompleteUserChallenge from '../CompleteUserChallenge';
 import CompleteAcceptChallenge from '../CompleteAcceptChallenge';
 import ChallengeScreen from '../../screens/ChallengeScreen';
 import {useWindowDimensions} from 'react-native';
-import {isEmpty, isTablet} from '../../util/util';
+import {isTablet} from '../../util/util';
 import GlobalStyles from '../../constants/GlobalStyles';
 import CreateAcceptChallenge from '../CreateAcceptChallenge';
 import CreateChallenge from '../CreateChallenge';
@@ -89,9 +88,9 @@ function TabsNavigator() {
         name="LoginScreen"
         component={LoginScreen}
         options={{
-          title: 'Toqyn',
           tabBarLabel: 'Login',
-          headerShown: true, // Hide the header for this screen
+          headerShown: false,
+          // eslint-disable-next-line react/no-unstable-nested-components
           tabBarIcon: ({color, size}) => (
             <Icon
               color={color}
@@ -110,9 +109,9 @@ function TabsNavigator() {
           name="SignupScreen"
           component={SignupScreen}
           options={{
-            title: 'Toqyn',
             tabBarLabel: 'Signup',
-            headerShown: true, // Hide the header for this screen
+            headerShown: false,
+            // eslint-disable-next-line react/no-unstable-nested-components
             tabBarIcon: ({color, size}) => (
               <Icon
                 color={color}
@@ -131,9 +130,9 @@ function TabsNavigator() {
         name="ChallengeScreen"
         component={ChallengeScreen}
         options={{
-          title: 'Toqyn',
           tabBarLabel: 'Challenges',
-          headerShown: true, // Hide the header for this screen
+          headerShown: false,
+          // eslint-disable-next-line react/no-unstable-nested-components
           tabBarIcon: ({color, size}) => (
             <Icon
               color={color}
@@ -152,9 +151,8 @@ function TabsNavigator() {
           name="NftScreen"
           component={NftScreen}
           options={{
-            title: 'Toqyn',
             tabBarLabel: 'NFTs',
-            headerShown: true,
+            headerShown: false,
             // eslint-disable-next-line react/no-unstable-nested-components
             tabBarIcon: ({color, size}) => (
               <Icon
@@ -175,9 +173,9 @@ function TabsNavigator() {
           name="NftMinter"
           component={NftMinter}
           options={{
-            title: 'Toqyn',
             tabBarLabel: 'Mint',
-            headerShown: false, // Hide the header for this screen
+            headerShown: false,
+            // eslint-disable-next-line react/no-unstable-nested-components
             tabBarIcon: ({color, size}) => (
               <Icon
                 color={color}
@@ -196,9 +194,8 @@ function TabsNavigator() {
         name="ImageDetail"
         component={ImageDetail}
         options={{
-          title: 'Toqyn',
           tabBarVisible: false,
-          headerShown: false, // Hide the header for this screen
+          headerShown: false,
           tabBarButton: props => null,
         }}
       />
@@ -206,9 +203,8 @@ function TabsNavigator() {
         name="CreateChallenge"
         component={CreateChallenge}
         options={{
-          title: 'Toqyn',
           tabBarVisible: true,
-          headerShown: true, // Hide the header for this screen
+          headerShown: false,
           tabBarButton: props => null,
         }}
       />
@@ -216,7 +212,6 @@ function TabsNavigator() {
         name="CreateAcceptChallenge"
         component={CreateAcceptChallenge}
         options={{
-          title: 'Toqyn',
           tabBarVisible: false,
           headerShown: false,
           tabBarButton: props => null,
@@ -226,7 +221,6 @@ function TabsNavigator() {
         name="CompleteAcceptChallenge"
         component={CompleteAcceptChallenge}
         options={{
-          title: 'Toqyn',
           tabBarVisible: false,
           headerShown: false,
           tabBarButton: props => null,
