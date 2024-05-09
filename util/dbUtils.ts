@@ -1,14 +1,13 @@
 import Config from 'react-native-config';
 import axios from 'axios';
 
-export async function dbFindOne({endPoint, conditions, setError}) {
+export async function dbFind({endPoint, conditions, setError}) {
   if (!conditions) {
     const err = `[dbFindOne] "conditions" is null for endpoint ${endPoint}`;
     console.log(err);
     setError(err);
     return;
   }
-
   try {
     const url = `${Config.NODEJS_EXPRESS_SERVER}/${endPoint}`;
     const response = await axios.post(url, conditions, {

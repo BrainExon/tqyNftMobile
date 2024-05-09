@@ -8,7 +8,7 @@ import {
   TouchableOpacity,
   Image,
 } from 'react-native';
-import {dbFindOne} from '../util/dbUtils';
+import {dbFind} from '../util/dbUtils';
 import React, {useState, useEffect} from 'react';
 import {isTablet, setOutline} from '../util/util';
 import {
@@ -53,7 +53,7 @@ const EditChallenge = ({route}) => {
             chId: challengeId,
           },
         };
-        const foundChallenge = await dbFindOne({
+        const foundChallenge = await dbFind({
           endPoint: 'find_one',
           conditions: findChallenge,
           setError: handleErrorCallback,

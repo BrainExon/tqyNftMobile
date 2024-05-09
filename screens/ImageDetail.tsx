@@ -51,7 +51,7 @@ const ImageDetail = ({route}) => {
           />
         </View>
         <View style={styles.cancelButton}>
-          <Button title="OFO Cancel" onPress={() => handleImagePress()} />
+          <Button title="Cancel" onPress={() => handleImagePress()} />
         </View>
       </View>
       <View style={styles.exploreButton}>

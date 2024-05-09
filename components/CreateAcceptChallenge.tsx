@@ -7,7 +7,7 @@ import {
   TouchableOpacity,
   Image,
 } from 'react-native';
-import {dbFetch, dbFindOne, dbUpsert} from '../util/dbUtils';
+import {dbFetch, dbFind, dbUpsert} from '../util/dbUtils';
 import React, {useState, useCallback} from 'react';
 import {
   getMimeType,
@@ -121,13 +121,20 @@ const CreateAcceptChallenge = ({route}) => {
           dataTxId: dataTxId,
         },
       };
-      const existingUserChallenge = await dbFindOne({
+      const existingUserChallenge = await dbFind({
         endPoint: 'find_one',
         conditions: userChallengeFind,
         setError: handleErrorCallback,
       });
       console.log(
         `\n====\n[CreateAcceptChallenge] EXISTING User challenge: ${JSON.stringify(
+          existingUserChallenge,
+          null,
+          2,
+        )}\n====\n`,
+      );
+      console.log(
+        `\n====\n[CreateAcceptChallenge] User challenge: ${JSON.stringify(
           existingUserChallenge,
           null,
           2,
@@ -212,7 +219,7 @@ const CreateAcceptChallenge = ({route}) => {
         },
       };
       console.log('[CreateAcceptChallenge] find original Challenge....');
-      const challenge = await dbFindOne({
+      const challenge = await dbFind({
         endPoint: 'find_one',
         conditions: challengeFind,
         setError: handleErrorCallback,

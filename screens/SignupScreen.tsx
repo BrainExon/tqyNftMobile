@@ -1,7 +1,7 @@
 import React, {useState, useEffect, useCallback} from 'react';
 import {View, StyleSheet} from 'react-native';
 import {useWindowDimensions} from 'react-native';
-import {dbFetch} from '../util/dbUtils';
+import {dbFetch, dbFind} from '../util/dbUtils';
 import {getUrlFileName, isEmpty, isObjectEmpty, setOutline} from '../util/util';
 import {useNavigation} from '@react-navigation/native';
 import UserModal from '../components/ui/UserModal';
@@ -78,18 +78,17 @@ function SignupScreen() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const foundChallenges = await dbFetch({
-          endPoint: 'get_user_challenges',
+        const searchByUserId = {
+          collection: 'user_challenges',
+          conditions: {
+            userId: userState.userId,
+          },
+        };
+        const foundChallenges = await dbFind({
+          endPoint: 'find',
+          conditions: searchByUserId,
+          setError: handleErrorCallback,
         });
-        /*
-        console.log(
-          `[SignupScreen] FOUND Challenges: ${JSON.stringify(
-            foundChallenges,
-            null,
-            2,
-          )}`,
-        );
-         */
 
         if (foundChallenges.data) {
           const updatedBucketArray = [];

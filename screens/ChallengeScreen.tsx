@@ -1,7 +1,7 @@
 import React, {useState, useEffect, useCallback} from 'react';
 import {View, StyleSheet, Text} from 'react-native';
 import {useWindowDimensions} from 'react-native';
-import {dbFetch} from '../util/dbUtils';
+import {dbFetch, dbFind} from '../util/dbUtils';
 import {isEmpty, isObjectEmpty, setOutline} from '../util/util';
 import {useNavigation} from '@react-navigation/native';
 import UserModal from '../components/ui/UserModal';
@@ -72,8 +72,22 @@ function ChallengeScreen() {
          *   "doubloon":"/Users/chellax/Projects/Express/functions/images_store/1842c321-c47c-4e44-9c5d-2375f84f3162_v1.png",
          *   "date":1714402370049,
          *   "dateCompleted":null
+         * }
          */
-        const foundChallenges = await dbFetch({endPoint: 'get_challenges'});
+
+        const searchByUserId = {
+          collection: 'challenges',
+          conditions: {
+            owner: userState.userId,
+          },
+        };
+        const foundChallenges = await dbFind({
+          endPoint: 'find',
+          conditions: searchByUserId,
+          setError: handleErrorCallback,
+        });
+
+        //const foundChallenges = await dbFetch({endPoint: 'get_challenges'});
         if (foundChallenges.data) {
           const updatedBucketArray = [];
           foundChallenges.data.forEach(challenge => {
