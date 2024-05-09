@@ -16,12 +16,12 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 
 function generateDropStyle(size: any) {
   const dropStyles = StyleSheet.create({
-    dropContainer: {
+    dropDContainer: {
       position: 'absolute',
       top: isTablet(size.width, size.height) ? hp('35') : wp('28'),
-      left: isTablet(size.width, size.height) ? hp('80') : wp('50'),
-      width: isTablet(size.width, size.height) ? hp('40') : wp('48'),
-      height: isTablet(size.width, size.height) ? hp('30') : wp('22'),
+      left: isTablet(size.width, size.height) ? hp('77') : wp('67'),
+      width: isTablet(size.width, size.height) ? hp('38') : wp('30'),
+      height: isTablet(size.width, size.height) ? hp('32') : wp('22'),
       borderStyle: 'solid',
       borderWidth: isTablet(size.width, size.height) ? hp('2') : wp('.50'),
       borderRadius: isTablet(size.width, size.height) ? hp('4') : wp('2'),
@@ -29,15 +29,15 @@ function generateDropStyle(size: any) {
       backgroundColor: 'rgba(0, 0, 0, 0.9)',
       justifyContent: 'center',
     },
-    dropIcon: {
+    dropDIcon: {
       width: isTablet(size.width, size.height) ? hp('40') : wp('30'),
       alignItems: 'flex-end',
       justifyContent: 'center',
     },
-    dropTitle: {
+    dropDTitle: {
       fontSize: isTablet(size.width, size.height) ? hp('4') : wp('4'),
-      paddingHorizontal: isTablet(size.width, size.height) ? hp('2') : wp('1'),
       backgroundColor: 'transparent',
+      paddingHorizontal: isTablet(size.width, size.height) ? hp('2') : wp('2'),
       color: 'white',
       textAlign: 'left',
     },
@@ -68,19 +68,19 @@ const DropdownMenu = ({options, onSelect}) => {
   return (
     <View>
       <TouchableOpacity
-        style={styles.dropIcon}
+        style={styles.dropDIcon}
         onPress={() => setIsModalVisible(true)}>
         <Icon color={'white'} name={'bars'} size={24} />
       </TouchableOpacity>
       <Modal visible={isModalVisible} transparent={true} animationType="none">
-        <View style={styles.dropContainer}>
+        <View style={styles.dropDContainer}>
           {options.map(option => (
             <TouchableOpacity key={option} onPress={() => handleSelect(option)}>
-              <Text style={styles.dropTitle}>{option}</Text>
+              <Text style={styles.dropDTitle}>{option}</Text>
             </TouchableOpacity>
           ))}
           <TouchableOpacity onPress={() => setIsModalVisible(false)}>
-            <Text style={styles.dropTitle}>[&nbsp;Close&nbsp;]</Text>
+            <Text style={styles.dropDTitle}>[Close]</Text>
           </TouchableOpacity>
         </View>
       </Modal>
