@@ -4,7 +4,7 @@ import React, {useEffect, useState} from 'react';
 import TransparentButton from '../components/ui/TransParentButton';
 import UserModal from '../components/ui/UserModal';
 import {v4 as uuidv4} from 'uuid';
-import {dbFindOne, dbUpsert} from '../util/dbUtils';
+import {dbFind, dbUpsert} from '../util/dbUtils';
 import {User, UserRole} from '../components/models/User';
 import {
   widthPercentageToDP as wp,
@@ -85,9 +85,7 @@ function LoginScreen() {
     console.log(`[handlePress] cleanPhoneNumber: ${cleanPhoneNumber}`);
     const timestamp = Date.now();
     try {
-      console.log(
-        '[Login] call dbFindOne and see if we have an existing user...',
-      );
+      console.log('[Login] call dbFind and see if we have an existing user...');
       const search = {
         collection: 'users',
         conditions: {
@@ -95,7 +93,7 @@ function LoginScreen() {
           phone: cleanPhoneNumber,
         },
       };
-      const response = await dbFindOne({
+      const response = await dbFind({
         endPoint: 'find_one',
         conditions: search,
         setError: handleErrorCallback,

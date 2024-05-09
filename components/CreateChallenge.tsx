@@ -7,7 +7,7 @@ import {
   useWindowDimensions,
 } from 'react-native';
 
-import {dbFindOne, dbUpsert} from '../util/dbUtils';
+import {dbFind, dbUpsert} from '../util/dbUtils';
 import Config from 'react-native-config';
 import React, {useState, useEffect} from 'react';
 import {isObjectEmpty, isTablet, setOutline} from '../util/util';
@@ -87,7 +87,7 @@ const CreateChallenge = ({route}) => {
           dataTxId: dataTxId,
         },
       };
-      const existingChallenge = await dbFindOne({
+      const existingChallenge = await dbFind({
         endPoint: 'find_one',
         conditions: challengeFind,
         setError: handleErrorCallback,
