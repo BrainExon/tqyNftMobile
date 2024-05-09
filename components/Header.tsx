@@ -2,7 +2,7 @@ import React, {useCallback, useState} from 'react';
 import {StyleSheet, Text, useWindowDimensions, View} from 'react-native';
 import Config from 'react-native-config';
 import DropdownMenu from './ui/DropdownMenu';
-import {isTablet, setOutline} from '../util/util';
+import {capitalizeFirstLetter, isTablet, setOutline} from '../util/util';
 import {
   heightPercentageToDP as hp,
   widthPercentageToDP as wp,
@@ -36,11 +36,9 @@ function generateLoginStyles(size: any) {
       margin: isTablet(size.width, size.height) ? hp('8') : wp('2'),
     },
     headDropText: {
-      color: '#fff',
-      //padding: isTablet(size.width, size.height) ? hp('4') : wp('2'),
-      marginHorizontal: isTablet(size.width, size.height) ? hp('6') : wp('4'),
-      fontSize: isTablet(size.width, size.height) ? hp('6') : wp('4'),
-      fontWeight: '700',
+      padding: isTablet(size.width, size.height) ? hp('4') : wp('2'),
+      fontSize: isTablet(size.width, size.height) ? hp('4') : wp('4'),
+      color: 'white',
     },
     headIconButtonContainer: {
       justifyContent: 'flex-end',
@@ -68,8 +66,9 @@ export function Header() {
   const userState = useSelector(getUserState);
   const dispatch = useDispatch();
   const handleSelect = useCallback(async option => {
+    console.log(`[Header] OPTION: "${option}"`);
     setSelectedOption(option);
-    if (option.startsWith('Change role:')) {
+    if (option.startsWith('[Change Role]')) {
       userState.role = userState.role === 'creator' ? 'user' : 'creator';
       console.log(`[Header] option selection: ${option}`);
       console.log(
@@ -84,11 +83,15 @@ export function Header() {
       );
     }
   }, []);
-  const options = ['[ Edit Profile ]', `[ Change Role ]: ${userState.role}`];
+  const options = ['[Edit Profile]', '[Change Role]'];
   return (
     <>
       <View style={styles.headContainer}>
-        <View style={styles.headLeftContainer} />
+        <View style={styles.headLeftContainer}>
+          <Text style={styles.headDropText}>
+            {capitalizeFirstLetter(userState.role)}
+          </Text>
+        </View>
         <Text style={styles.headTitle}>{Config.META_APP_NAME}</Text>
         <View style={styles.headRightContainer}>
           <DropdownMenu options={options} onSelect={handleSelect} />

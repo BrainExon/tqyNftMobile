@@ -110,7 +110,7 @@ const CreateChallenge = ({route}) => {
           )}\n----\n`,
         );
         handleErrorCallback(
-          'Challenge already exists. Mint a new NFT and to create a New Challenge.',
+          'This NFT has already been used in a challenge. Mint a new NFT to create a New Challenge.',
         );
         return;
       }
