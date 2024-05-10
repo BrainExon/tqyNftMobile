@@ -16,6 +16,7 @@ import {
 } from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import Config from 'react-native-config';
+import GlobalStyles from '../constants/GlobalStyles';
 
 const ImageDetail = ({route}) => {
   const {uri, dataTxId, nftId} = route.params;
@@ -31,7 +32,7 @@ const ImageDetail = ({route}) => {
     `[ImageDetail] blockchain url: ${Config.BLOCKCHAIN_URI}/${dataTxId}`,
   );
   return (
-    <View style={styles.container}>
+    <View style={styles.imgDetailContainer}>
       <TouchableOpacity onPress={() => handleImagePress()}>
         <View style={styles.imgContainer}>
           <Image source={{uri: uri}} style={styles.imgImage} />
@@ -50,19 +51,18 @@ const ImageDetail = ({route}) => {
             }
           />
         </View>
-        <View style={styles.cancelButton}>
-          <Button title="Cancel" onPress={() => handleImagePress()} />
+        <View style={styles.exploreButton}>
+          <Button
+            title="Blockchain"
+            onPress={() => {
+              Linking.openURL(`${Config.BLOCKCHAIN_URI}/${dataTxId}`).catch(
+                e => {
+                  e.message;
+                },
+              );
+            }}
+          />
         </View>
-      </View>
-      <View style={styles.exploreButton}>
-        <Button
-          title="Blockchain"
-          onPress={() => {
-            Linking.openURL(`${Config.BLOCKCHAIN_URI}/${dataTxId}`).catch(e => {
-              e.message;
-            });
-          }}
-        />
       </View>
     </View>
   );
@@ -70,7 +70,7 @@ const ImageDetail = ({route}) => {
 
 function generateDetailStyles(size: any) {
   const mintStyles = StyleSheet.create({
-    container: {
+    imgDetailContainer: {
       flex: 1,
       alignItems: 'center',
       justifyContent: 'center',
@@ -78,34 +78,25 @@ function generateDetailStyles(size: any) {
     },
     imgContainer: {
       marginBottom: 20,
-      alignItems: 'center',
     },
     imgImage: {
       width: 200,
       height: 200,
       resizeMode: 'cover',
+      marginVertical: isTablet(size.width, size.height) ? hp('8') : wp('4'),
     },
     imgButtonGroup: {
-      width: '100%',
       flexDirection: 'row',
-      justifyContent: 'center',
-    },
-    buttonRow: {
-      flexDirection: 'row',
-      justifyContent: 'center',
-      marginTop: isTablet(size.width, size.height) ? hp('18') : wp('14'),
     },
     challengeButton: {
-      flex: 1,
-      paddingHorizontal: isTablet(size.width, size.height) ? hp('2') : wp('2'),
-      marginHorizontal: isTablet(size.width, size.height) ? hp('2') : wp('2'),
+      marginHorizontal: isTablet(size.width, size.height) ? hp('8') : wp('4'),
+      width: isTablet(size.width, size.height) ? hp('12') : wp('40'),
+      borderRadius: isTablet(size.width, size.height) ? hp('6') : wp('8'),
     },
     exploreButton: {
-      width: isTablet(size.width, size.height) ? hp('58') : wp('48'),
-      paddingVertical: isTablet(size.width, size.height) ? hp('6') : wp('4'),
-      padding: isTablet(size.width, size.height) ? hp('4') : wp('2'),
-      marginHorizontal: isTablet(size.width, size.height) ? hp('4') : wp('4'),
-      paddingHorizontal: isTablet(size.width, size.height) ? hp('4') : wp('6'),
+      marginHorizontal: isTablet(size.width, size.height) ? hp('8') : wp('4'),
+      width: isTablet(size.width, size.height) ? hp('12') : wp('40'),
+      borderRadius: isTablet(size.width, size.height) ? hp('6') : wp('8'),
     },
     cancelButton: {
       flex: 1,

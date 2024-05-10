@@ -47,6 +47,14 @@ const generateChListStyles = (size: any) => {
       flexWrap: 'wrap',
       marginBottom: 5,
       color: 'white',
+      fontStyle: 'italic',
+    },
+    chListTitle: {
+      flexWrap: 'wrap',
+      marginBottom: 5,
+      color: 'white',
+      fontWeight: 'bold',
+      fontSize: isTablet(size.width, size.height) ? hp('7') : wp('4'),
     },
   });
   const styles = JSON.parse(JSON.stringify(chListStyles));
@@ -107,12 +115,10 @@ const ChallengesList = ({items}) => {
         </TouchableOpacity>
         <View style={styles.chTextContainerWrapper}>
           <View style={styles.chTextContainer}>
-            <Text style={styles.chListText}>Challenge: "{item.name}"</Text>
-            <Text style={styles.chListText}>
-              Description: "{item.description}"
-            </Text>
-            <Text style={styles.chListText}>Date: {date}</Text>
-            <Text style={styles.chListText}>Category: {cat}</Text>
+            <Text style={styles.chListTitle}>{item.name}</Text>
+            <Text style={styles.chListText}>{item.description}</Text>
+            <Text style={styles.chListText}>{date}</Text>
+            <Text style={styles.chListText}>{cat}</Text>
           </View>
         </View>
       </View>

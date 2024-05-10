@@ -105,6 +105,7 @@ const styles = StyleSheet.create({
     height: imageWidth,
   },
   nftText: {
+    padding: 4,
     color: 'white',
     fontSize: 12,
     textAlign: 'center',
