@@ -3,7 +3,7 @@ import axios from 'axios';
 
 export async function dbFind({endPoint, conditions, setError}) {
   if (!conditions) {
-    const err = `[dbFindOne] "conditions" is null for endpoint ${endPoint}`;
+    const err = `[dbFind] "conditions" is null for endpoint ${endPoint}`;
     console.log(err);
     setError(err);
     return;
@@ -18,22 +18,22 @@ export async function dbFind({endPoint, conditions, setError}) {
 
     console.log('\n--------\n');
     console.log(
-      `[dbFindOne] end point "${endPoint}" response: ${JSON.stringify(
+      `[dbFind] end point "${endPoint}" response: ${JSON.stringify(
         response.data,
       )}`,
     );
     console.log('\n--------\n');
     if (response.status === 200) {
-      //console.log('[dbFindOne] Data retrieved successfully:', response.data);
+      //console.log('[dbFind] Data retrieved successfully:', response.data);
       return response.data;
     } else {
-      const er = `[dbFindOne] Error retrieving data: ${JSON.stringify(
+      const er = `[dbFind] Error retrieving data: ${JSON.stringify(
         response.statusText,
       )}`;
       setError(er);
     }
   } catch (error) {
-    const er = `[dbFindOne] An error occurred while searching endpoint: ${JSON.stringify(
+    const er = `[dbFind] An error occurred while searching endpoint: ${JSON.stringify(
       endPoint,
     )}`;
     setError(er);
