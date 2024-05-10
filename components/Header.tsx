@@ -1,4 +1,4 @@
-import React, {useCallback, useState} from 'react';
+import React, {useEffect, useCallback, useState} from 'react';
 import {StyleSheet, Text, useWindowDimensions, View} from 'react-native';
 import Config from 'react-native-config';
 import DropdownMenu from './ui/DropdownMenu';
@@ -63,27 +63,28 @@ export function Header() {
   const headSize = useWindowDimensions();
   const styles = generateLoginStyles(headSize);
   const [selectedOption, setSelectedOption] = useState(null);
-  const userState = useSelector(getUserState);
+  const userState = useSelector(getUserState); // Get userState from Redux store
   const dispatch = useDispatch();
-  const handleSelect = useCallback(async option => {
-    console.log(`[Header] OPTION: "${option}"`);
-    setSelectedOption(option);
-    if (option.startsWith('[Change Role]')) {
-      userState.role = userState.role === 'creator' ? 'user' : 'creator';
-      console.log(`[Header] option selection: ${option}`);
-      console.log(
-        `[Header] User State ROLE Change: ${JSON.stringify(userState)}`,
-      );
-      dispatch(
-        setUser({
-          phone: userState.phone,
-          role: userState.role,
-          userId: userState.userId,
-        }),
-      );
-    }
-  }, []);
+
+  useEffect(() => {
+    // Update local state when userState changes
+    setSelectedOption(null); // Reset selectedOption
+  }, [userState]);
+
+  const handleSelect = useCallback(
+    async option => {
+      setSelectedOption(option);
+      if (option.startsWith('[Change Role]')) {
+        const userStateCopy = {...userState};
+        userStateCopy.role = userState.role === 'creator' ? 'user' : 'creator';
+        dispatch(setUser(userStateCopy)); // Dispatch setUser with the updated userStateCopy
+      }
+    },
+    [dispatch, userState],
+  );
+
   const options = ['[Edit Profile]', '[Change Role]'];
+
   return (
     <>
       <View style={styles.headContainer}>
