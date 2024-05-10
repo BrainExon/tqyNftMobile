@@ -43,11 +43,30 @@ const generateChListStyles = (size: any) => {
       margin: isTablet(size.width, size.height) ? hp('6') : wp('4'),
       paddingLeft: isTablet(size.width, size.height) ? hp('6') : wp('4'),
     },
-    uacListText: {
-      fontSize: 16,
+    uacListTitle: {
+      fontSize: isTablet(size.width, size.height) ? hp('6') : wp('5'),
       marginBottom: 5,
       textAlign: 'left',
       color: 'white',
+    },
+    uacListText: {
+      fontSize: isTablet(size.width, size.height) ? hp('6') : wp('4'),
+      fontStyle: 'italic',
+      marginBottom: 5,
+      textAlign: 'left',
+      color: 'white',
+    },
+    uacListStatus: {
+      fontSize: isTablet(size.width, size.height) ? hp('6') : wp('4'),
+      marginBottom: 5,
+      textAlign: 'left',
+      color: 'red',
+    },
+    uacListStatusVerified: {
+      fontSize: isTablet(size.width, size.height) ? hp('6') : wp('4'),
+      marginBottom: 5,
+      textAlign: 'left',
+      color: 'green',
     },
     mask: {
       position: 'absolute',
@@ -123,12 +142,18 @@ const UserAcceptChallengeList = ({items}) => {
           {item.status === 'active' && <View style={styles.mask} />}
         </TouchableOpacity>
         <View style={styles.textContainer}>
-          <Text style={styles.uacListText}>Challenge: "{item.name}"</Text>
-          <Text style={styles.uacListText}>
-            Description: "{item.description}"
+          <Text style={styles.uacListTitle}>"{item.name}"</Text>
+          <Text style={styles.uacListText}>{item.description} </Text>
+          <Text style={styles.uacListText}>{date}</Text>
+          <Text
+            aria-label={'Status'}
+            style={
+              item.status === 'verified'
+                ? styles.uacListStatusVerified
+                : styles.uacListStatus
+            }>
+            {item.status}
           </Text>
-          <Text style={styles.uacListText}>Date: {date}</Text>
-          <Text style={styles.uacListText}>Status: "{item.status}"</Text>
         </View>
       </View>
     );
