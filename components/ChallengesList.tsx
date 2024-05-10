@@ -66,6 +66,9 @@ const ChallengesList = ({items}) => {
   console.log('[ChallengeList]');
   console.log('\n------\n');
   const userState = useSelector(getUserState);
+  console.log(
+    `[ChallengeList] userState: ${JSON.stringify(userState, null, 2)}`,
+  );
   const chListSize = useWindowDimensions();
   const styles = generateChListStyles(chListSize);
   const navigation = useNavigation();

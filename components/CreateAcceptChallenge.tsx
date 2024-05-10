@@ -118,7 +118,8 @@ const CreateAcceptChallenge = ({route}) => {
       const userChallengeFind = {
         collection: 'user_challenges',
         conditions: {
-          dataTxId: dataTxId,
+          chId: chId,
+          userId: ownerId,
         },
       };
       const existingUserChallenge = await dbFind({
