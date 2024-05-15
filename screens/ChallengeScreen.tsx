@@ -1,7 +1,7 @@
 import React, {useState, useEffect, useCallback} from 'react';
 import {View, StyleSheet, Text} from 'react-native';
 import {useWindowDimensions} from 'react-native';
-import {dbFetch, dbFind} from '../util/dbUtils';
+import {dbFind} from '../util/dbUtils';
 import {isEmpty, isObjectEmpty, setOutline} from '../util/util';
 import {useNavigation} from '@react-navigation/native';
 import UserModal from '../components/ui/UserModal';

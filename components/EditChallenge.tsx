@@ -8,15 +8,16 @@ import {
   TouchableOpacity,
   Image,
 } from 'react-native';
+import CategoryList from './CategoryList';
 import {dbFind} from '../util/dbUtils';
-import React, {useState, useEffect} from 'react';
-import {isTablet, setOutline} from '../util/util';
+import React, {useState, useEffect, useCallback} from 'react';
+import {isEmpty, isTablet, setOutline} from '../util/util';
 import {
   heightPercentageToDP as hp,
   widthPercentageToDP as wp,
 } from 'react-native-responsive-screen';
-import UserModal from './ui/UserModal';
 import {useNavigation} from '@react-navigation/native';
+import {setUser} from '../redux/userSlice';
 
 const EditChallenge = ({route}) => {
   console.log('\n------\n[EditChallenge]....\n------\n');
@@ -25,11 +26,12 @@ const EditChallenge = ({route}) => {
   const navigation = useNavigation();
   const chSize = useWindowDimensions();
   const styles = generateEditChStyles(chSize);
+  const [selectedCategory, setSelectedCategory] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [challenge, setChallenge] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
 
-  const handleErrorCallback = (errMsg: any) => {
+  const handleErrorCallback = errMsg => {
     setErrorMsg(errMsg);
     setShowModal(true);
   };
@@ -37,11 +39,6 @@ const EditChallenge = ({route}) => {
   const handleUserChPress = () => {
     setShowModal(false);
     navigation.navigate('ChallengeScreen');
-  };
-
-  const handleButtonClose = () => {
-    setShowModal(false);
-    navigation.navigate('SignupScreen');
   };
 
   useEffect(() => {
@@ -73,42 +70,59 @@ const EditChallenge = ({route}) => {
         return;
       }
     };
+
     fetchChallenge();
   }, []);
+
   console.log(
     `[EditChallenge] challenge: ${JSON.stringify(challenge, null, 2)}`,
   );
+
+  const handleSelectedCategory = useCallback(
+    async cat => {
+      console.log(
+        `[EditChallenge] handle category callback: ${JSON.stringify(cat)}`,
+      );
+      setSelectedCategory(cat);
+    },
+    [selectedCategory],
+  );
+
   return (
     <View style={styles.editChContent}>
-      {challenge && (
-        <View style={styles.editChContent}>
-          <View style={styles.editChContainer}>
-            <TouchableOpacity onPress={() => handleUserChPress()}>
-              <View style={styles.editChImgContainer}>
-                {challenge.data.doubloon && (
-                  <Image
-                    source={{uri: challenge.data.doubloon}}
-                    style={styles.editChImgImage}
-                  />
-                )}
-              </View>
-            </TouchableOpacity>
-            <Text style={styles.editChTextTitle}>{challenge.data.name}</Text>
-            <Text style={styles.editChText}>
-              Description: {challenge.data.description}
-            </Text>
-            <Text style={styles.editChUsersTitle}>Users:</Text>
-            <FlatList
-              data={challenge.data.users}
-              keyExtractor={(item, index) => index.toString()}
-              renderItem={({item}) => (
-                <View style={styles.editChUsersContainer}>
-                  <Text style={styles.editChText}>{item}</Text>
+      {isEmpty(selectedCategory) ? (
+        <CategoryList categoryCallback={handleSelectedCategory} />
+      ) : (
+        challenge && (
+          <View style={styles.editChContent}>
+            <View style={styles.editChContainer}>
+              <TouchableOpacity onPress={() => handleUserChPress()}>
+                <View style={styles.editChImgContainer}>
+                  {challenge.data.doubloon && (
+                    <Image
+                      source={{uri: challenge.data.doubloon}}
+                      style={styles.editChImgImage}
+                    />
+                  )}
                 </View>
-              )}
-            />
+              </TouchableOpacity>
+              <Text style={styles.editChTextTitle}>{challenge.data.name}</Text>
+              <Text style={styles.editChText}>
+                Description: {challenge.data.description}
+              </Text>
+              <Text style={styles.editChUsersTitle}>Users:</Text>
+              <FlatList
+                data={challenge.data.users}
+                keyExtractor={(item, index) => index.toString()}
+                renderItem={({item}) => (
+                  <View style={styles.editChUsersContainer}>
+                    <Text style={styles.editChText}>{item}</Text>
+                  </View>
+                )}
+              />
+            </View>
           </View>
-        </View>
+        )
       )}
     </View>
   );
