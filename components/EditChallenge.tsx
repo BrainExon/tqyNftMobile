@@ -23,9 +23,11 @@ const EditChallenge = ({route}) => {
   console.log('\n------\n[EditChallenge]....\n------\n');
   const {challengeId} = route.params;
   console.log(`[EditChallenge] challengeId: ${challengeId}`);
+
   const navigation = useNavigation();
   const chSize = useWindowDimensions();
   const styles = generateEditChStyles(chSize);
+
   const [selectedCategory, setSelectedCategory] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [challenge, setChallenge] = useState('');
@@ -41,13 +43,14 @@ const EditChallenge = ({route}) => {
     navigation.navigate('ChallengeScreen');
   };
 
-  useEffect(() => {
-    const fetchChallenge = async () => {
+  const fetchChallenge = useCallback(
+    async category => {
       try {
         const findChallenge = {
           collection: 'challenges',
           conditions: {
             chId: challengeId,
+            category: category,
           },
         };
         const foundChallenge = await dbFind({
@@ -69,61 +72,56 @@ const EditChallenge = ({route}) => {
         );
         return;
       }
-    };
-
-    fetchChallenge();
-  }, []);
-
-  console.log(
-    `[EditChallenge] challenge: ${JSON.stringify(challenge, null, 2)}`,
+    },
+    [challengeId, dbFind, handleErrorCallback],
   );
 
   const handleSelectedCategory = useCallback(
     async cat => {
-      console.log(
-        `[EditChallenge] handle category callback: ${JSON.stringify(cat)}`,
-      );
       setSelectedCategory(cat);
+      await fetchChallenge(cat);
     },
     [selectedCategory],
   );
 
+  const renderChallenges = challenge => {
+    return (
+      <View style={styles.editChContent}>
+        <View style={styles.editChContainer}>
+          <TouchableOpacity onPress={() => handleUserChPress()}>
+            <View style={styles.editChImgContainer}>
+              {challenge.data.doubloon && (
+                <Image
+                  source={{uri: challenge.data.doubloon}}
+                  style={styles.editChImgImage}
+                />
+              )}
+            </View>
+          </TouchableOpacity>
+          <Text style={styles.editChTextTitle}>{challenge.data.name}</Text>
+          <Text style={styles.editChText}>
+            {' '}
+            Description: {challenge.data.description}{' '}
+          </Text>
+          <Text style={styles.editChUsersTitle}>Users:</Text>
+          <FlatList
+            data={challenge.data.users}
+            keyExtractor={(item, index) => index.toString()}
+            renderItem={({item}) => (
+              <View style={styles.editChUsersContainer}>
+                <Text style={styles.editChText}>{item}</Text>
+              </View>
+            )}
+          />
+        </View>
+      </View>
+    );
+  };
+
   return (
     <View style={styles.editChContent}>
-      {isEmpty(selectedCategory) ? (
-        <CategoryList categoryCallback={handleSelectedCategory} />
-      ) : (
-        challenge && (
-          <View style={styles.editChContent}>
-            <View style={styles.editChContainer}>
-              <TouchableOpacity onPress={() => handleUserChPress()}>
-                <View style={styles.editChImgContainer}>
-                  {challenge.data.doubloon && (
-                    <Image
-                      source={{uri: challenge.data.doubloon}}
-                      style={styles.editChImgImage}
-                    />
-                  )}
-                </View>
-              </TouchableOpacity>
-              <Text style={styles.editChTextTitle}>{challenge.data.name}</Text>
-              <Text style={styles.editChText}>
-                Description: {challenge.data.description}
-              </Text>
-              <Text style={styles.editChUsersTitle}>Users:</Text>
-              <FlatList
-                data={challenge.data.users}
-                keyExtractor={(item, index) => index.toString()}
-                renderItem={({item}) => (
-                  <View style={styles.editChUsersContainer}>
-                    <Text style={styles.editChText}>{item}</Text>
-                  </View>
-                )}
-              />
-            </View>
-          </View>
-        )
-      )}
+      <CategoryList categoryCallback={handleSelectedCategory} />
+      {selectedCategory && challenge && renderChallenges(challenge)}
     </View>
   );
 };
