@@ -100,8 +100,7 @@ const EditChallenge = ({route}) => {
           </TouchableOpacity>
           <Text style={styles.editChTextTitle}>{challenge.data.name}</Text>
           <Text style={styles.editChText}>
-            {' '}
-            Description: {challenge.data.description}{' '}
+            Description: {challenge.data.description}
           </Text>
           <Text style={styles.editChUsersTitle}>Users:</Text>
           <FlatList
