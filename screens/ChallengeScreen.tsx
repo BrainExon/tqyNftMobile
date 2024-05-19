@@ -74,15 +74,55 @@ function ChallengeScreen() {
     setSelectedCategory(null);
   };
 
+  const replaceFilePath = (path, userState) => {
+    // Check if the user's role is 'user'
+    if (userState.role === 'user') {
+      // Define the string to be replaced
+      const targetString =
+        'file:///Users/chellax/Projects/Express/functions/images_store/';
+      // Define the replacement string
+      const replacementString = 'http://127.0.0.1:3030/image/';
+
+      // Replace the target string with replacement string in the provided path
+      return path.replace(targetString, replacementString);
+    }
+
+    // If the role is not 'user', return the path unchanged
+    return path;
+  };
+
   const fetchData = async category => {
+    console.log(
+      `\n***\n[ChallengeScreen] user state: : ${JSON.stringify(
+        userState,
+      )} \n***\n`,
+    );
     try {
-      const searchByUserId = {
-        collection: 'challenges',
-        conditions: {
-          owner: userState.userId,
-          category: category,
-        },
-      };
+      let searchByUserId = '';
+      if (userState.role === 'user') {
+        /*
+        searchByUserId = {
+          collection: 'user_challenges',
+          conditions: {
+            userId: userState.userId,
+          },
+        };
+        */
+        searchByUserId = {
+          collection: 'challenges',
+          conditions: {
+            category: category,
+          },
+        };
+      } else {
+        searchByUserId = {
+          collection: 'challenges',
+          conditions: {
+            owner: userState.userId,
+            category: category,
+          },
+        };
+      }
       const foundChallenges = await dbFind({
         endPoint: 'find',
         conditions: searchByUserId,
@@ -95,7 +135,8 @@ function ChallengeScreen() {
             const item = {
               _id: challenge._id,
               name: challenge.name,
-              doubloon: challenge.doubloon,
+              //doubloon: challenge.doubloon,
+              doubloon: replaceFilePath(challenge.doubloon, userState),
               nft: challenge.nft,
               chId: challenge.chId,
               date: challenge.date,
