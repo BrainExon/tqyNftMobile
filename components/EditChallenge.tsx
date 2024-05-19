@@ -107,6 +107,11 @@ const EditChallenge = ({route}) => {
                 </View>
               )}
             />
+            <TouchableOpacity
+              onPress={() => navigation.navigate('ChallengeScreen')}
+              style={styles.cancelButtonStyle}>
+              <Text style={styles.cancelButtonText}>Cancel</Text>
+            </TouchableOpacity>
           </View>
         </View>
       )}
@@ -116,6 +121,16 @@ const EditChallenge = ({route}) => {
 
 function generateEditChStyles(size: any) {
   const chStyles = StyleSheet.create({
+    cancelButtonStyle: {
+      marginTop: 20,
+      backgroundColor: 'red', // Choose a suitable color or keep it transparent
+      padding: 10,
+      alignItems: 'center',
+    },
+    cancelButtonText: {
+      color: 'white',
+      fontSize: 12, // Font size as 12 pt
+    },
     editChContent: {
       flex: 1,
       backgroundColor: 'rgba(0, 0, 0, 0.7)',
