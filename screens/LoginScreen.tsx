@@ -20,7 +20,7 @@ function LoginScreen() {
   const boardSize = useWindowDimensions();
   const styles = generateLoginStyles(boardSize);
   const navigation = useNavigation();
-  const [phone, setPhone] = useState('(770) 289-6960');
+  const [phone, setPhone] = useState('(770) 289-0000');
   const [error, setError] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [message, setMessage] = useState('');
@@ -89,7 +89,6 @@ function LoginScreen() {
       const search = {
         collection: 'users',
         conditions: {
-          //phone: '7702896960',
           phone: cleanPhoneNumber,
         },
       };

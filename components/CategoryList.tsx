@@ -17,12 +17,13 @@ const CategoryList = ({categoryCallback}) => {
   return (
     <View style={styles.container}>
       {categories.map((category, index) => (
-        <Button
-          key={index}
-          title={category.label}
-          onPress={() => handleCategoryPress(category.value)}
-          color={selectedCategory === category ? 'blue' : 'gray'}
-        />
+        <View style={styles.buttonContainer} key={index}>
+          <Button
+            title={category.label}
+            onPress={() => handleCategoryPress(category.value)}
+            color={selectedCategory === category.value ? 'blue' : 'gray'}
+          />
+        </View>
       ))}
     </View>
   );
@@ -30,9 +31,14 @@ const CategoryList = ({categoryCallback}) => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    flexDirection: 'column', // Align children vertically
+    alignItems: 'stretch', // Stretch children to match the container's width
+    padding: 40,
+  },
+  buttonContainer: {
+    margin: 5, // Margin around each button
+    paddingHorizontal: 10, // Horizontal padding inside each button container
+    height: 40, // Set a fixed height for each button
   },
 });
 

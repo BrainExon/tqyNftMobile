@@ -8,32 +8,28 @@ import {
   TouchableOpacity,
   Image,
 } from 'react-native';
-import CategoryList from './CategoryList';
 import {dbFind} from '../util/dbUtils';
-import React, {useState, useEffect, useCallback} from 'react';
-import {isEmpty, isTablet, setOutline} from '../util/util';
+import React, {useState, useEffect} from 'react';
+import {isTablet, setOutline} from '../util/util';
 import {
   heightPercentageToDP as hp,
   widthPercentageToDP as wp,
 } from 'react-native-responsive-screen';
+import UserModal from './ui/UserModal';
 import {useNavigation} from '@react-navigation/native';
-import {setUser} from '../redux/userSlice';
 
 const EditChallenge = ({route}) => {
   console.log('\n------\n[EditChallenge]....\n------\n');
   const {challengeId} = route.params;
   console.log(`[EditChallenge] challengeId: ${challengeId}`);
-
   const navigation = useNavigation();
   const chSize = useWindowDimensions();
   const styles = generateEditChStyles(chSize);
-
-  const [selectedCategory, setSelectedCategory] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [challenge, setChallenge] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
 
-  const handleErrorCallback = errMsg => {
+  const handleErrorCallback = (errMsg: any) => {
     setErrorMsg(errMsg);
     setShowModal(true);
   };
@@ -43,14 +39,18 @@ const EditChallenge = ({route}) => {
     navigation.navigate('ChallengeScreen');
   };
 
-  const fetchChallenge = useCallback(
-    async category => {
+  const handleButtonClose = () => {
+    setShowModal(false);
+    navigation.navigate('SignupScreen');
+  };
+
+  useEffect(() => {
+    const fetchChallenge = async () => {
       try {
         const findChallenge = {
           collection: 'challenges',
           conditions: {
             chId: challengeId,
-            category: category,
           },
         };
         const foundChallenge = await dbFind({
@@ -72,61 +72,65 @@ const EditChallenge = ({route}) => {
         );
         return;
       }
-    },
-    [challengeId, dbFind, handleErrorCallback],
+    };
+    fetchChallenge();
+  }, []);
+  console.log(
+    `[EditChallenge] challenge: ${JSON.stringify(challenge, null, 2)}`,
   );
-
-  const handleSelectedCategory = useCallback(
-    async cat => {
-      setSelectedCategory(cat);
-      await fetchChallenge(cat);
-    },
-    [selectedCategory],
-  );
-
-  const renderChallenges = challenge => {
-    return (
-      <View style={styles.editChContent}>
-        <View style={styles.editChContainer}>
-          <TouchableOpacity onPress={() => handleUserChPress()}>
-            <View style={styles.editChImgContainer}>
-              {challenge.data.doubloon && (
-                <Image
-                  source={{uri: challenge.data.doubloon}}
-                  style={styles.editChImgImage}
-                />
-              )}
-            </View>
-          </TouchableOpacity>
-          <Text style={styles.editChTextTitle}>{challenge.data.name}</Text>
-          <Text style={styles.editChText}>
-            Description: {challenge.data.description}
-          </Text>
-          <Text style={styles.editChUsersTitle}>Users:</Text>
-          <FlatList
-            data={challenge.data.users}
-            keyExtractor={(item, index) => index.toString()}
-            renderItem={({item}) => (
-              <View style={styles.editChUsersContainer}>
-                <Text style={styles.editChText}>{item}</Text>
-              </View>
-            )}
-          />
-        </View>
-      </View>
-    );
-  };
-
   return (
     <View style={styles.editChContent}>
-      <CategoryList categoryCallback={handleSelectedCategory} />
-      {selectedCategory && challenge && renderChallenges(challenge)}
+      {challenge && (
+        <View style={styles.editChContent}>
+          <View style={styles.editChContainer}>
+            <TouchableOpacity onPress={() => handleUserChPress()}>
+              <View style={styles.editChImgContainer}>
+                {challenge.data.doubloon && (
+                  <Image
+                    source={{uri: challenge.data.doubloon}}
+                    style={styles.editChImgImage}
+                  />
+                )}
+              </View>
+            </TouchableOpacity>
+            <Text style={styles.editChTextTitle}>{challenge.data.name}</Text>
+            <Text style={styles.editChText}>
+              Description: {challenge.data.description}
+            </Text>
+            <Text style={styles.editChUsersTitle}>Users:</Text>
+            <FlatList
+              data={challenge.data.users}
+              keyExtractor={(item, index) => index.toString()}
+              renderItem={({item}) => (
+                <View style={styles.editChUsersContainer}>
+                  <Text style={styles.editChText}>{item}</Text>
+                </View>
+              )}
+            />
+            <TouchableOpacity
+              onPress={() => navigation.navigate('ChallengeScreen')}
+              style={styles.cancelButtonStyle}>
+              <Text style={styles.cancelButtonText}>Cancel</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      )}
     </View>
   );
 };
 
 function generateEditChStyles(size: any) {
   const chStyles = StyleSheet.create({
+    cancelButtonStyle: {
+      marginTop: 20,
+      backgroundColor: 'red', // Choose a suitable color or keep it transparent
+      padding: 10,
+      alignItems: 'center',
+    },
+    cancelButtonText: {
+      color: 'white',
+      fontSize: 12, // Font size as 12 pt
+    },
     editChContent: {
       flex: 1,
       backgroundColor: 'rgba(0, 0, 0, 0.7)',
