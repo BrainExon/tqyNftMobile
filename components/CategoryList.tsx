@@ -33,7 +33,7 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: 'column', // Align children vertically
     alignItems: 'stretch', // Stretch children to match the container's width
-    padding: 40,
+    padding: 10,
   },
   buttonContainer: {
     margin: 5, // Margin around each button

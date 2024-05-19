@@ -78,6 +78,12 @@ function SignupScreen() {
   useEffect(() => {
     const fetchData = async () => {
       try {
+        console.log(
+          `\n***\n[SignupScreen] user state: : ${JSON.stringify(
+            userState,
+          )} \n***\n`,
+        );
+
         const searchByUserId = {
           collection: 'user_challenges',
           conditions: {
