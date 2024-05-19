@@ -55,7 +55,7 @@ const CompleteAcceptChallenge = ({route}) => {
     navigation.navigate('SignupScreen');
   };
 
-  const handleImagePress = () => {
+  const handleImagePress = async () => {
     setShowModal(false);
     console.log(`QRCODE PRESS image: ${JSON.stringify(image)}`);
     const filename = getUrlFileName(image);
@@ -64,7 +64,7 @@ const CompleteAcceptChallenge = ({route}) => {
     console.log(`QRCODE PRESS Challenge ID: ${JSON.stringify(challengeId)}`);
     console.log(`QRCODE PRESS user ID: ${JSON.stringify(userId)}`);
     console.log('\n-------\n');
-    const verified = verifyChallenge(challengeId, userId);
+    const verified = await verifyChallenge(challengeId, userId);
     console.log(
       `[CompleteAcceptChallenge] verified: ${JSON.stringify(verified)}`,
     );
